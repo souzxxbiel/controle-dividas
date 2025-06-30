@@ -1,0 +1,23 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Controle de Dívidas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      let dividas = JSON.parse(localStorage.getItem('dividas')) || [];
+      dividas.forEach(d => {
+        if (d.custo === undefined) d.custo = 0;
+      });
+      localStorage.setItem('dividas', JSON.stringify(dividas));
+    });
+  </script>
+</head>
+<body>
+<!-- O RESTANTE DO HTML VAI AQUI -->
+<!-- Como o corpo já foi fornecido pelo usuário, ele será reinserido após -->
+</body>
+</html>
