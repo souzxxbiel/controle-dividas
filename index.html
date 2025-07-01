@@ -260,4 +260,790 @@
     <div class="mt-8 flex justify-center gap-4 flex-wrap">
       <button id="exportCSV"
         class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded transition focus-visible:outline-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2"
-      >
+      >Exportar CSV</button>
+      <button id="exportPDF"
+        class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded transition focus-visible:outline-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2"
+      >Exportar PDF</button>
+      <button id="limparDados"
+        class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded transition focus-visible:outline-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2"
+      >Limpar Tudo</button>
+    </div>
+  </section>
+
+</main>
+
+<nav id="bottomNav" class="fixed bottom-0 left-0 right-0 flex justify-around py-3">
+  <button aria-label="Produtos" class="tabBtn flex flex-col items-center gap-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 active focus-visible:outline-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2" data-tab="tabProdutos" type="button" role="tab" aria-selected="true" tabindex="0">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>
+    <span class="text-xs select-none">Produtos</span>
+  </button>
+  <button aria-label="Vendas" class="tabBtn flex flex-col items-center gap-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 focus-visible:outline-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2" data-tab="tabVendas" type="button" role="tab" aria-selected="false" tabindex="-1">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h18v18H3z"></path><path d="M7 7h10v10H7z" stroke="#2563eb"></path></svg>
+    <span class="text-xs select-none">Vendas</span>
+  </button>
+  <button aria-label="Dashboard" class="tabBtn flex flex-col items-center gap-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 focus-visible:outline-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2" data-tab="tabDashboard" type="button" role="tab" aria-selected="false" tabindex="-1">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M8 12l2 2 4-4"></path></svg>
+    <span class="text-xs select-none">Dashboard</span>
+  </button>
+</nav>
+
+<script>
+(() => {
+  "use strict";
+
+  // ======== UTILITÁRIOS ========
+
+  // Formatador moeda BRL
+  const formatBRL = (value) => {
+    return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  };
+
+  // Mostrar notificação temporária
+  const notification = document.getElementById("notification");
+  let notificationTimeout = null;
+  function showNotification(message, duration = 3000) {
+    if (notificationTimeout) clearTimeout(notificationTimeout);
+    notification.textContent = message;
+    notification.classList.add("show");
+    notificationTimeout = setTimeout(() => {
+      notification.classList.remove("show");
+    }, duration);
+  }
+
+  // Debounce
+  function debounce(fn, delay) {
+    let timer = null;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => fn(...args), delay);
+    };
+  }
+
+  // Data ISO para DD/MM/YYYY
+  function formatDateBR(dateISO) {
+    if (!dateISO) return "";
+    const d = new Date(dateISO);
+    return d.toLocaleDateString("pt-BR");
+  }
+
+  // Compara datas para ordenar
+  function compareDate(a, b) {
+    return new Date(a).getTime() - new Date(b).getTime();
+  }
+
+  // ======== CLASSES PRINCIPAIS ========
+
+  class Produto {
+    constructor(nome, valor, custo) {
+      this.nome = nome;
+      this.valor = parseFloat(valor);
+      this.custo = parseFloat(custo);
+    }
+  }
+
+  class Venda {
+    constructor(devedor, produto, quantidade, valor, vencimento, status = "Pendente") {
+      this.id = Date.now() + Math.random().toString(36).substring(2, 9);
+      this.devedor = devedor;
+      this.produto = produto;
+      this.quantidade = Number(quantidade);
+      this.valor = parseFloat(valor);
+      this.vencimento = vencimento;
+      this.status = status; // Pendente | Recebido | Cancelado
+    }
+    get custo() {
+      const p = app.produtos[this.produto];
+      return p ? p.custo * this.quantidade : 0;
+    }
+    get lucro() {
+      return (this.valor * this.quantidade) - this.custo;
+    }
+    get total() {
+      return this.valor * this.quantidade;
+    }
+  }
+
+  // ======== APP ========
+
+  const app = {
+    produtos: {},
+    vendas: [],
+    ordenacao: {
+      campo: null,
+      asc: true,
+    },
+
+    // Inicializa
+    init() {
+      this.loadData();
+      this.cacheDom();
+      this.bindEvents();
+      this.renderAll();
+      this.setupDarkMode();
+    },
+
+    // Elementos fixos
+    cacheDom() {
+      // Produtos
+      this.produtoForm = document.getElementById("produtoForm");
+      this.nomeProdutoInput = document.getElementById("nomeProduto");
+      this.valorProdutoInput = document.getElementById("valorProduto");
+      this.custoProdutoInput = document.getElementById("custoProduto");
+      this.produtosTabela = document.getElementById("produtosTabela");
+
+      // Vendas
+      this.vendaForm = document.getElementById("vendaForm");
+      this.devedorVendaInput = document.getElementById("devedorVenda");
+      this.produtoVendaInput = document.getElementById("produtoVenda");
+      this.quantidadeVendaInput = document.getElementById("quantidadeVenda");
+      this.valorVendaInput = document.getElementById("valorVenda");
+      this.vencimentoVendaInput = document.getElementById("vencimentoVenda");
+      this.vendasTabela = document.getElementById("vendasTabela");
+      this.buscaVendasInput = document.getElementById("buscaVendas");
+
+      this.devedoresDatalist = document.getElementById("devedores");
+      this.produtosDatalist = document.getElementById("produtosDatalist");
+
+      // Tabs
+      this.tabs = {
+        produtos: document.getElementById("tabProdutos"),
+        vendas: document.getElementById("tabVendas"),
+        dashboard: document.getElementById("tabDashboard"),
+      };
+      this.tabButtons = document.querySelectorAll(".tabBtn");
+
+      // Dashboard
+      this.totalRecebidoEl = document.getElementById("totalRecebido");
+      this.totalAReceberEl = document.getElementById("totalAReceber");
+      this.totalCustoEl = document.getElementById("totalCusto");
+      this.lucroTotalEl = document.getElementById("lucroTotal");
+
+      this.exportCSVBtn = document.getElementById("exportCSV");
+      this.exportPDFBtn = document.getElementById("exportPDF");
+      this.limparDadosBtn = document.getElementById("limparDados");
+
+      // Dark mode
+      this.darkToggleBtn = document.getElementById("darkToggle");
+      this.iconSun = document.getElementById("iconSun");
+      this.iconMoon = document.getElementById("iconMoon");
+
+      // Gráficos
+      this.chartProdutos = null;
+      this.chartStatus = null;
+    },
+
+    // Eventos
+    bindEvents() {
+      // Form produtos
+      this.produtoForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        this.adicionarProduto();
+      });
+
+      this.produtoForm.addEventListener("reset", () => {
+        this.clearProdutoFormErrors();
+      });
+
+      // Form vendas
+      this.vendaForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        this.adicionarVenda();
+      });
+
+      // Busca vendas (debounce)
+      this.buscaVendasInput.addEventListener("input", debounce(() => {
+        this.renderVendasTabela();
+      }, 300));
+
+      // Ordenação cabeçalhos
+      this.vendasTabela.parentElement.querySelectorAll("th[data-sort]").forEach((th) => {
+        th.addEventListener("click", () => {
+          this.toggleSort(th.dataset.sort);
+        });
+        th.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            this.toggleSort(th.dataset.sort);
+          }
+        });
+      });
+
+      // Tabs navegação
+      this.tabButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          this.setActiveTab(btn.dataset.tab);
+        });
+        btn.addEventListener("keydown", (e) => {
+          // Navegação por teclado entre tabs
+          let idx = Array.from(this.tabButtons).indexOf(btn);
+          if (e.key === "ArrowRight") {
+            e.preventDefault();
+            let next = this.tabButtons[(idx + 1) % this.tabButtons.length];
+            next.focus();
+          }
+          if (e.key === "ArrowLeft") {
+            e.preventDefault();
+            let prev = this.tabButtons[(idx - 1 + this.tabButtons.length) % this.tabButtons.length];
+            prev.focus();
+          }
+        });
+      });
+
+      // Exportar CSV
+      this.exportCSVBtn.addEventListener("click", () => this.exportCSV());
+
+      // Exportar PDF
+      this.exportPDFBtn.addEventListener("click", () => this.exportPDF());
+
+      // Limpar dados
+      this.limparDadosBtn.addEventListener("click", () => {
+        if (confirm("Confirma apagar TODOS os dados? Esta ação não pode ser desfeita.")) {
+          this.produtos = {};
+          this.vendas = [];
+          this.salvar();
+          this.renderAll();
+          showNotification("Dados apagados com sucesso!");
+        }
+      });
+
+      // Dark mode toggle
+      this.darkToggleBtn.addEventListener("click", () => {
+        this.darkMode = !this.darkMode;
+        this.aplicarDarkMode();
+        this.salvar();
+      });
+
+      // Atualiza valor unitário na venda quando produto selecionado
+      this.produtoVendaInput.addEventListener("input", () => {
+        let prod = this.produtos[this.produtoVendaInput.value];
+        if (prod) {
+          this.valorVendaInput.value = prod.valor.toFixed(2);
+        }
+      });
+    },
+
+    // Estado localStorage
+    loadData() {
+      const produtosJSON = localStorage.getItem("produtos");
+      const vendasJSON = localStorage.getItem("vendas");
+      const darkModeLS = localStorage.getItem("darkMode");
+
+      this.produtos = produtosJSON ? JSON.parse(produtosJSON) : {};
+      this.vendas = vendasJSON ? JSON.parse(vendasJSON).map(v => new Venda(v.devedor, v.produto, v.quantidade, v.valor, v.vencimento, v.status)) : [];
+      this.darkMode = darkModeLS === "true";
+    },
+
+    salvar() {
+      localStorage.setItem("produtos", JSON.stringify(this.produtos));
+      localStorage.setItem("vendas", JSON.stringify(this.vendas));
+      localStorage.setItem("darkMode", this.darkMode ? "true" : "false");
+    },
+
+    aplicarDarkMode() {
+      if (this.darkMode) {
+        document.documentElement.classList.add("dark");
+        this.iconSun.classList.remove("hidden");
+        this.iconMoon.classList.add("hidden");
+      } else {
+        document.documentElement.classList.remove("dark");
+        this.iconSun.classList.add("hidden");
+        this.iconMoon.classList.remove("hidden");
+      }
+    },
+
+    setupDarkMode() {
+      this.aplicarDarkMode();
+    },
+
+    // Limpa erros do formulário produtos
+    clearProdutoFormErrors() {
+      this.nomeProdutoInput.setCustomValidity("");
+      this.valorProdutoInput.setCustomValidity("");
+      this.custoProdutoInput.setCustomValidity("");
+    },
+
+    // Adiciona produto novo
+    adicionarProduto() {
+      this.clearProdutoFormErrors();
+      const nome = this.nomeProdutoInput.value.trim();
+      const valor = parseFloat(this.valorProdutoInput.value);
+      const custo = parseFloat(this.custoProdutoInput.value);
+
+      if (!nome || nome.length < 3 || nome.length > 50) {
+        this.nomeProdutoInput.setCustomValidity("Nome deve ter entre 3 e 50 caracteres.");
+        this.nomeProdutoInput.reportValidity();
+        return;
+      }
+      if (isNaN(valor) || valor < 0) {
+        this.valorProdutoInput.setCustomValidity("Valor inválido, deve ser >= 0.");
+        this.valorProdutoInput.reportValidity();
+        return;
+      }
+      if (isNaN(custo) || custo < 0) {
+        this.custoProdutoInput.setCustomValidity("Custo inválido, deve ser >= 0.");
+        this.custoProdutoInput.reportValidity();
+        return;
+      }
+      if (this.produtos[nome]) {
+        this.nomeProdutoInput.setCustomValidity("Produto já existe!");
+        this.nomeProdutoInput.reportValidity();
+        return;
+      }
+
+      this.produtos[nome] = new Produto(nome, valor, custo);
+      this.salvar();
+      this.renderProdutos();
+      this.produtoForm.reset();
+      showNotification(`Produto "${nome}" adicionado!`);
+    },
+
+    // Render produtos na tabela e datalist
+    renderProdutos() {
+      this.produtosTabela.innerHTML = "";
+      this.produtosDatalist.innerHTML = "";
+
+      for (const [nome, prod] of Object.entries(this.produtos)) {
+        // Tabela
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-blue-50 dark:hover:bg-blue-900 transition";
+
+        tr.innerHTML = `
+          <td class="p-2 border-b border-gray-300 dark:border-gray-600">${nome}</td>
+          <td class="p-2 border-b border-gray-300 dark:border-gray-600">${formatBRL(prod.valor)}</td>
+          <td class="p-2 border-b border-gray-300 dark:border-gray-600">${formatBRL(prod.custo)}</td>
+          <td class="p-2 border-b border-gray-300 dark:border-gray-600 text-center">
+            <button aria-label="Excluir produto ${nome}" title="Excluir produto ${nome}" class="text-red-600 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-600 rounded" data-produto="${nome}">
+              &#10060;
+            </button>
+          </td>
+        `;
+        this.produtosTabela.appendChild(tr);
+
+        // Datalist
+        const option = document.createElement("option");
+        option.value = nome;
+        this.produtosDatalist.appendChild(option);
+      }
+
+      // Atualizar campo valor unitário na venda se estiver preenchido
+      if (this.produtoVendaInput.value && this.produtos[this.produtoVendaInput.value]) {
+        this.valorVendaInput.value = this.produtos[this.produtoVendaInput.value].valor.toFixed(2);
+      }
+
+      // Bind exclusão
+      this.produtosTabela.querySelectorAll("button[data-produto]").forEach(btn => {
+        btn.onclick = () => {
+          const nome = btn.dataset.produto;
+          if (confirm(`Excluir produto "${nome}"? Isso removerá também vendas relacionadas.`)) {
+            this.excluirProduto(nome);
+          }
+        };
+      });
+
+      this.renderDevedoresDatalist();
+    },
+
+    excluirProduto(nome) {
+      delete this.produtos[nome];
+      // Remove vendas que usam este produto
+      this.vendas = this.vendas.filter(v => v.produto !== nome);
+      this.salvar();
+      this.renderAll();
+      showNotification(`Produto "${nome}" e vendas relacionadas excluídas.`);
+    },
+
+    // Render datalist de devedores (únicos)
+    renderDevedoresDatalist() {
+      this.devedoresDatalist.innerHTML = "";
+      const devedoresSet = new Set(this.vendas.map(v => v.devedor));
+      devedoresSet.forEach(d => {
+        const option = document.createElement("option");
+        option.value = d;
+        this.devedoresDatalist.appendChild(option);
+      });
+    },
+
+    // Adiciona venda nova
+    adicionarVenda() {
+      const devedor = this.devedorVendaInput.value.trim();
+      const produto = this.produtoVendaInput.value.trim();
+      const quantidade = parseInt(this.quantidadeVendaInput.value, 10);
+      const valor = parseFloat(this.valorVendaInput.value);
+      const vencimento = this.vencimentoVendaInput.value;
+
+      // Validações básicas
+      if (!devedor) {
+        alert("Informe o nome do devedor.");
+        this.devedorVendaInput.focus();
+        return;
+      }
+      if (!produto || !this.produtos[produto]) {
+        alert("Informe um produto válido.");
+        this.produtoVendaInput.focus();
+        return;
+      }
+      if (isNaN(quantidade) || quantidade < 1) {
+        alert("Informe uma quantidade válida (>= 1).");
+        this.quantidadeVendaInput.focus();
+        return;
+      }
+      if (isNaN(valor) || valor < 0) {
+        alert("Informe um valor válido (>= 0).");
+        this.valorVendaInput.focus();
+        return;
+      }
+      if (!vencimento) {
+        alert("Informe a data de vencimento.");
+        this.vencimentoVendaInput.focus();
+        return;
+      }
+
+      // Cria venda e adiciona
+      const venda = new Venda(devedor, produto, quantidade, valor, vencimento);
+      this.vendas.push(venda);
+      this.salvar();
+      this.renderVendasTabela();
+      this.vendaForm.reset();
+      this.valorVendaInput.value = "";
+
+      showNotification(`Venda registrada para ${devedor} - ${produto}.`);
+      this.renderDevedoresDatalist();
+    },
+
+    // Render tabela vendas (filtrada e ordenada)
+    renderVendasTabela() {
+      const busca = this.buscaVendasInput.value.toLowerCase();
+
+      // Ordena
+      let vendasOrdenadas = [...this.vendas];
+      if (this.ordenacao.campo) {
+        const campo = this.ordenacao.campo;
+        const asc = this.ordenacao.asc ? 1 : -1;
+        vendasOrdenadas.sort((a, b) => {
+          let valA = a[campo];
+          let valB = b[campo];
+          if (campo === "vencimento") {
+            return compareDate(valA, valB) * asc;
+          }
+          if (campo === "devedor" || campo === "produto" || campo === "status") {
+            valA = valA.toLowerCase();
+            valB = valB.toLowerCase();
+            return valA.localeCompare(valB) * asc;
+          }
+          return 0;
+        });
+      }
+
+      // Filtra
+      if (busca) {
+        vendasOrdenadas = vendasOrdenadas.filter(v => 
+          v.devedor.toLowerCase().includes(busca) || 
+          v.produto.toLowerCase().includes(busca)
+        );
+      }
+
+      // Limpa tabela
+      this.vendasTabela.innerHTML = "";
+
+      if (vendasOrdenadas.length === 0) {
+        this.vendasTabela.innerHTML = `<tr><td colspan="9" class="text-center p-4 text-gray-500 dark:text-gray-400">Nenhuma venda encontrada.</td></tr>`;
+        return;
+      }
+
+      vendasOrdenadas.forEach(v => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-blue-50 dark:hover:bg-blue-900 transition";
+
+        const statusColors = {
+          "Pendente": "text-yellow-600 dark:text-yellow-400",
+          "Recebido": "text-green-600 dark:text-green-400",
+          "Cancelado": "text-red-600 dark:text-red-400"
+        };
+
+        tr.innerHTML = `
+          <td class="p-2 border-b border-gray-300 dark:border-gray-600">${v.devedor}</td>
+          <td class="p-2 border-b border-gray-300 dark:border-gray-600">${v.produto}</td>
+          <td class="p-2 border-b border-gray-300 dark:border-gray-600 text-center">${v.quantidade}</td>
+          <td class="p-2 border-b border-gray-300 dark:border-gray-600">${formatBRL(v.valor)}</td>
+          <td class="p-2 border-b border-gray-300 dark:border-gray-600">${formatBRL(v.custo)}</td>
+          <td class="p-2 border-b border-gray-300 dark:border-gray-600">${formatBRL(v.lucro)}</td>
+          <td class="p-2 border-b border-gray-300 dark:border-gray-600">${formatDateBR(v.vencimento)}</td>
+          <td class="p-2 border-b border-gray-300 dark:border-gray-600 font-semibold ${statusColors[v.status] || ""}">${v.status}</td>
+          <td class="p-2 border-b border-gray-300 dark:border-gray-600 text-center space-x-1">
+            ${v.status === "Pendente" ? `<button title="Marcar como Recebido" aria-label="Marcar venda como Recebido" class="btnRecebido text-green-600 hover:text-green-800 focus:outline-none focus:ring-2 focus:ring-green-600 rounded" data-id="${v.id}">&#10004;</button>` : ""}
+            ${v.status !== "Cancelado" ? `<button title="Cancelar Venda" aria-label="Cancelar venda" class="btnCancelar text-red-600 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-600 rounded" data-id="${v.id}">&#10060;</button>` : ""}
+          </td>
+        `;
+
+        this.vendasTabela.appendChild(tr);
+      });
+
+      // Bind ações nas linhas
+      this.vendasTabela.querySelectorAll(".btnRecebido").forEach(btn => {
+        btn.onclick = () => {
+          const venda = this.vendas.find(v => v.id === btn.dataset.id);
+          if (venda && venda.status === "Pendente") {
+            venda.status = "Recebido";
+            this.salvar();
+            this.renderVendasTabela();
+            this.renderDashboard();
+            showNotification("Venda marcada como Recebido.");
+          }
+        };
+      });
+      this.vendasTabela.querySelectorAll(".btnCancelar").forEach(btn => {
+        btn.onclick = () => {
+          const venda = this.vendas.find(v => v.id === btn.dataset.id);
+          if (venda && venda.status !== "Cancelado") {
+            if (confirm("Cancelar esta venda? Esta ação não pode ser desfeita.")) {
+              venda.status = "Cancelado";
+              this.salvar();
+              this.renderVendasTabela();
+              this.renderDashboard();
+              showNotification("Venda cancelada.");
+            }
+          }
+        };
+      });
+
+      this.renderDashboard();
+    },
+
+    // Alterna ordenação
+    toggleSort(campo) {
+      if (this.ordenacao.campo === campo) {
+        this.ordenacao.asc = !this.ordenacao.asc;
+      } else {
+        this.ordenacao.campo = campo;
+        this.ordenacao.asc = true;
+      }
+      // Atualiza aria-pressed
+      this.vendasTabela.parentElement.querySelectorAll("th[data-sort]").forEach(th => {
+        th.setAttribute("aria-pressed", th.dataset.sort === campo ? "true" : "false");
+      });
+      this.renderVendasTabela();
+    },
+
+    // Render dashboard
+    renderDashboard() {
+      // Valores totais
+      const totalRecebido = this.vendas
+        .filter(v => v.status === "Recebido")
+        .reduce((acc, v) => acc + (v.valor * v.quantidade), 0);
+
+      const totalAReceber = this.vendas
+        .filter(v => v.status === "Pendente")
+        .reduce((acc, v) => acc + (v.valor * v.quantidade), 0);
+
+      const totalCusto = this.vendas
+        .filter(v => v.status !== "Cancelado")
+        .reduce((acc, v) => acc + v.custo, 0);
+
+      const lucroTotal = totalRecebido - totalCusto;
+
+      this.totalRecebidoEl.textContent = formatBRL(totalRecebido);
+      this.totalAReceberEl.textContent = formatBRL(totalAReceber);
+      this.totalCustoEl.textContent = formatBRL(totalCusto);
+      this.lucroTotalEl.textContent = formatBRL(lucroTotal);
+
+      // Dados para gráfico Produtos mais vendidos
+      const produtoCount = {};
+      this.vendas.forEach(v => {
+        if (v.status !== "Cancelado") {
+          produtoCount[v.produto] = (produtoCount[v.produto] || 0) + v.quantidade;
+        }
+      });
+      const produtos = Object.keys(produtoCount);
+      const quantidades = Object.values(produtoCount);
+
+      // Cria gráfico de barras
+      if (this.chartProdutos) this.chartProdutos.destroy();
+      this.chartProdutos = new Chart(document.getElementById("graficoProdutos").getContext("2d"), {
+        type: "bar",
+        data: {
+          labels: produtos,
+          datasets: [{
+            label: "Quantidade Vendida",
+            data: quantidades,
+            backgroundColor: "rgba(37, 99, 235, 0.7)",
+            borderRadius: 4,
+            borderSkipped: false,
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: { enabled: true },
+          },
+          scales: {
+            y: { beginAtZero: true, stepSize: 1 }
+          }
+        }
+      });
+
+      // Dados para gráfico Status vendas
+      const statusCount = {
+        Pendente: 0,
+        Recebido: 0,
+        Cancelado: 0,
+      };
+      this.vendas.forEach(v => {
+        statusCount[v.status] = (statusCount[v.status] || 0) + 1;
+      });
+
+      if (this.chartStatus) this.chartStatus.destroy();
+      this.chartStatus = new Chart(document.getElementById("graficoStatus").getContext("2d"), {
+        type: "doughnut",
+        data: {
+          labels: Object.keys(statusCount),
+          datasets: [{
+            label: "Status das Vendas",
+            data: Object.values(statusCount),
+            backgroundColor: [
+              "rgba(253, 224, 71, 0.8)",   // amarelo Pendente
+              "rgba(34, 197, 94, 0.8)",    // verde Recebido
+              "rgba(239, 68, 68, 0.8)",    // vermelho Cancelado
+            ],
+            borderColor: "rgba(255, 255, 255, 0.8)",
+            borderWidth: 2,
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: "bottom",
+              labels: {
+                color: document.body.classList.contains("dark") ? "#eee" : "#333",
+                font: { weight: "bold" }
+              }
+            }
+          }
+        }
+      });
+    },
+
+    // Export CSV completo com produtos e vendas
+    exportCSV() {
+      let csv = "Categoria;Nome;Quantidade;Valor Unitário (R$);Custo Unitário (R$);Total (R$);Status;Vencimento\n";
+
+      // Produtos (sem vendas)
+      for (const [nome, p] of Object.entries(this.produtos)) {
+        csv += `Produto;${nome};;;;${formatBRL(p.valor)};;\n`;
+      }
+
+      // Vendas
+      this.vendas.forEach(v => {
+        csv += `Venda;${v.produto};${v.quantidade};${v.valor.toFixed(2)};${(v.custo / v.quantidade).toFixed(2)};${(v.valor * v.quantidade).toFixed(2)};${v.status};${formatDateBR(v.vencimento)}\n`;
+      });
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `controle_vendas_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      showNotification("CSV exportado com sucesso!");
+    },
+
+    // Export PDF com jsPDF
+    async exportPDF() {
+      // Importa jsPDF da variável global
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.setFontSize(16);
+      doc.text("Relatório de Vendas & Produtos", 14, 22);
+
+      doc.setFontSize(12);
+      doc.text(`Gerado em: ${new Date().toLocaleString("pt-BR")}`, 14, 30);
+
+      // Produtos
+      doc.setFontSize(14);
+      doc.text("Produtos", 14, 40);
+      const prodData = [["Nome", "Valor (R$)", "Custo (R$)"]];
+      for (const [nome, p] of Object.entries(this.produtos)) {
+        prodData.push([nome, formatBRL(p.valor), formatBRL(p.custo)]);
+      }
+      doc.autoTable({
+        startY: 45,
+        head: [prodData[0]],
+        body: prodData.slice(1),
+        theme: "grid",
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [37, 99, 235] }
+      });
+
+      // Vendas
+      let y = doc.previousAutoTable.finalY + 10;
+      doc.setFontSize(14);
+      doc.text("Vendas", 14, y);
+      const vendasData = [["Devedor", "Produto", "Qtd", "Valor Unit. (R$)", "Custo Unit. (R$)", "Total (R$)", "Status", "Vencimento"]];
+      this.vendas.forEach(v => {
+        vendasData.push([
+          v.devedor,
+          v.produto,
+          v.quantidade.toString(),
+          v.valor.toFixed(2),
+          (v.custo / v.quantidade).toFixed(2),
+          (v.valor * v.quantidade).toFixed(2),
+          v.status,
+          formatDateBR(v.vencimento),
+        ]);
+      });
+      doc.autoTable({
+        startY: y + 5,
+        head: [vendasData[0]],
+        body: vendasData.slice(1),
+        theme: "grid",
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [37, 99, 235] }
+      });
+
+      doc.save(`relatorio_vendas_${new Date().toISOString().slice(0,10)}.pdf`);
+      showNotification("PDF exportado com sucesso!");
+    },
+
+    // Render geral
+    renderAll() {
+      this.renderProdutos();
+      this.renderVendasTabela();
+      this.renderDashboard();
+    },
+
+    // Troca aba ativa
+    setActiveTab(tabId) {
+      for (const key in this.tabs) {
+        const el = this.tabs[key];
+        const btn = [...this.tabButtons].find(b => b.dataset.tab === el.id);
+        if (el.id === tabId) {
+          el.classList.add("active");
+          el.removeAttribute("hidden");
+          btn.classList.add("active");
+          btn.setAttribute("aria-selected", "true");
+          btn.tabIndex = 0;
+          el.focus();
+        } else {
+          el.classList.remove("active");
+          el.setAttribute("hidden", "");
+          btn.classList.remove("active");
+          btn.setAttribute("aria-selected", "false");
+          btn.tabIndex = -1;
+        }
+      }
+    }
+  };
+
+  // Inicializa app
+  app.init();
+})();
+</script>
+
+<!-- AutoTable do jsPDF para tabelas (min) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
+</body>
+</html>
