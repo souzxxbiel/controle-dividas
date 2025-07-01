@@ -3,196 +3,270 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Controle Clientes e Produtos</title>
+<title>Painel de Controle Profissional - Gestão Completa</title>
+
+<!-- Fonte moderna -->
 <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
+
+<!-- Chart.js para gráficos -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; background: #121212; color: #ddd;
-    font-family: 'Inter', sans-serif;
-    min-height: 100vh;
-    display: flex; flex-direction: column;
-    align-items: center;
-    padding: 20px;
+  /* Reset básico e estilo global */
+  * {
+    margin: 0; padding: 0; box-sizing: border-box;
   }
-  h1,h2 { color: #f0a500; margin-bottom: 12px; }
-  #app {
-    width: 100%; max-width: 960px;
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #0f111a;
+    color: #eee;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  a {
+    color: #fbbf24;
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  button {
+    cursor: pointer;
   }
 
-  /* Login */
+  /* Container principal */
+  #app {
+    max-width: 1280px;
+    margin: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 2rem 3rem 2rem;
+  }
+
+  /* LOGIN */
   #loginPage {
-    max-width: 360px;
-    background: #222;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 0 20px #f0a500aa;
+    max-width: 380px;
+    margin: 8vh auto;
+    background: #1e202f;
+    padding: 3rem 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 0 30px #fbbf2499;
+  }
+  #loginPage h1 {
+    margin-bottom: 2rem;
+    font-weight: 900;
+    text-align: center;
+    font-size: 2.4rem;
+    color: #fbbf24;
   }
   #loginPage label {
-    display: block; margin: 12px 0 6px; font-weight: 600; color: #eee;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    display: block;
+    font-size: 1.1rem;
   }
   #loginPage input, #loginPage select {
     width: 100%;
-    padding: 10px 8px;
-    border-radius: 6px;
+    padding: 0.8rem 1rem;
+    margin-bottom: 1.4rem;
+    border-radius: 0.6rem;
     border: none;
-    background: #333;
-    color: #eee;
     font-size: 1rem;
+    background: #292b3d;
+    color: #eee;
+    transition: background-color 0.3s ease;
+  }
+  #loginPage input:focus, #loginPage select:focus {
+    background-color: #3a3d5a;
+    outline: none;
   }
   #loginPage button {
-    margin-top: 20px;
-    background: #f0a500;
+    background: #fbbf24;
+    color: #0f111a;
+    font-weight: 900;
+    font-size: 1.2rem;
+    padding: 1rem;
+    border-radius: 1rem;
     border: none;
-    padding: 12px;
     width: 100%;
-    font-weight: 700;
-    color: #121212;
-    border-radius: 8px;
-    cursor: pointer;
     transition: background-color 0.3s ease;
   }
-  #loginPage button:hover { background: #cf8600; }
+  #loginPage button:hover {
+    background: #d1a61f;
+  }
 
-  /* Header (exibido após login) */
+  /* HEADER */
   header {
-    display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #292b3d;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
   }
   header h1 {
-    margin: 0; font-weight: 700; font-size: 2rem;
+    font-weight: 900;
+    font-size: 2.5rem;
+    color: #fbbf24;
   }
   #logoutBtn {
-    background: #f03e3e;
+    background: #e03e3e;
+    color: #fff;
     border: none;
-    padding: 8px 18px;
-    font-weight: 600;
-    color: white;
-    border-radius: 8px;
-    cursor: pointer;
+    border-radius: 1rem;
+    padding: 0.8rem 2rem;
+    font-weight: 700;
+    font-size: 1rem;
     transition: background-color 0.3s ease;
   }
-  #logoutBtn:hover { background: #c13131; }
-
-  /* Navegação */
-  nav {
-    display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;
+  #logoutBtn:hover {
+    background: #b12b2b;
   }
-  nav button {
-    background: #222;
-    border: 2px solid #444;
-    color: #ccc;
-    padding: 8px 14px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
+
+  /* NAV PRINCIPAL */
+  nav.main-nav {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+  nav.main-nav button {
+    background: #292b3d;
+    border: none;
+    border-radius: 1rem;
+    padding: 1rem 1.5rem;
+    font-weight: 700;
+    color: #eee;
+    font-size: 1.1rem;
     transition: all 0.3s ease;
   }
-  nav button.active,
-  nav button:hover {
-    background: #f0a500;
-    color: #121212;
-    border-color: #f0a500;
+  nav.main-nav button.active,
+  nav.main-nav button:hover {
+    background: #fbbf24;
+    color: #0f111a;
+    box-shadow: 0 0 10px #fbbf24aa;
   }
 
-  /* Páginas */
+  /* SEÇÕES DE PÁGINAS */
   section.page {
     display: none;
+    animation: fadeIn 0.5s ease forwards;
   }
   section.page.active {
     display: block;
   }
+  @keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+  }
 
-  /* Formulários gerais */
+  /* FORMULÁRIOS */
   form {
-    background: #222;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 12px #f0a500aa;
-    max-width: 100%;
+    background: #1e202f;
+    padding: 2rem;
+    border-radius: 1rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 0 20px #fbbf2444;
   }
   form label {
     display: block;
-    margin-bottom: 6px;
-    font-weight: 600;
-    color: #eee;
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+    font-size: 1.1rem;
   }
   form input, form select {
     width: 100%;
-    padding: 8px 10px;
-    margin-bottom: 16px;
-    border-radius: 6px;
+    padding: 0.9rem 1.2rem;
+    margin-bottom: 1.4rem;
+    border-radius: 0.8rem;
     border: none;
-    background: #333;
+    background: #292b3d;
     color: #eee;
     font-size: 1rem;
+    transition: background-color 0.3s ease;
+  }
+  form input:focus, form select:focus {
+    background-color: #3a3d5a;
+    outline: none;
   }
   form button {
-    background: #f0a500;
+    background: #fbbf24;
     border: none;
-    padding: 12px;
+    color: #0f111a;
+    font-weight: 900;
+    font-size: 1.2rem;
+    padding: 1rem;
+    border-radius: 1rem;
     width: 100%;
-    font-weight: 700;
-    color: #121212;
-    border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s ease;
   }
-  form button:hover { background: #cf8600; }
+  form button:hover {
+    background: #d1a61f;
+  }
 
-  /* Tabela */
+  /* TABELAS */
   table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.9rem;
-    margin-top: 12px;
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
   }
-  table thead tr {
-    background: #222;
+  thead tr {
+    background: #292b3d;
   }
-  table thead th {
-    padding: 10px;
-    color: #f0a500;
-    border-bottom: 2px solid #f0a500;
+  thead tr th {
+    color: #fbbf24;
+    padding: 1rem 1.2rem;
+    border-bottom: 2px solid #fbbf24;
     text-align: left;
   }
-  table tbody tr {
-    background: #1c1c1c;
-    border-bottom: 1px solid #333;
+  tbody tr {
+    background: #1e202f;
+    border-bottom: 1px solid #292b3d;
     transition: background-color 0.3s ease;
   }
-  table tbody tr:hover {
-    background: #2a2a2a;
+  tbody tr:hover {
+    background: #2f314a;
   }
-  table tbody td {
-    padding: 8px 10px;
+  tbody tr td {
+    padding: 1rem 1.2rem;
     color: #ddd;
   }
-  .btn-action {
-    cursor: pointer;
-    background: #f0a500;
+  tbody tr td.actions {
+    display: flex;
+    gap: 1rem;
+  }
+  .btn {
+    background: #fbbf24;
+    color: #0f111a;
     border: none;
-    padding: 6px 12px;
-    border-radius: 5px;
-    font-weight: 600;
-    color: #121212;
+    border-radius: 0.8rem;
+    padding: 0.6rem 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
     transition: background-color 0.3s ease;
   }
-  .btn-action:hover { background: #cf8600; }
+  .btn:hover {
+    background: #d1a61f;
+  }
 
-  /* Notificação */
+  /* NOTIFICAÇÕES */
   #notification {
     position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #f0a500;
-    color: #121212;
-    padding: 14px 20px;
-    border-radius: 10px;
-    font-weight: 700;
-    box-shadow: 0 0 10px #f0a500aa;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: #fbbf24;
+    color: #0f111a;
+    padding: 1rem 2rem;
+    border-radius: 1rem;
+    font-weight: 900;
+    box-shadow: 0 0 20px #fbbf2499;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.5s ease;
+    transition: opacity 0.4s ease;
     z-index: 10000;
   }
   #notification.show {
@@ -200,567 +274,221 @@
     pointer-events: auto;
   }
 
-  /* Responsividade */
-  @media (max-width: 600px) {
-    nav { flex-direction: column; }
-    table thead { display: none; }
-    table, table tbody, table tr, table td {
-      display: block;
-      width: 100%;
+  /* MODAL */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,17,26,0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 20000;
+  }
+  .modal-backdrop.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .modal {
+    background: #292b3d;
+    border-radius: 1rem;
+    padding: 2rem 2.5rem;
+    max-width: 520px;
+    width: 100%;
+    box-shadow: 0 0 40px #fbbf24cc;
+    position: relative;
+  }
+  .modal h3 {
+    margin-bottom: 1.5rem;
+  }
+  .modal .close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: #e03e3e;
+    color: white;
+    border: none;
+    border-radius: 1rem;
+    padding: 0.5rem 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  .modal .close-btn:hover {
+    background: #b12b2b;
+  }
+
+  /* RESPONSIVIDADE */
+  @media (max-width: 900px) {
+    #app {
+      padding: 1rem;
     }
-    table tr { margin-bottom: 15px; }
-    table td {
-      padding-left: 50%;
-      position: relative;
+    nav.main-nav {
+      justify-content: center;
     }
-    table td::before {
-      content: attr(data-label);
-      position: absolute;
-      left: 15px;
-      top: 8px;
-      font-weight: 700;
-      color: #f0a500;
+  }
+  @media (max-width: 520px) {
+    form input, form select, form button {
+      font-size: 0.9rem;
+    }
+    header h1 {
+      font-size: 1.8rem;
+    }
+    nav.main-nav button {
+      font-size: 1rem;
+      padding: 0.8rem 1rem;
     }
   }
 </style>
 </head>
 <body>
+  <div id="app">
+    <!-- LOGIN -->
+    <section id="loginPage" aria-label="Página de login">
+      <h1>Faça seu login</h1>
+      <form id="formLogin" aria-label="Formulário de login">
+        <label for="inputUsername">Usuário</label>
+        <input type="text" id="inputUsername" autocomplete="username" required aria-required="true" />
 
-<div id="app">
+        <label for="inputPassword">Senha</label>
+        <input type="password" id="inputPassword" autocomplete="current-password" required aria-required="true" />
 
-  <!-- Página Login -->
-  <section id="loginPage">
-    <h1>Login</h1>
-    <form id="formLogin">
-      <label for="inputUsername">Usuário</label>
-      <input type="text" id="inputUsername" required autocomplete="username" />
-      
-      <label for="inputPassword">Senha</label>
-      <input type="password" id="inputPassword" required autocomplete="current-password" />
+        <label for="selectUserType">Tipo de usuário</label>
+        <select id="selectUserType" required aria-required="true" >
+          <option value="" disabled selected>Selecione o tipo</option>
+          <option value="admin">Administrador</option>
+          <option value="cliente">Cliente</option>
+        </select>
 
-      <label for="inputUserType">Tipo de Usuário</label>
-      <select id="inputUserType" required>
-        <option value="">Selecione</option>
-        <option value="cliente">Cliente</option>
-        <option value="admin">Admin</option>
-      </select>
-
-      <button type="submit">Entrar</button>
-    </form>
-  </section>
-
-  <!-- Área principal após login -->
-  <section id="mainApp" style="display:none;">
-    <header>
-      <h1>Controle Clientes & Produtos</h1>
-      <button id="logoutBtn">Logout</button>
-    </header>
-
-    <nav aria-label="Navegação principal">
-      <!-- Admin vê cadastro de produtos e devedores -->
-      <!-- Cliente vê produtos e anota dívidas -->
-    </nav>
-
-    <!-- Páginas / abas -->
-    <section id="clientesPage" class="page" aria-label="Área dos Clientes">
-      <h2>Produtos Disponíveis</h2>
-      <table id="produtosClienteTable" aria-label="Lista de produtos para cliente">
-        <thead>
-          <tr><th>Produto</th><th>Preço Unit.</th><th>Ação</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-      <h3>Minhas Dívidas</h3>
-      <table id="dividasClienteTable" aria-label="Minhas dívidas">
-        <thead>
-          <tr><th>Produto</th><th>Quantidade</th><th>Total</th><th>Pago</th><th>Pendente</th><th>Status</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+        <button type="submit">Entrar</button>
+      </form>
     </section>
 
-    <section id="adminPage" class="page" aria-label="Painel do Admin">
-      <nav aria-label="Sub-navegação Admin" style="margin-bottom:20px;">
-        <button class="admin-tab-btn active" data-tab="produtosTab">Produtos</button>
-        <button class="admin-tab-btn" data-tab="devedoresTab">Devedores</button>
+    <!-- ÁREA PRINCIPAL -->
+    <section id="mainApp" style="display:none;">
+      <header role="banner">
+        <h1>Painel de Controle Profissional</h1>
+        <button id="logoutBtn" aria-label="Sair do sistema">Logout</button>
+      </header>
+
+      <nav class="main-nav" role="navigation" aria-label="Menu principal">
+        <!-- botões gerados dinamicamente -->
       </nav>
 
-      <!-- Aba Produtos -->
-      <section id="produtosTab" class="admin-tab page active">
-        <h2>Cadastro de Produtos</h2>
-        <form id="formCadastroProduto">
-          <label for="produtoNome">Nome do Produto</label>
-          <input type="text" id="produtoNome" required />
-
-          <label for="produtoPreco">Preço Unitário (R$)</label>
-          <input type="number" id="produtoPreco" min="0.01" step="0.01" required />
-
-          <button type="submit">Cadastrar Produto</button>
-        </form>
-        <table id="produtosAdminTable" aria-label="Tabela de produtos cadastrados" style="margin-top: 20px;">
-          <thead>
-            <tr><th>Produto</th><th>Preço Unit.</th><th>Ações</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+      <!-- PÁGINAS SEPARADAS -->
+      <!-- Dashboard -->
+      <section id="dashboardPage" class="page active" aria-label="Painel principal com gráficos e resumo">
+        <h2>Resumo Financeiro</h2>
+        <div style="display:flex; gap: 2rem; flex-wrap: wrap; margin-bottom: 2rem;">
+          <div style="flex:1; min-width: 250px; background:#1e202f; padding: 1.5rem; border-radius:1rem; box-shadow: 0 0 20px #fbbf2411;">
+            <h3>Total Gasto</h3>
+            <p id="totalGasto" style="font-size:2.5rem; font-weight: 900; color:#f03e3e;">R$ 0,00</p>
+          </div>
+          <div style="flex:1; min-width: 250px; background:#1e202f; padding: 1.5rem; border-radius:1rem; box-shadow: 0 0 20px #fbbf2411;">
+            <h3>Total Lucro</h3>
+            <p id="totalLucro" style="font-size:2.5rem; font-weight: 900; color:#22c55e;">R$ 0,00</p>
+          </div>
+        </div>
+        <canvas id="graficoLucroGasto" style="max-width: 100%; height: 300px;"></canvas>
       </section>
 
-      <!-- Aba Devedores -->
-      <section id="devedoresTab" class="admin-tab page" style="margin-top: 20px;">
-        <h2>Controle de Devedores e Dívidas</h2>
-        <form id="formAnotarDivida">
-          <label for="devedorNome">Nome do Devedor</label>
-          <input type="text" id="devedorNome" required />
+      <!-- Produtos -->
+      <section id="produtosPage" class="page" aria-label="Cadastro e controle de produtos">
+        <h2>Produtos</h2>
 
-          <label for="devedorProduto">Produto</label>
-          <select id="devedorProduto" required>
-            <!-- Opções produtos dinamicamente -->
-          </select>
+        <form id="formProduto">
+          <label for="produtoNome">Nome do produto</label>
+          <input type="text" id="produtoNome" required aria-required="true" />
 
-          <label for="devedorQuantidade">Quantidade</label>
-          <input type="number" id="devedorQuantidade" min="1" value="1" required />
+          <label for="produtoCusto">Custo (R$)</label>
+          <input type="number" id="produtoCusto" min="0" step="0.01" required aria-required="true" />
 
-          <label for="devedorData">Data</label>
-          <input type="date" id="devedorData" required />
+          <label for="produtoPrecoVenda">Preço de Venda (R$)</label>
+          <input type="number" id="produtoPrecoVenda" min="0" step="0.01" required aria-required="true" />
 
-          <button type="submit">Anotar Dívida</button>
+          <button type="submit">Cadastrar / Atualizar Produto</button>
         </form>
 
-        <table id="dividasAdminTable" aria-label="Tabela de dívidas cadastradas" style="margin-top: 20px;">
+        <table id="tableProdutos">
           <thead>
             <tr>
-              <th>Devedor</th><th>Produto</th><th>Qtd.</th><th>Valor Unit.</th><th>Total</th><th>Pago</th><th>Pendente</th><th>Status</th><th>Ações</th>
+              <th>Produto</th>
+              <th>Custo (R$)</th>
+              <th>Preço de Venda (R$)</th>
+              <th>Estoque</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
       </section>
-    </section>
-  </section>
 
-</div>
+      <!-- Clientes -->
+      <section id="clientesPage" class="page" aria-label="Cadastro e controle de clientes">
+        <h2>Clientes</h2>
 
-<!-- Notificação -->
-<div id="notification" role="alert" aria-live="assertive"></div>
+        <form id="formCliente">
+          <label for="clienteNome">Nome do cliente</label>
+          <input type="text" id="clienteNome" required aria-required="true" />
+          <button type="submit">Cadastrar / Atualizar Cliente</button>
+        </form>
 
-<script>
-(() => {
-  // Storage Keys
-  const STORAGE_USER = 'controleUserLogged'; // {username, tipo}
-  const STORAGE_CLIENTES = 'controleClientes'; // Array clientes registrados
-  const STORAGE_PRODUTOS = 'controleProdutos'; // Array produtos
-  const STORAGE_DIVIDAS = 'controleDividas';   // Array dívidas
+        <table id="tableClientes">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
 
-  // DOM
-  const loginPage = document.getElementById('loginPage');
-  const mainApp = document.getElementById('mainApp');
-  const formLogin = document.getElementById('formLogin');
-  const logoutBtn = document.getElementById('logoutBtn');
-  const nav = mainApp.querySelector('nav');
+      <!-- Vendas / Dívidas -->
+      <section id="vendasPage" class="page" aria-label="Registro e controle de vendas e dívidas">
+        <h2>Registro de Vendas / Dívidas</h2>
 
-  // Clientes page
-  const clientesPage = document.getElementById('clientesPage');
-  const produtosClienteTableBody = document.querySelector('#produtosClienteTable tbody');
-  const dividasClienteTableBody = document.querySelector('#dividasClienteTable tbody');
+        <form id="formVenda">
+          <label for="vendaCliente">Cliente</label>
+          <select id="vendaCliente" required aria-required="true">
+            <option value="" disabled selected>Selecione o cliente</option>
+            <!-- dinamicamente preenchido -->
+          </select>
 
-  // Admin page and tabs
-  const adminPage = document.getElementById('adminPage');
-  const adminTabBtns = adminPage.querySelectorAll('.admin-tab-btn');
-  const produtosTab = document.getElementById('produtosTab');
-  const devedoresTab = document.getElementById('devedoresTab');
+          <label for="vendaProduto">Produto</label>
+          <select id="vendaProduto" required aria-required="true">
+            <option value="" disabled selected>Selecione o produto</option>
+            <!-- dinamicamente preenchido -->
+          </select>
 
-  // Form produtos (admin)
-  const formCadastroProduto = document.getElementById('formCadastroProduto');
-  const produtoNomeInput = document.getElementById('produtoNome');
-  const produtoPrecoInput = document.getElementById('produtoPreco');
-  const produtosAdminTableBody = document.querySelector('#produtosAdminTable tbody');
+          <label for="vendaQuantidade">Quantidade</label>
+          <input type="number" id="vendaQuantidade" min="1" value="1" required aria-required="true" />
 
-  // Form dívidas (admin)
-  const formAnotarDivida = document.getElementById('formAnotarDivida');
-  const devedorNomeInput = document.getElementById('devedorNome');
-  const devedorProdutoSelect = document.getElementById('devedorProduto');
-  const devedorQuantidadeInput = document.getElementById('devedorQuantidade');
-  const devedorDataInput = document.getElementById('devedorData');
-  const dividasAdminTableBody = document.querySelector('#dividasAdminTable tbody');
+          <label for="vendaData">Data da venda</label>
+          <input type="date" id="vendaData" required aria-required="true" />
 
-  // Notification
-  const notification = document.getElementById('notification');
+          <button type="submit">Registrar Venda</button>
+        </form>
 
-  // Dados
-  let usuarios = JSON.parse(localStorage.getItem(STORAGE_CLIENTES) || '[]'); 
-  let produtos = JSON.parse(localStorage.getItem(STORAGE_PRODUTOS) || '[]');
-  let dividas = JSON.parse(localStorage.getItem(STORAGE_DIVIDAS) || '[]');
+        <table id="tableVendas">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Produto</th>
+              <th>Qtd.</th>
+              <th>Valor Total (R$)</th>
+              <th>Pago (R$)</th>
+              <th>Pendente (R$)</th>
+              <th>Status</th>
+              <th>Data</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
 
-  // Usuário atual
-  let usuarioAtual = JSON.parse(localStorage.getItem(STORAGE_USER));
-
-  // Função notificação
-  function showNotification(msg, duration=3500) {
-    notification.textContent = msg;
-    notification.classList.add('show');
-    setTimeout(() => notification.classList.remove('show'), duration);
-  }
-
-  // Limpar tabela
-  function limparTabela(tbody) {
-    while(tbody.firstChild) tbody.removeChild(tbody.firstChild);
-  }
-
-  // Render produtos admin tabela
-  function renderProdutosAdmin() {
-    limparTabela(produtosAdminTableBody);
-    produtos.forEach((p, i) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td data-label="Produto">${p.nome}</td>
-        <td data-label="Preço Unit.">R$ ${p.preco.toFixed(2)}</td>
-        <td data-label="Ações">
-          <button class="btn-action btn-remove-produto" data-index="${i}">Remover</button>
-        </td>
-      `;
-      produtosAdminTableBody.appendChild(tr);
-    });
-    // Eventos remover produto
-    produtosAdminTableBody.querySelectorAll('.btn-remove-produto').forEach(btn => {
-      btn.onclick = () => {
-        const idx = Number(btn.dataset.index);
-        produtos.splice(idx,1);
-        salvarProdutos();
-        renderProdutosAdmin();
-        atualizarProdutosSelect();
-        if(usuarioAtual.tipo === 'cliente') renderProdutosCliente();
-        showNotification('Produto removido');
-      };
-    });
-  }
-
-  // Render produtos para cliente (lista)
-  function renderProdutosCliente() {
-    limparTabela(produtosClienteTableBody);
-    produtos.forEach((p, i) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td data-label="Produto">${p.nome}</td>
-        <td data-label="Preço Unit.">R$ ${p.preco.toFixed(2)}</td>
-        <td data-label="Ação">
-          <button class="btn-action btn-comprar" data-index="${i}">Anotar Dívida</button>
-        </td>
-      `;
-      produtosClienteTableBody.appendChild(tr);
-    });
-    produtosClienteTableBody.querySelectorAll('.btn-comprar').forEach(btn => {
-      btn.onclick = () => {
-        const idx = Number(btn.dataset.index);
-        abrirModalAnotarDividaCliente(produtos[idx]);
-      };
-    });
-  }
-
-  // Render dívidas cliente atual
-  function renderDividasCliente() {
-    limparTabela(dividasClienteTableBody);
-    if(!usuarioAtual) return;
-    const minhasDividas = dividas.filter(d => d.devedor.toLowerCase() === usuarioAtual.username.toLowerCase());
-    minhasDividas.forEach(d => {
-      const total = d.quantidade * d.valorUnitario;
-      const pago = d.pago || 0;
-      const pendente = total - pago;
-      let status = 'Pendente';
-      if(pago >= total) status = 'Pago';
-      else if(pago > 0 && pago < total) status = 'Parcial';
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td data-label="Produto">${d.produto}</td>
-        <td data-label="Quantidade">${d.quantidade}</td>
-        <td data-label="Total">R$ ${total.toFixed(2)}</td>
-        <td data-label="Pago">R$ ${pago.toFixed(2)}</td>
-        <td data-label="Pendente">R$ ${pendente.toFixed(2)}</td>
-        <td data-label="Status">${status}</td>
-      `;
-      dividasClienteTableBody.appendChild(tr);
-    });
-  }
-
-  // Render dívidas admin
-  function renderDividasAdmin() {
-    limparTabela(dividasAdminTableBody);
-    dividas.forEach((d,i) => {
-      const total = d.quantidade * d.valorUnitario;
-      const pago = d.pago || 0;
-      const pendente = total - pago;
-      let status = 'Pendente';
-      if(pago >= total) status = 'Pago';
-      else if(pago > 0 && pago < total) status = 'Parcial';
-
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td data-label="Devedor">${d.devedor}</td>
-        <td data-label="Produto">${d.produto}</td>
-        <td data-label="Qtd.">${d.quantidade}</td>
-        <td data-label="Valor Unit.">R$ ${d.valorUnitario.toFixed(2)}</td>
-        <td data-label="Total">R$ ${total.toFixed(2)}</td>
-        <td data-label="Pago">R$ ${pago.toFixed(2)}</td>
-        <td data-label="Pendente">R$ ${pendente.toFixed(2)}</td>
-        <td data-label="Status">${status}</td>
-        <td data-label="Ações">
-          <button class="btn-action btn-pagar" data-index="${i}">Registrar Pagamento</button>
-          <button class="btn-action btn-remover" data-index="${i}">Remover</button>
-        </td>
-      `;
-      dividasAdminTableBody.appendChild(tr);
-    });
-    // Eventos botões
-    dividasAdminTableBody.querySelectorAll('.btn-pagar').forEach(btn => {
-      btn.onclick = () => abrirModalPagamento(Number(btn.dataset.index));
-    });
-    dividasAdminTableBody.querySelectorAll('.btn-remover').forEach(btn => {
-      btn.onclick = () => {
-        const idx = Number(btn.dataset.index);
-        if(confirm('Remover essa dívida?')) {
-          dividas.splice(idx,1);
-          salvarDividas();
-          renderDividasAdmin();
-          showNotification('Dívida removida');
-        }
-      };
-    });
-  }
-
-  // Atualiza select produtos na aba dívidas admin
-  function atualizarProdutosSelect() {
-    devedorProdutoSelect.innerHTML = '';
-    produtos.forEach(p => {
-      const opt = document.createElement('option');
-      opt.value = p.nome;
-      opt.textContent = p.nome;
-      devedorProdutoSelect.appendChild(opt);
-    });
-  }
-
-  // Salvar dados no localStorage
-  function salvarProdutos() {
-    localStorage.setItem(STORAGE_PRODUTOS, JSON.stringify(produtos));
-  }
-  function salvarDividas() {
-    localStorage.setItem(STORAGE_DIVIDAS, JSON.stringify(dividas));
-  }
-  function salvarUsuarioLogado(user) {
-    localStorage.setItem(STORAGE_USER, JSON.stringify(user));
-  }
-
-  // Login
-  formLogin.addEventListener('submit', e => {
-    e.preventDefault();
-    const username = formLogin.inputUsername.value.trim();
-    const password = formLogin.inputPassword.value;
-    const tipo = formLogin.inputUserType.value;
-
-    // Login simplificado (no real security)
-    // Admin fixo: username=admin password=admin123
-    // Clientes registrados ficam no localStorage (para simplificar, aceitar qualquer cliente cadastrado sem senha)
-    if(tipo === 'admin') {
-      if(username === 'admin' && password === 'admin123') {
-        usuarioAtual = { username, tipo };
-        salvarUsuarioLogado(usuarioAtual);
-        showNotification('Login Admin realizado');
-        mostrarAreaAdmin();
-      } else {
-        alert('Usuário ou senha admin incorretos');
-      }
-    } else if(tipo === 'cliente') {
-      // Clientes não tem senha no momento (pode ser melhorado)
-      // Verificar se cliente existe no cadastro, se não existe, cadastrar automaticamente
-      if(!username) return alert('Informe seu nome de usuário');
-      let clienteExistente = usuarios.find(u => u.username.toLowerCase() === username.toLowerCase());
-      if(!clienteExistente) {
-        // Cadastrar novo cliente
-        usuarios.push({ username });
-        localStorage.setItem(STORAGE_CLIENTES, JSON.stringify(usuarios));
-        showNotification('Novo cliente cadastrado');
-      }
-      usuarioAtual = { username, tipo };
-      salvarUsuarioLogado(usuarioAtual);
-      showNotification('Login Cliente realizado');
-      mostrarAreaCliente();
-    } else {
-      alert('Selecione um tipo de usuário');
-    }
-    formLogin.reset();
-  });
-
-  // Logout
-  logoutBtn.onclick = () => {
-    usuarioAtual = null;
-    localStorage.removeItem(STORAGE_USER);
-    showLogin();
-    showNotification('Logout realizado');
-  };
-
-  // Mostrar login
-  function showLogin() {
-    mainApp.style.display = 'none';
-    loginPage.style.display = 'block';
-    nav.innerHTML = '';
-    clientesPage.classList.remove('active');
-    adminPage.classList.remove('active');
-  }
-
-  // Mostrar área admin
-  function mostrarAreaAdmin() {
-    loginPage.style.display = 'none';
-    mainApp.style.display = 'block';
-    nav.innerHTML = '';
-    clientesPage.classList.remove('active');
-    adminPage.classList.add('active');
-    montarNavAdmin();
-    atualizarProdutosSelect();
-    renderProdutosAdmin();
-    renderDividasAdmin();
-  }
-
-  // Mostrar área cliente
-  function mostrarAreaCliente() {
-    loginPage.style.display = 'none';
-    mainApp.style.display = 'block';
-    nav.innerHTML = '';
-    clientesPage.classList.add('active');
-    adminPage.classList.remove('active');
-    montarNavCliente();
-    renderProdutosCliente();
-    renderDividasCliente();
-  }
-
-  // Montar navegação admin
-  function montarNavAdmin() {
-    nav.innerHTML = '';
-    ['Produtos','Devedores'].forEach((tabName,i) => {
-      const btn = document.createElement('button');
-      btn.textContent = tabName;
-      btn.className = 'nav-btn' + (i === 0 ? ' active' : '');
-      btn.dataset.tab = tabName.toLowerCase();
-      btn.onclick = () => {
-        // Trocar aba
-        nav.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        if(tabName === 'Produtos') {
-          produtosTab.classList.add('active');
-          devedoresTab.classList.remove('active');
-        } else {
-          produtosTab.classList.remove('active');
-          devedoresTab.classList.add('active');
-        }
-      };
-      nav.appendChild(btn);
-    });
-  }
-
-  // Montar navegação cliente (simples)
-  function montarNavCliente() {
-    nav.innerHTML = '';
-    const btn = document.createElement('button');
-    btn.textContent = 'Produtos & Dívidas';
-    btn.className = 'nav-btn active';
-    btn.onclick = () => {
-      // Apenas uma aba, manter ativa
-      clientesPage.classList.add('active');
-    };
-    nav.appendChild(btn);
-  }
-
-  // Form produtos admin submit
-  formCadastroProduto.addEventListener('submit', e => {
-    e.preventDefault();
-    const nome = produtoNomeInput.value.trim();
-    const preco = parseFloat(produtoPrecoInput.value);
-    if(!nome || isNaN(preco) || preco <= 0) return alert('Informe nome e preço válidos');
-    produtos.push({ nome, preco });
-    salvarProdutos();
-    produtoNomeInput.value = '';
-    produtoPrecoInput.value = '';
-    renderProdutosAdmin();
-    atualizarProdutosSelect();
-    showNotification('Produto cadastrado');
-  });
-
-  // Form dívidas admin submit
-  formAnotarDivida.addEventListener('submit', e => {
-    e.preventDefault();
-    const devedor = devedorNomeInput.value.trim();
-    const produto = devedorProdutoSelect.value;
-    const quantidade = parseInt(devedorQuantidadeInput.value);
-    const data = devedorDataInput.value;
-
-    if(!devedor || !produto || isNaN(quantidade) || quantidade < 1 || !data) return alert('Preencha todos os campos');
-
-    // Pega preço do produto
-    const p = produtos.find(prod => prod.nome === produto);
-    if(!p) return alert('Produto inválido');
-
-    dividas.push({
-      devedor,
-      produto,
-      quantidade,
-      valorUnitario: p.preco,
-      data,
-      pago: 0,
-    });
-    salvarDividas();
-    formAnotarDivida.reset();
-    renderDividasAdmin();
-    showNotification('Dívida registrada');
-  });
-
-  // Modal anotar dívida para cliente
-  function abrirModalAnotarDividaCliente(produto) {
-    const qtd = prompt(`Digite a quantidade do produto "${produto.nome}" para anotar dívida:`, '1');
-    const quantidade = parseInt(qtd);
-    if(isNaN(quantidade) || quantidade < 1) return showNotification('Quantidade inválida');
-    const data = new Date().toISOString().slice(0,10);
-
-    dividas.push({
-      devedor: usuarioAtual.username,
-      produto: produto.nome,
-      quantidade,
-      valorUnitario: produto.preco,
-      data,
-      pago: 0,
-    });
-    salvarDividas();
-    renderDividasCliente();
-    showNotification('Dívida anotada');
-  }
-
-  // Modal pagamento admin (simples prompt)
-  function abrirModalPagamento(index) {
-    const divida = dividas[index];
-    if(!divida) return;
-    const total = divida.quantidade * divida.valorUnitario;
-    const pendente = total - (divida.pago || 0);
-    if(pendente <= 0) return showNotification('Dívida já totalmente paga');
-
-    let valor = prompt(`Dívida pendente R$ ${pendente.toFixed(2)}. Informe valor do pagamento:`, pendente.toFixed(2));
-    if(valor === null) return;
-    valor = parseFloat(valor);
-    if(isNaN(valor) || valor <= 0 || valor > pendente) return alert('Valor inválido');
-
-    divida.pago = (divida.pago || 0) + valor;
-    salvarDividas();
-    renderDividasAdmin();
-    showNotification('Pagamento registrado');
-  }
-
-  // Inicialização
-  function init() {
-    if(usuarioAtual) {
-      if(usuarioAtual.tipo === 'admin') mostrarAreaAdmin();
-      else if(usuarioAtual.tipo === 'cliente') mostrarAreaCliente();
-    } else {
-      showLogin();
-    }
-  }
-  init();
-
-})();
-</script>
-</body>
-</html>
+      <!-- Pagamentos -->
+      <section id="
