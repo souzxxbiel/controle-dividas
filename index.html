@@ -1,281 +1,72 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Controle de Dívidas</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    /* Scroll horizontal suave para a tabela no mobile */
-    #tabelaDividas {
-      scrollbar-width: thin;
-      scrollbar-color: #3b82f6 #e0e7ff;
-    }
-    #tabelaDividas::-webkit-scrollbar {
-      height: 8px;
-    }
-    #tabelaDividas::-webkit-scrollbar-thumb {
-      background-color: #3b82f6;
-      border-radius: 8px;
-    }
-    /* Estilo para botões com foco acessível */
-    button:focus-visible {
-      outline: 2px solid #2563eb;
-      outline-offset: 2px;
-    }
-  </style>
-</head>
-<body class="bg-gradient-to-br from-blue-100 to-white min-h-screen flex flex-col items-center p-6 font-sans text-gray-800">
+Crie um site totalmente automatizado para me ajudar a gerenciar minhas vendas e dívidas pessoais. O sistema deve funcionar inteiramente no navegador (sem backend), utilizando `localStorage` para manter os dados salvos automaticamente. O foco é **facilitar minha vida** ao máximo: tudo deve ser intuitivo, rápido de preencher, com o mínimo de digitação.
 
-  <div class="w-full max-w-7xl bg-white rounded-2xl shadow-xl p-10">
-    <h1 class="text-5xl font-extrabold text-center mb-12 text-blue-800 drop-shadow-lg">Controle de Dívidas Pessoais</h1>
+### Objetivo:
+Controlar o que vendi, para quem, por quanto, quanto custou, quanto estou ganhando, quanto foi pago, e o que ainda falta receber.
 
-    <!-- Formulário -->
-    <form id="debtForm" class="grid grid-cols-1 md:grid-cols-6 gap-8 mb-10">
-      <div class="flex flex-col">
-        <label for="devedor" class="mb-3 font-semibold text-blue-700">Nome do Devedor</label>
-        <input type="text" id="devedor" placeholder="Digite ou selecione..." required list="listaDevedores" 
-          class="p-4 border border-blue-300 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-400 transition" />
-        <datalist id="listaDevedores"></datalist>
-      </div>
+---
 
-      <div class="flex flex-col">
-        <label for="produto" class="mb-3 font-semibold text-blue-700">Produto ou Serviço</label>
-        <input type="text" id="produto" placeholder="Produto ou serviço" required 
-          class="p-4 border border-blue-300 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-400 transition" />
-      </div>
+### Funcionalidades principais (automatizadas):
 
-      <div class="flex flex-col">
-        <label for="quantidade" class="mb-3 font-semibold text-blue-700">Quantidade</label>
-        <input type="number" id="quantidade" placeholder="Quantidade" required min="1" 
-          class="p-4 border border-blue-300 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-400 transition" />
-      </div>
+#### 🧾 Registro de vendas/dívidas
+- Nome do devedor (com autocompletar)
+- Produto (com autocompletar, valor de venda e custo preenchidos automaticamente)
+- Quantidade
+- Total calculado automaticamente (quantidade × valor de venda)
+- Custo total também calculado (quantidade × custo)
+- Data da venda (auto preenchida com data atual)
+- Data de vencimento (selecionável)
+- Status ("A receber" ou "Recebido") com botão para alternar
+- Botão “Salvar”
 
-      <div class="flex flex-col">
-        <label for="custo" class="mb-3 font-semibold text-blue-700">Custo Unitário (R$)</label>
-        <input type="number" id="custo" placeholder="Custo unitário" required step="0.01" min="0" 
-          class="p-4 border border-blue-300 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-400 transition" />
-      </div>
+#### 📦 Cadastro inteligente de produtos
+- Cadastro de produtos com:
+  - Nome
+  - Valor de venda
+  - Valor de custo
+- Quando eu escolho um produto, o valor de venda e custo aparecem automaticamente.
+- Se o produto já existir, ele preenche tudo.
+- Se for novo, posso cadastrá-lo direto no formulário.
 
-      <div class="flex flex-col">
-        <label for="valor" class="mb-3 font-semibold text-blue-700">Valor Unitário (R$)</label>
-        <input type="number" id="valor" placeholder="Valor unitário" required step="0.01" min="0" 
-          class="p-4 border border-blue-300 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-400 transition" />
-      </div>
+#### 📊 Painel financeiro automatizado
+- Total a receber
+- Total já recebido
+- Total de vendas
+- Total de custos
+- Lucro total (vendas - custos)
+- Tudo atualizado automaticamente conforme registro
 
-      <div class="flex flex-col">
-        <label for="vencimento" class="mb-3 font-semibold text-blue-700">Data de Vencimento</label>
-        <input type="date" id="vencimento" required
-          class="p-4 border border-blue-300 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-400 transition" />
-      </div>
+#### 👤 Resumo por cliente
+- Lista de devedores com:
+  - Quanto cada um já pagou
+  - Quanto ainda deve
+  - Lucro gerado por cliente
 
-      <div class="md:col-span-6 mt-6">
-        <button type="submit" 
-          class="w-full md:w-auto bg-blue-700 hover:bg-blue-800 text-white font-bold py-4 px-12 rounded-xl shadow-lg transition transform hover:scale-105 focus:ring-4 focus:ring-blue-600">
-          Adicionar Dívida
-        </button>
-      </div>
-    </form>
+#### 📁 Exportação e filtros
+- Filtro por nome do devedor
+- Filtro por data
+- Filtro por produto
+- Botão para exportar todos os dados para CSV
 
-    <!-- Tabela -->
-    <div class="overflow-x-auto rounded-xl shadow-lg border border-blue-200">
-      <table class="min-w-full divide-y divide-blue-200">
-        <thead class="bg-blue-200">
-          <tr>
-            <th class="px-6 py-4 text-left text-sm font-semibold text-blue-900 uppercase tracking-wide">Devedor</th>
-            <th class="px-6 py-4 text-left text-sm font-semibold text-blue-900 uppercase tracking-wide">Produto</th>
-            <th class="px-6 py-4 text-center text-sm font-semibold text-blue-900 uppercase tracking-wide">Qtd</th>
-            <th class="px-6 py-4 text-right text-sm font-semibold text-blue-900 uppercase tracking-wide">Custo Unit.</th>
-            <th class="px-6 py-4 text-right text-sm font-semibold text-blue-900 uppercase tracking-wide">Valor Unit.</th>
-            <th class="px-6 py-4 text-right text-sm font-semibold text-blue-900 uppercase tracking-wide">Total Gasto</th>
-            <th class="px-6 py-4 text-right text-sm font-semibold text-blue-900 uppercase tracking-wide">Lucro</th>
-            <th class="px-6 py-4 text-center text-sm font-semibold text-blue-900 uppercase tracking-wide">Vencimento</th>
-            <th class="px-6 py-4 text-center text-sm font-semibold text-blue-900 uppercase tracking-wide">Status</th>
-            <th class="px-6 py-4 text-center text-sm font-semibold text-blue-900 uppercase tracking-wide">Ações</th>
-          </tr>
-        </thead>
-        <tbody id="tabelaDividas" class="bg-white divide-y divide-blue-100"></tbody>
-      </table>
-    </div>
+---
 
-    <!-- Resumo por Devedor -->
-    <h2 class="text-3xl font-bold mt-12 mb-6 text-blue-800">Resumo por Devedor</h2>
-    <div id="resumoDevedores" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8"></div>
+### Recursos extras:
+- Visual limpo e bonito com Tailwind CSS
+- Totalmente responsivo (funciona bem no celular, como um app)
+- Salva tudo automaticamente com `localStorage`
+- Campo de busca rápida
+- Animações leves (opcional) para melhorar a experiência
 
-    <!-- Resumo Geral -->
-    <section class="mt-12 max-w-3xl mx-auto p-8 bg-blue-50 rounded-2xl shadow-inner text-center">
-      <h3 class="text-2xl font-semibold text-blue-900 mb-6">Resumo Geral</h3>
-      <div class="flex justify-around text-lg font-medium text-blue-700 space-x-8">
-        <div>
-          <p class="text-xl font-extrabold text-blue-600" id="totalGasto">R$ 0.00</p>
-          <p>Gasto Total</p>
-        </div>
-        <div>
-          <p class="text-xl font-extrabold text-green-600" id="totalLucro">R$ 0.00</p>
-          <p>Lucro Recebido</p>
-        </div>
-        <div>
-          <p class="text-xl font-extrabold text-blue-900" id="saldoAtual">R$ 0.00</p>
-          <p>Saldo Atual</p>
-        </div>
-      </div>
-    </section>
+---
 
-    <!-- Exportar CSV -->
-    <div class="mt-12 text-center">
-      <button onclick="exportCSV()" 
-        class="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold py-4 px-10 rounded-2xl shadow-lg transition transform hover:scale-105 focus:ring-4 focus:ring-green-500">
-        Exportar para CSV
-      </button>
-    </div>
-  </div>
+### Tecnologias:
+- HTML5
+- Tailwind CSS (ou CSS puro)
+- JavaScript puro (sem frameworks)
+- Sem backend, banco de dados ou login
+- Compatível com navegador de celular (iPhone, Android, Safari, Chrome)
 
-  <script>
-    (function() {
-      let dividas = JSON.parse(localStorage.getItem('dividas')) || [];
+---
 
-      function salvarDividas() {
-        localStorage.setItem('dividas', JSON.stringify(dividas));
-      }
+### Objetivo final:
+Um painel leve, bonito e rápido, onde eu não precise digitar tudo toda vez. Os campos se preenchem com base nos dados anteriores (autocompletar). Os cálculos de totais, custos e lucros são todos automáticos. Ideal para uso diário como vendedor informal ou para cobrar clientes de forma simples.
 
-      function atualizarTabela() {
-        const tbody = document.getElementById('tabelaDividas');
-        tbody.innerHTML = '';
-        dividas.forEach((divida, index) => {
-          const totalGasto = divida.quantidade * divida.custo;
-          const totalValor = divida.quantidade * divida.valor;
-          const lucro = divida.status === 'Recebido' ? (totalValor - totalGasto) : 0;
-          const statusColor = divida.status === 'Recebido' ? 'text-green-600' : 'text-yellow-600';
-          const lucroColor = lucro > 0 ? 'text-green-600' : (lucro < 0 ? 'text-red-600' : 'text-gray-600');
-          const row = document.createElement('tr');
-          row.classList.add('hover:bg-blue-50', 'transition-colors', 'duration-150');
-          row.innerHTML = `
-            <td class="px-6 py-4 whitespace-nowrap font-medium">${divida.devedor}</td>
-            <td class="px-6 py-4 whitespace-nowrap">${divida.produto}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-center">${divida.quantidade}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-right">R$ ${divida.custo.toFixed(2)}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-right">R$ ${divida.valor.toFixed(2)}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-right font-semibold">R$ ${totalGasto.toFixed(2)}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-right font-semibold ${lucroColor}">R$ ${lucro.toFixed(2)}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-center">${divida.vencimento}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-center">
-              <button onclick="alternarStatus(${index})" 
-                class="font-semibold ${statusColor} hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded px-2">
-                ${divida.status}
-              </button>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-center">
-              <button onclick="excluirDivida(${index})" 
-                class="text-red-600 hover:text-red-800 font-semibold transition focus:outline-none focus:ring-2 focus:ring-red-500 rounded px-2">
-                Excluir
-              </button>
-            </td>
-          `;
-          tbody.appendChild(row);
-        });
-        atualizarResumo();
-        salvarDividas();
-        atualizarAutocomplete();
-      }
-
-      function atualizarResumo() {
-        const resumo = {};
-        let totalGasto = 0;
-        let totalLucro = 0;
-
-        dividas.forEach(d => {
-          if (!resumo[d.devedor]) resumo[d.devedor] = { gasto: 0, lucro: 0 };
-          const gasto = d.quantidade * d.custo;
-          const valorTotal = d.quantidade * d.valor;
-          resumo[d.devedor].gasto += gasto;
-          if (d.status === 'Recebido') {
-            resumo[d.devedor].lucro += (valorTotal - gasto);
-            totalLucro += (valorTotal - gasto);
-          }
-          totalGasto += gasto;
-        });
-
-        const divResumo = document.getElementById('resumoDevedores');
-        divResumo.innerHTML = Object.entries(resumo).map(([nome, dados]) => `
-          <div class="bg-white rounded-xl p-6 shadow-md border border-blue-200 hover:shadow-lg transition">
-            <h3 class="font-semibold text-blue-900 mb-3 text-lg">${nome}</h3>
-            <p><span class="font-medium">Gasto:</span> R$ ${dados.gasto.toFixed(2)}</p>
-            <p><span class="font-medium text-green-700">Lucro Recebido:</span> R$ ${dados.lucro.toFixed(2)}</p>
-          </div>
-        `).join('');
-
-        document.getElementById('totalGasto').textContent = totalGasto.toFixed(2);
-        document.getElementById('totalLucro').textContent = totalLucro.toFixed(2);
-        document.getElementById('saldoAtual').textContent = (totalLucro - totalGasto).toFixed(2);
-      }
-
-      function alternarStatus(index) {
-        dividas[index].status = dividas[index].status === 'Recebido' ? 'A receber' : 'Recebido';
-        atualizarTabela();
-      }
-
-      function excluirDivida(index) {
-        if (confirm('Deseja realmente excluir esta dívida?')) {
-          dividas.splice(index, 1);
-          atualizarTabela();
-        }
-      }
-
-      function exportCSV() {
-        const linhas = ["Devedor,Produto,Quantidade,Custo Unitário,Valor Unitário,Total Gasto,Lucro,Vencimento,Status"];
-        dividas.forEach(d => {
-          const gasto = d.quantidade * d.custo;
-          const valorTotal = d.quantidade * d.valor;
-          const lucro = d.status === 'Recebido' ? (valorTotal - gasto) : 0;
-          linhas.push(`${d.devedor},${d.produto},${d.quantidade},${d.custo.toFixed(2)},${d.valor.toFixed(2)},${gasto.toFixed(2)},${lucro.toFixed(2)},${d.vencimento},${d.status}`);
-        });
-        const csv = linhas.join('\n');
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'dividas.csv';
-        a.click();
-      }
-
-      function atualizarAutocomplete() {
-        const lista = document.getElementById('listaDevedores');
-        const nomesUnicos = [...new Set(dividas.map(d => d.devedor))];
-        lista.innerHTML = '';
-        nomesUnicos.forEach(nome => {
-          const option = document.createElement('option');
-          option.value = nome;
-          lista.appendChild(option);
-        });
-      }
-
-      document.getElementById('debtForm').addEventListener('submit', e => {
-        e.preventDefault();
-        const novaDivida = {
-          devedor: document.getElementById('devedor').value.trim(),
-          produto: document.getElementById('produto').value.trim(),
-          quantidade: Number(document.getElementById('quantidade').value),
-          custo: Number(document.getElementById('custo').value),
-          valor: Number(document.getElementById('valor').value),
-          vencimento: document.getElementById('vencimento').value,
-          status: 'A receber'
-        };
-        if (!novaDivida.devedor || !novaDivida.produto || novaDivida.quantidade <= 0 || novaDivida.valor < 0 || novaDivida.custo < 0 || !novaDivida.vencimento) {
-          alert('Por favor, preencha todos os campos corretamente.');
-          return;
-        }
-        dividas.push(novaDivida);
-        atualizarTabela();
-        e.target.reset();
-      });
-
-      // Expõe funções para botões inline
-      window.alternarStatus = alternarStatus;
-      window.excluirDivida = excluirDivida;
-      window.exportCSV = exportCSV;
-
-      atualizarTabela();
-    })();
-  </script>
-</body>
-</html>
