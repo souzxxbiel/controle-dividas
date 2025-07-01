@@ -3,492 +3,1094 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Painel de Controle Profissional - Gestão Completa</title>
-
-<!-- Fonte moderna -->
-<link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
-
-<!-- Chart.js para gráficos -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+<title>Controle Completo Produtos e Dívidas</title>
 <style>
-  /* Reset básico e estilo global */
+  /* Reset e base */
   * {
-    margin: 0; padding: 0; box-sizing: border-box;
+    box-sizing: border-box;
   }
   body {
-    font-family: 'Inter', sans-serif;
-    background-color: #0f111a;
-    color: #eee;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0; background: #f0f2f5; color: #222;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    display: flex; flex-direction: column;
   }
-  a {
-    color: #fbbf24;
-    text-decoration: none;
-  }
-  a:hover {
-    text-decoration: underline;
-  }
-  button {
-    cursor: pointer;
-  }
-
-  /* Container principal */
-  #app {
-    max-width: 1280px;
-    margin: auto;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 1rem 2rem 3rem 2rem;
-  }
-
-  /* LOGIN */
-  #loginPage {
-    max-width: 380px;
-    margin: 8vh auto;
-    background: #1e202f;
-    padding: 3rem 2rem;
-    border-radius: 1rem;
-    box-shadow: 0 0 30px #fbbf2499;
-  }
-  #loginPage h1 {
-    margin-bottom: 2rem;
-    font-weight: 900;
-    text-align: center;
-    font-size: 2.4rem;
-    color: #fbbf24;
-  }
-  #loginPage label {
-    font-weight: 600;
-    margin-bottom: 0.4rem;
-    display: block;
-    font-size: 1.1rem;
-  }
-  #loginPage input, #loginPage select {
-    width: 100%;
-    padding: 0.8rem 1rem;
-    margin-bottom: 1.4rem;
-    border-radius: 0.6rem;
-    border: none;
-    font-size: 1rem;
-    background: #292b3d;
-    color: #eee;
-    transition: background-color 0.3s ease;
-  }
-  #loginPage input:focus, #loginPage select:focus {
-    background-color: #3a3d5a;
-    outline: none;
-  }
-  #loginPage button {
-    background: #fbbf24;
-    color: #0f111a;
-    font-weight: 900;
-    font-size: 1.2rem;
-    padding: 1rem;
-    border-radius: 1rem;
-    border: none;
-    width: 100%;
-    transition: background-color 0.3s ease;
-  }
-  #loginPage button:hover {
-    background: #d1a61f;
-  }
-
-  /* HEADER */
   header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid #292b3d;
-    padding-bottom: 1rem;
-    margin-bottom: 1.5rem;
+    background: #004aad;
+    color: white;
+    padding: 1rem 2rem;
+    display: flex; justify-content: space-between; align-items: center;
   }
   header h1 {
-    font-weight: 900;
-    font-size: 2.5rem;
-    color: #fbbf24;
+    margin: 0; font-weight: 700;
+    font-size: 1.5rem;
   }
-  #logoutBtn {
-    background: #e03e3e;
-    color: #fff;
+  nav button {
+    margin-left: 1rem;
+    background: #0066ff;
     border: none;
-    border-radius: 1rem;
-    padding: 0.8rem 2rem;
-    font-weight: 700;
-    font-size: 1rem;
+    color: white;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
     transition: background-color 0.3s ease;
   }
-  #logoutBtn:hover {
-    background: #b12b2b;
+  nav button:hover {
+    background: #0052cc;
   }
-
-  /* NAV PRINCIPAL */
-  nav.main-nav {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-  }
-  nav.main-nav button {
-    background: #292b3d;
-    border: none;
-    border-radius: 1rem;
-    padding: 1rem 1.5rem;
-    font-weight: 700;
-    color: #eee;
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
-  }
-  nav.main-nav button.active,
-  nav.main-nav button:hover {
-    background: #fbbf24;
-    color: #0f111a;
-    box-shadow: 0 0 10px #fbbf24aa;
-  }
-
-  /* SEÇÕES DE PÁGINAS */
-  section.page {
-    display: none;
-    animation: fadeIn 0.5s ease forwards;
-  }
-  section.page.active {
-    display: block;
-  }
-  @keyframes fadeIn {
-    from {opacity: 0;}
-    to {opacity: 1;}
-  }
-
-  /* FORMULÁRIOS */
-  form {
-    background: #1e202f;
+  main {
+    flex: 1;
     padding: 2rem;
-    border-radius: 1rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 0 20px #fbbf2444;
+    max-width: 1200px;
+    margin: 0 auto 3rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 3px 12px rgb(0 0 0 / 0.1);
   }
-  form label {
+  .hidden {
+    display: none;
+  }
+  h2 {
+    margin-top: 0;
+    font-weight: 700;
+    color: #004aad;
+  }
+  form {
+    max-width: 500px;
+  }
+  label {
     display: block;
-    font-weight: 700;
-    margin-bottom: 0.6rem;
-    font-size: 1.1rem;
+    margin: 0.8rem 0 0.3rem;
+    font-weight: 600;
   }
-  form input, form select {
+  input[type=text],
+  input[type=password],
+  input[type=number],
+  select,
+  textarea {
     width: 100%;
-    padding: 0.9rem 1.2rem;
-    margin-bottom: 1.4rem;
-    border-radius: 0.8rem;
-    border: none;
-    background: #292b3d;
-    color: #eee;
+    padding: 0.5rem;
     font-size: 1rem;
-    transition: background-color 0.3s ease;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color 0.3s ease;
   }
-  form input:focus, form select:focus {
-    background-color: #3a3d5a;
+  input[type=text]:focus,
+  input[type=password]:focus,
+  input[type=number]:focus,
+  select:focus,
+  textarea:focus {
     outline: none;
+    border-color: #004aad;
   }
-  form button {
-    background: #fbbf24;
-    border: none;
-    color: #0f111a;
-    font-weight: 900;
-    font-size: 1.2rem;
-    padding: 1rem;
-    border-radius: 1rem;
-    width: 100%;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  form button:hover {
-    background: #d1a61f;
-  }
-
-  /* TABELAS */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.95rem;
-    margin-bottom: 2rem;
-  }
-  thead tr {
-    background: #292b3d;
-  }
-  thead tr th {
-    color: #fbbf24;
-    padding: 1rem 1.2rem;
-    border-bottom: 2px solid #fbbf24;
-    text-align: left;
-  }
-  tbody tr {
-    background: #1e202f;
-    border-bottom: 1px solid #292b3d;
-    transition: background-color 0.3s ease;
-  }
-  tbody tr:hover {
-    background: #2f314a;
-  }
-  tbody tr td {
-    padding: 1rem 1.2rem;
-    color: #ddd;
-  }
-  tbody tr td.actions {
-    display: flex;
-    gap: 1rem;
-  }
-  .btn {
-    background: #fbbf24;
-    color: #0f111a;
-    border: none;
-    border-radius: 0.8rem;
-    padding: 0.6rem 1.2rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  .btn:hover {
-    background: #d1a61f;
-  }
-
-  /* NOTIFICAÇÕES */
-  #notification {
-    position: fixed;
-    top: 1.5rem;
-    right: 1.5rem;
-    background: #fbbf24;
-    color: #0f111a;
-    padding: 1rem 2rem;
-    border-radius: 1rem;
-    font-weight: 900;
-    box-shadow: 0 0 20px #fbbf2499;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.4s ease;
-    z-index: 10000;
-  }
-  #notification.show {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  /* MODAL */
-  .modal-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(15,17,26,0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-    z-index: 20000;
-  }
-  .modal-backdrop.active {
-    opacity: 1;
-    pointer-events: auto;
-  }
-  .modal {
-    background: #292b3d;
-    border-radius: 1rem;
-    padding: 2rem 2.5rem;
-    max-width: 520px;
-    width: 100%;
-    box-shadow: 0 0 40px #fbbf24cc;
-    position: relative;
-  }
-  .modal h3 {
-    margin-bottom: 1.5rem;
-  }
-  .modal .close-btn {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: #e03e3e;
+  button[type=submit], button.action-btn {
+    margin-top: 1rem;
+    background: #004aad;
     color: white;
     border: none;
-    border-radius: 1rem;
-    padding: 0.5rem 1rem;
+    padding: 0.75rem 1.5rem;
     font-weight: 700;
+    border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s ease;
   }
-  .modal .close-btn:hover {
-    background: #b12b2b;
+  button[type=submit]:hover, button.action-btn:hover {
+    background: #003580;
   }
-
-  /* RESPONSIVIDADE */
-  @media (max-width: 900px) {
-    #app {
-      padding: 1rem;
-    }
-    nav.main-nav {
-      justify-content: center;
-    }
+  .error {
+    color: #cc0000;
+    margin-top: 0.5rem;
+    font-weight: 600;
   }
-  @media (max-width: 520px) {
-    form input, form select, form button {
-      font-size: 0.9rem;
-    }
-    header h1 {
-      font-size: 1.8rem;
-    }
-    nav.main-nav button {
-      font-size: 1rem;
-      padding: 0.8rem 1rem;
-    }
+  .success {
+    color: #2b7a0b;
+    margin-top: 0.5rem;
+    font-weight: 600;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+  }
+  table th, table td {
+    padding: 0.6rem;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+  table th {
+    background: #004aad;
+    color: white;
+  }
+  .flex-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+  }
+  .flex-row > * {
+    flex: 1;
+  }
+  .small-input {
+    max-width: 150px;
+  }
+  .pagination {
+    margin-top: 1rem;
+    text-align: center;
+  }
+  .pagination button {
+    margin: 0 0.25rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 4px;
+    border: 1px solid #004aad;
+    background: white;
+    color: #004aad;
+    cursor: pointer;
+    font-weight: 700;
+  }
+  .pagination button.active {
+    background: #004aad;
+    color: white;
+  }
+  /* Scroll barra para tabela */
+  .table-wrapper {
+    overflow-x: auto;
   }
 </style>
 </head>
 <body>
-  <div id="app">
-    <!-- LOGIN -->
-    <section id="loginPage" aria-label="Página de login">
-      <h1>Faça seu login</h1>
-      <form id="formLogin" aria-label="Formulário de login">
-        <label for="inputUsername">Usuário</label>
-        <input type="text" id="inputUsername" autocomplete="username" required aria-required="true" />
 
-        <label for="inputPassword">Senha</label>
-        <input type="password" id="inputPassword" autocomplete="current-password" required aria-required="true" />
+<header>
+  <h1>Controle Completo Produtos e Dívidas</h1>
+  <nav>
+    <button id="btn-login">Login</button>
+    <button id="btn-cadastrar-usuario">Cadastrar Usuário</button>
+    <button id="btn-logout" class="hidden">Logout</button>
+  </nav>
+</header>
 
-        <label for="selectUserType">Tipo de usuário</label>
-        <select id="selectUserType" required aria-required="true" >
-          <option value="" disabled selected>Selecione o tipo</option>
-          <option value="admin">Administrador</option>
-          <option value="cliente">Cliente</option>
-        </select>
+<main>
 
-        <button type="submit">Entrar</button>
+  <!-- LOGIN -->
+  <section id="section-login">
+    <h2>Login</h2>
+    <form id="form-login" autocomplete="off">
+      <label for="login-username">Usuário</label>
+      <input id="login-username" type="text" required autofocus />
+      <label for="login-password">Senha</label>
+      <input id="login-password" type="password" required />
+      <button type="submit">Entrar</button>
+    </form>
+    <div id="login-error" class="error"></div>
+  </section>
+
+  <!-- CADASTRAR USUÁRIO -->
+  <section id="section-cadastrar-usuario" class="hidden">
+    <h2>Cadastrar Novo Usuário</h2>
+    <form id="form-cadastrar-usuario" autocomplete="off">
+      <label for="cad-username">Usuário</label>
+      <input id="cad-username" type="text" minlength="3" required />
+      <label for="cad-password">Senha</label>
+      <input id="cad-password" type="password" minlength="6" required />
+      <label for="cad-password-confirm">Confirmar Senha</label>
+      <input id="cad-password-confirm" type="password" minlength="6" required />
+      <label for="cad-user-type">Tipo de Usuário</label>
+      <select id="cad-user-type" required>
+        <option value="" disabled selected>Selecione o tipo</option>
+        <option value="admin">Administrador</option>
+        <option value="cliente">Cliente</option>
+      </select>
+      <button type="submit">Cadastrar</button>
+    </form>
+    <div id="cad-usuario-error" class="error"></div>
+    <div id="cad-usuario-success" class="success"></div>
+  </section>
+
+  <!-- PAINEL ADMIN -->
+  <section id="section-painel-admin" class="hidden">
+    <h2>Painel Administrativo</h2>
+    <p>Olá, <span id="admin-user-name"></span> | <button id="btn-voltar-admin" class="action-btn" style="background:#cc0000;">Logout</button></p>
+
+    <nav>
+      <button id="tab-produtos" class="action-btn">Gerenciar Produtos</button>
+      <button id="tab-vendas" class="action-btn">Controle de Vendas e Dívidas</button>
+      <button id="tab-relatorios" class="action-btn">Relatórios de Lucro</button>
+    </nav>
+
+    <section id="tab-content-produtos" class="tab-content">
+      <h3>Cadastro de Produtos</h3>
+      <form id="form-cadastrar-produto" autocomplete="off">
+        <label for="produto-nome">Nome do Produto</label>
+        <input id="produto-nome" type="text" required minlength="3" />
+        <label for="produto-custo">Custo Unitário (R$)</label>
+        <input id="produto-custo" type="number" min="0" step="0.01" required />
+        <label for="produto-preco">Preço de Venda (R$)</label>
+        <input id="produto-preco" type="number" min="0" step="0.01" required />
+        <button type="submit">Adicionar Produto</button>
       </form>
+      <div id="produto-msg-error" class="error"></div>
+      <div id="produto-msg-success" class="success"></div>
+      <div class="table-wrapper">
+        <table id="tabela-produtos" aria-label="Tabela de produtos cadastrados">
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Custo Unitário (R$)</th>
+              <th>Preço de Venda (R$)</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </section>
 
-    <!-- ÁREA PRINCIPAL -->
-    <section id="mainApp" style="display:none;">
-      <header role="banner">
-        <h1>Painel de Controle Profissional</h1>
-        <button id="logoutBtn" aria-label="Sair do sistema">Logout</button>
-      </header>
-
-      <nav class="main-nav" role="navigation" aria-label="Menu principal">
-        <!-- botões gerados dinamicamente -->
-      </nav>
-
-      <!-- PÁGINAS SEPARADAS -->
-      <!-- Dashboard -->
-      <section id="dashboardPage" class="page active" aria-label="Painel principal com gráficos e resumo">
-        <h2>Resumo Financeiro</h2>
-        <div style="display:flex; gap: 2rem; flex-wrap: wrap; margin-bottom: 2rem;">
-          <div style="flex:1; min-width: 250px; background:#1e202f; padding: 1.5rem; border-radius:1rem; box-shadow: 0 0 20px #fbbf2411;">
-            <h3>Total Gasto</h3>
-            <p id="totalGasto" style="font-size:2.5rem; font-weight: 900; color:#f03e3e;">R$ 0,00</p>
-          </div>
-          <div style="flex:1; min-width: 250px; background:#1e202f; padding: 1.5rem; border-radius:1rem; box-shadow: 0 0 20px #fbbf2411;">
-            <h3>Total Lucro</h3>
-            <p id="totalLucro" style="font-size:2.5rem; font-weight: 900; color:#22c55e;">R$ 0,00</p>
-          </div>
-        </div>
-        <canvas id="graficoLucroGasto" style="max-width: 100%; height: 300px;"></canvas>
-      </section>
-
-      <!-- Produtos -->
-      <section id="produtosPage" class="page" aria-label="Cadastro e controle de produtos">
-        <h2>Produtos</h2>
-
-        <form id="formProduto">
-          <label for="produtoNome">Nome do produto</label>
-          <input type="text" id="produtoNome" required aria-required="true" />
-
-          <label for="produtoCusto">Custo (R$)</label>
-          <input type="number" id="produtoCusto" min="0" step="0.01" required aria-required="true" />
-
-          <label for="produtoPrecoVenda">Preço de Venda (R$)</label>
-          <input type="number" id="produtoPrecoVenda" min="0" step="0.01" required aria-required="true" />
-
-          <button type="submit">Cadastrar / Atualizar Produto</button>
-        </form>
-
-        <table id="tableProdutos">
-          <thead>
-            <tr>
-              <th>Produto</th>
-              <th>Custo (R$)</th>
-              <th>Preço de Venda (R$)</th>
-              <th>Estoque</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </section>
-
-      <!-- Clientes -->
-      <section id="clientesPage" class="page" aria-label="Cadastro e controle de clientes">
-        <h2>Clientes</h2>
-
-        <form id="formCliente">
-          <label for="clienteNome">Nome do cliente</label>
-          <input type="text" id="clienteNome" required aria-required="true" />
-          <button type="submit">Cadastrar / Atualizar Cliente</button>
-        </form>
-
-        <table id="tableClientes">
-          <thead>
-            <tr>
-              <th>Cliente</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </section>
-
-      <!-- Vendas / Dívidas -->
-      <section id="vendasPage" class="page" aria-label="Registro e controle de vendas e dívidas">
-        <h2>Registro de Vendas / Dívidas</h2>
-
-        <form id="formVenda">
-          <label for="vendaCliente">Cliente</label>
-          <select id="vendaCliente" required aria-required="true">
-            <option value="" disabled selected>Selecione o cliente</option>
-            <!-- dinamicamente preenchido -->
-          </select>
-
-          <label for="vendaProduto">Produto</label>
-          <select id="vendaProduto" required aria-required="true">
-            <option value="" disabled selected>Selecione o produto</option>
-            <!-- dinamicamente preenchido -->
-          </select>
-
-          <label for="vendaQuantidade">Quantidade</label>
-          <input type="number" id="vendaQuantidade" min="1" value="1" required aria-required="true" />
-
-          <label for="vendaData">Data da venda</label>
-          <input type="date" id="vendaData" required aria-required="true" />
-
-          <button type="submit">Registrar Venda</button>
-        </form>
-
-        <table id="tableVendas">
+    <section id="tab-content-vendas" class="tab-content hidden">
+      <h3>Controle de Vendas e Dívidas</h3>
+      <form id="form-registrar-venda" autocomplete="off">
+        <label for="venda-cliente">Cliente</label>
+        <select id="venda-cliente" required></select>
+        <label for="venda-produto">Produto</label>
+        <select id="venda-produto" required></select>
+        <label for="venda-quantidade">Quantidade</label>
+        <input id="venda-quantidade" type="number" min="1" required />
+        <label for="venda-pago">Pagamento Parcial (R$)</label>
+        <input id="venda-pago" type="number" min="0" step="0.01" value="0" required />
+        <button type="submit">Registrar Venda/Dívida</button>
+      </form>
+      <div id="venda-msg-error" class="error"></div>
+      <div id="venda-msg-success" class="success"></div>
+      <div class="table-wrapper">
+        <table id="tabela-vendas" aria-label="Tabela de vendas e dívidas">
           <thead>
             <tr>
               <th>Cliente</th>
               <th>Produto</th>
-              <th>Qtd.</th>
+              <th>Quantidade</th>
               <th>Valor Total (R$)</th>
-              <th>Pago (R$)</th>
-              <th>Pendente (R$)</th>
-              <th>Status</th>
+              <th>Valor Pago (R$)</th>
+              <th>Valor Devido (R$)</th>
               <th>Data</th>
               <th>Ações</th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
-      </section>
+      </div>
+    </section>
 
-      <!-- Pagamentos -->
-      <section id="
+    <section id="tab-content-relatorios" class="tab-content hidden">
+      <h3>Relatórios de Lucro por Produto</h3>
+      <div class="table-wrapper">
+        <table id="tabela-relatorios" aria-label="Tabela de relatórios de lucro">
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Total Vendido (Qtd)</th>
+              <th>Receita Total (R$)</th>
+              <th>Custo Total (R$)</th>
+              <th>Lucro Total (R$)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+
+  <!-- PAINEL CLIENTE -->
+  <section id="section-painel-cliente" class="hidden">
+    <h2>Painel do Cliente</h2>
+    <p>Olá, <span id="cliente-user-name"></span> | <button id="btn-logout-cliente" class="action-btn" style="background:#cc0000;">Logout</button></p>
+
+    <section>
+      <h3>Produtos Disponíveis</h3>
+      <div class="table-wrapper">
+        <table id="tabela-produtos-cliente" aria-label="Tabela de produtos disponíveis para cliente">
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Preço de Venda (R$)</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <h3>Registrar Compra</h3>
+      <form id="form-registrar-compra" autocomplete="off">
+        <label for="compra-produto">Produto</label>
+        <select id="compra-produto" required></select>
+        <label for="compra-quantidade">Quantidade</label>
+        <input id="compra-quantidade" type="number" min="1" value="1" required />
+        <label for="compra-pago">Pagamento Parcial (R$)</label>
+        <input id="compra-pago" type="number" min="0" step="0.01" value="0" required />
+        <button type="submit">Registrar Compra</button>
+      </form>
+      <div id="compra-msg-error" class="error"></div>
+      <div id="compra-msg-success" class="success"></div>
+
+      <h3>Minhas Dívidas</h3>
+      <div class="table-wrapper">
+        <table id="tabela-dividas-cliente" aria-label="Tabela de dívidas do cliente">
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Quantidade</th>
+              <th>Valor Total (R$)</th>
+              <th>Valor Pago (R$)</th>
+              <th>Valor Devido (R$)</th>
+              <th>Data</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+
+</main>
+
+<script>
+  // --- DADOS E ESTADO ---
+
+  // Carrega usuários (admin e cliente demo padrão)
+  let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [
+    { username: 'admin', password: 'admin123', type: 'admin' },
+    { username: 'cliente1', password: 'cliente123', type: 'cliente' }
+  ];
+  localStorage.setItem('usuarios', JSON.stringify(usuarios));
+
+  // Produtos
+  let produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+  localStorage.setItem('produtos', JSON.stringify(produtos));
+
+  // Vendas e dívidas
+  let vendas = JSON.parse(localStorage.getItem('vendas')) || [];
+  localStorage.setItem('vendas', JSON.stringify(vendas));
+
+  // Usuário logado atual
+  let usuarioLogado = null;
+
+  // --- ELEMENTOS DO DOM ---
+  const btnLogin = document.getElementById('btn-login');
+  const btnCadastrarUsuario = document.getElementById('btn-cadastrar-usuario');
+  const btnLogout = document.getElementById('btn-logout');
+
+  // Sections
+  const sectionLogin = document.getElementById('section-login');
+  const sectionCadastrarUsuario = document.getElementById('section-cadastrar-usuario');
+  const sectionPainelAdmin = document.getElementById('section-painel-admin');
+  const sectionPainelCliente = document.getElementById('section-painel-cliente');
+
+  // Login form
+  const formLogin = document.getElementById('form-login');
+  const loginError = document.getElementById('login-error');
+
+  // Cadastro usuário form
+  const formCadastrarUsuario = document.getElementById('form-cadastrar-usuario');
+  const cadUsuarioError = document.getElementById('cad-usuario-error');
+  const cadUsuarioSuccess = document.getElementById('cad-usuario-success');
+
+  // Admin UI
+  const adminUserNameSpan = document.getElementById('admin-user-name');
+  const btnVoltarAdmin = document.getElementById('btn-voltar-admin');
+
+  const tabProdutosBtn = document.getElementById('tab-produtos');
+  const tabVendasBtn = document.getElementById('tab-vendas');
+  const tabRelatoriosBtn = document.getElementById('tab-relatorios');
+
+  const tabContentProdutos = document.getElementById('tab-content-produtos');
+  const tabContentVendas = document.getElementById('tab-content-vendas');
+  const tabContentRelatorios = document.getElementById('tab-content-relatorios');
+
+  // Produto form
+  const formCadastrarProduto = document.getElementById('form-cadastrar-produto');
+  const produtoMsgError = document.getElementById('produto-msg-error');
+  const produtoMsgSuccess = document.getElementById('produto-msg-success');
+  const tabelaProdutosBody = document.querySelector('#tabela-produtos tbody');
+
+  // Vendas form (admin)
+  const formRegistrarVenda = document.getElementById('form-registrar-venda');
+  const vendaMsgError = document.getElementById('venda-msg-error');
+  const vendaMsgSuccess = document.getElementById('venda-msg-success');
+  const vendaClienteSelect = document.getElementById('venda-cliente');
+  const vendaProdutoSelect = document.getElementById('venda-produto');
+  const tabelaVendasBody = document.querySelector('#tabela-vendas tbody');
+
+  // Relatórios tabela
+  const tabelaRelatoriosBody = document.querySelector('#tabela-relatorios tbody');
+
+  // Cliente UI
+  const clienteUserNameSpan = document.getElementById('cliente-user-name');
+  const btnLogoutCliente = document.getElementById('btn-logout-cliente');
+
+  const tabelaProdutosClienteBody = document.querySelector('#tabela-produtos-cliente tbody');
+  const compraProdutoSelect = document.getElementById('compra-produto');
+  const formRegistrarCompra = document.getElementById('form-registrar-compra');
+  const compraMsgError = document.getElementById('compra-msg-error');
+  const compraMsgSuccess = document.getElementById('compra-msg-success');
+  const compraQuantidadeInput = document.getElementById('compra-quantidade');
+  const compraPagoInput = document.getElementById('compra-pago');
+  const tabelaDividasClienteBody = document.querySelector('#tabela-dividas-cliente tbody');
+
+  // --- FUNÇÕES DE UTILIDADE ---
+
+  function salvarUsuarios() {
+    localStorage.setItem('usuarios', JSON.stringify(usuarios));
+  }
+  function salvarProdutos() {
+    localStorage.setItem('produtos', JSON.stringify(produtos));
+  }
+  function salvarVendas() {
+    localStorage.setItem('vendas', JSON.stringify(vendas));
+  }
+
+  // Formata número para moeda BRL
+  function formatarReais(valor) {
+    return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+
+  // Limpa tabelas
+  function limparTbody(tbody) {
+    while(tbody.firstChild) {
+      tbody.removeChild(tbody.firstChild);
+    }
+  }
+
+  // --- LOGIN E CADASTRO ---
+
+  function mostrarTela(tela) {
+    // Esconder todas as sections
+    sectionLogin.classList.add('hidden');
+    sectionCadastrarUsuario.classList.add('hidden');
+    sectionPainelAdmin.classList.add('hidden');
+    sectionPainelCliente.classList.add('hidden');
+
+    btnLogin.classList.remove('hidden');
+    btnCadastrarUsuario.classList.remove('hidden');
+    btnLogout.classList.add('hidden');
+
+    switch(tela) {
+      case 'login':
+        sectionLogin.classList.remove('hidden');
+        break;
+      case 'cadastro-usuario':
+        sectionCadastrarUsuario.classList.remove('hidden');
+        break;
+      case 'admin-panel':
+        sectionPainelAdmin.classList.remove('hidden');
+        btnLogin.classList.add('hidden');
+        btnCadastrarUsuario.classList.add('hidden');
+        btnLogout.classList.remove('hidden');
+        break;
+      case 'cliente-panel':
+        sectionPainelCliente.classList.remove('hidden');
+        btnLogin.classList.add('hidden');
+        btnCadastrarUsuario.classList.add('hidden');
+        btnLogout.classList.remove('hidden');
+        break;
+    }
+  }
+
+  function verificarLoginSessao() {
+    const sessao = sessionStorage.getItem('usuarioLogado');
+    if(sessao) {
+      usuarioLogado = JSON.parse(sessao);
+      if(usuarioLogado.type === 'admin') {
+        adminUserNameSpan.textContent = usuarioLogado.username;
+        carregarProdutosTabela();
+        carregarClientesSelect();
+        carregarProdutosSelectVenda();
+        carregarVendasTabela();
+        carregarRelatorioLucro();
+        mostrarTela('admin-panel');
+      } else {
+        clienteUserNameSpan.textContent = usuarioLogado.username;
+        carregarProdutosClienteTabela();
+        carregarProdutosSelectCompra();
+        carregarDividasClienteTabela();
+        mostrarTela('cliente-panel');
+      }
+    } else {
+      mostrarTela('login');
+    }
+  }
+
+  // --- EVENTOS DE NAVEGAÇÃO ---
+
+  btnLogin.addEventListener('click', () => {
+    limparMensagens();
+    mostrarTela('login');
+  });
+  btnCadastrarUsuario.addEventListener('click', () => {
+    limparMensagens();
+    mostrarTela('cadastro-usuario');
+  });
+  btnLogout.addEventListener('click', () => {
+    usuarioLogado = null;
+    sessionStorage.removeItem('usuarioLogado');
+    mostrarTela('login');
+  });
+
+  // --- LOGIN FORM ---
+
+  formLogin.addEventListener('submit', (e) => {
+    e.preventDefault();
+    loginError.textContent = '';
+    const username = document.getElementById('login-username').value.trim();
+    const password = document.getElementById('login-password').value;
+
+    const user = usuarios.find(u => u.username === username && u.password === password);
+    if(user) {
+      usuarioLogado = user;
+      sessionStorage.setItem('usuarioLogado', JSON.stringify(user));
+      if(user.type === 'admin') {
+        adminUserNameSpan.textContent = user.username;
+        carregarProdutosTabela();
+        carregarClientesSelect();
+        carregarProdutosSelectVenda();
+        carregarVendasTabela();
+        carregarRelatorioLucro();
+        mostrarTela('admin-panel');
+      } else {
+        clienteUserNameSpan.textContent = user.username;
+        carregarProdutosClienteTabela();
+        carregarProdutosSelectCompra();
+        carregarDividasClienteTabela();
+        mostrarTela('cliente-panel');
+      }
+      formLogin.reset();
+    } else {
+      loginError.textContent = 'Usuário ou senha incorretos.';
+    }
+  });
+
+  // --- CADASTRO USUÁRIO FORM ---
+
+  formCadastrarUsuario.addEventListener('submit', (e) => {
+    e.preventDefault();
+    cadUsuarioError.textContent = '';
+    cadUsuarioSuccess.textContent = '';
+
+    const username = document.getElementById('cad-username').value.trim();
+    const password = document.getElementById('cad-password').value;
+    const passwordConfirm = document.getElementById('cad-password-confirm').value;
+    const userType = document.getElementById('cad-user-type').value;
+
+    if(username.length < 3) {
+      cadUsuarioError.textContent = 'Usuário deve ter pelo menos 3 caracteres.';
+      return;
+    }
+    if(password.length < 6) {
+      cadUsuarioError.textContent = 'Senha deve ter pelo menos 6 caracteres.';
+      return;
+    }
+    if(password !== passwordConfirm) {
+      cadUsuarioError.textContent = 'Senhas não conferem.';
+      return;
+    }
+    if(!userType) {
+      cadUsuarioError.textContent = 'Selecione o tipo de usuário.';
+      return;
+    }
+    if(usuarios.some(u => u.username === username)) {
+      cadUsuarioError.textContent = 'Usuário já existe.';
+      return;
+    }
+
+    usuarios.push({ username, password, type: userType });
+    salvarUsuarios();
+    cadUsuarioSuccess.textContent = 'Usuário cadastrado com sucesso!';
+    formCadastrarUsuario.reset();
+  });
+
+  // --- PAINEL ADMIN: GESTÃO DE PRODUTOS ---
+
+  // Carrega produtos na tabela admin
+  function carregarProdutosTabela() {
+    limparTbody(tabelaProdutosBody);
+    if(produtos.length === 0) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td colspan="4" style="text-align:center;">Nenhum produto cadastrado</td>`;
+      tabelaProdutosBody.appendChild(tr);
+      return;
+    }
+    produtos.forEach((p, idx) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${p.nome}</td>
+        <td>${formatarReais(p.custo)}</td>
+        <td>${formatarReais(p.preco)}</td>
+        <td>
+          <button class="action-btn btn-editar-produto" data-index="${idx}" style="background:#007bff;">Editar</button>
+          <button class="action-btn btn-excluir-produto" data-index="${idx}" style="background:#cc0000;">Excluir</button>
+        </td>
+      `;
+      tabelaProdutosBody.appendChild(tr);
+    });
+
+    // Eventos dos botões editar e excluir
+    document.querySelectorAll('.btn-excluir-produto').forEach(btn => {
+      btn.onclick = (e) => {
+        const idx = parseInt(e.target.dataset.index);
+        if(confirm(`Excluir o produto "${produtos[idx].nome}"?`)) {
+          produtos.splice(idx,1);
+          salvarProdutos();
+          carregarProdutosTabela();
+          carregarProdutosSelectVenda();
+          carregarProdutosClienteTabela();
+          carregarProdutosSelectCompra();
+          carregarRelatorioLucro();
+        }
+      }
+    });
+
+    document.querySelectorAll('.btn-editar-produto').forEach(btn => {
+      btn.onclick = (e) => {
+        const idx = parseInt(e.target.dataset.index);
+        const p = produtos[idx];
+        // Preenche o formulário com dados para editar
+        document.getElementById('produto-nome').value = p.nome;
+        document.getElementById('produto-custo').value = p.custo;
+        document.getElementById('produto-preco').value = p.preco;
+        produtoMsgSuccess.textContent = '';
+        produtoMsgError.textContent = '';
+        // Muda o botão para salvar edição e guarda índice
+        formCadastrarProduto.dataset.editIndex = idx;
+        formCadastrarProduto.querySelector('button[type=submit]').textContent = 'Salvar Alteração';
+        window.scrollTo({top:0, behavior:'smooth'});
+      }
+    });
+  }
+
+  // Form cadastrar/editar produto
+  formCadastrarProduto.addEventListener('submit', (e) => {
+    e.preventDefault();
+    produtoMsgError.textContent = '';
+    produtoMsgSuccess.textContent = '';
+
+    const nome = document.getElementById('produto-nome').value.trim();
+    const custo = parseFloat(document.getElementById('produto-custo').value);
+    const preco = parseFloat(document.getElementById('produto-preco').value);
+
+    if(nome.length < 3) {
+      produtoMsgError.textContent = 'Nome do produto deve ter ao menos 3 caracteres.';
+      return;
+    }
+    if(isNaN(custo) || custo < 0) {
+      produtoMsgError.textContent = 'Informe um custo válido (>= 0).';
+      return;
+    }
+    if(isNaN(preco) || preco < 0) {
+      produtoMsgError.textContent = 'Informe um preço válido (>= 0).';
+      return;
+    }
+
+    if(formCadastrarProduto.dataset.editIndex !== undefined) {
+      // Editar produto
+      const idx = parseInt(formCadastrarProduto.dataset.editIndex);
+      produtos[idx] = { nome, custo, preco };
+      delete formCadastrarProduto.dataset.editIndex;
+      formCadastrarProduto.querySelector('button[type=submit]').textContent = 'Adicionar Produto';
+      produtoMsgSuccess.textContent = 'Produto alterado com sucesso!';
+    } else {
+      // Novo produto
+      if(produtos.some(p => p.nome.toLowerCase() === nome.toLowerCase())) {
+        produtoMsgError.textContent = 'Produto já cadastrado.';
+        return;
+      }
+      produtos.push({ nome, custo, preco });
+      produtoMsgSuccess.textContent = 'Produto cadastrado com sucesso!';
+    }
+
+    salvarProdutos();
+    formCadastrarProduto.reset();
+    carregarProdutosTabela();
+    carregarProdutosSelectVenda();
+    carregarProdutosClienteTabela();
+    carregarProdutosSelectCompra();
+    carregarRelatorioLucro();
+  });
+
+  // --- PAINEL ADMIN: GERENCIAR VENDAS/DÍVIDAS ---
+
+  // Carrega clientes no select vendas (exclui admins)
+  function carregarClientesSelect() {
+    limparSelect(vendaClienteSelect);
+    const clientes = usuarios.filter(u => u.type === 'cliente');
+    if(clientes.length === 0) {
+      const opt = document.createElement('option');
+      opt.textContent = 'Nenhum cliente cadastrado';
+      opt.disabled = true;
+      vendaClienteSelect.appendChild(opt);
+      return;
+    }
+    clientes.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.username;
+      opt.textContent = c.username;
+      vendaClienteSelect.appendChild(opt);
+    });
+  }
+  // Carrega produtos no select vendas
+  function carregarProdutosSelectVenda() {
+    limparSelect(vendaProdutoSelect);
+    if(produtos.length === 0) {
+      const opt = document.createElement('option');
+      opt.textContent = 'Nenhum produto cadastrado';
+      opt.disabled = true;
+      vendaProdutoSelect.appendChild(opt);
+      return;
+    }
+    produtos.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.nome;
+      opt.textContent = p.nome;
+      vendaProdutoSelect.appendChild(opt);
+    });
+  }
+
+  // Limpa options de um select
+  function limparSelect(select) {
+    while(select.firstChild) {
+      select.removeChild(select.firstChild);
+    }
+  }
+
+  // Carregar tabela vendas
+  function carregarVendasTabela() {
+    limparTbody(tabelaVendasBody);
+    if(vendas.length === 0) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td colspan="8" style="text-align:center;">Nenhuma venda ou dívida registrada</td>`;
+      tabelaVendasBody.appendChild(tr);
+      return;
+    }
+    vendas.forEach((v, idx) => {
+      const valorTotal = v.quantidade * (produtos.find(p => p.nome === v.produto)?.preco || 0);
+      const valorDevido = valorTotal - v.pago;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${v.cliente}</td>
+        <td>${v.produto}</td>
+        <td>${v.quantidade}</td>
+        <td>${formatarReais(valorTotal)}</td>
+        <td>${formatarReais(v.pago)}</td>
+        <td>${formatarReais(valorDevido)}</td>
+        <td>${new Date(v.data).toLocaleDateString('pt-BR')}</td>
+        <td>
+          <button class="action-btn btn-pagamento" data-index="${idx}" style="background:#006600;">Pagamento</button>
+          <button class="action-btn btn-excluir-venda" data-index="${idx}" style="background:#cc0000;">Excluir</button>
+        </td>
+      `;
+      tabelaVendasBody.appendChild(tr);
+    });
+
+    // Eventos pagamento parcial
+    document.querySelectorAll('.btn-pagamento').forEach(btn => {
+      btn.onclick = (e) => {
+        const idx = parseInt(e.target.dataset.index);
+        const venda = vendas[idx];
+        const valorTotal = venda.quantidade * (produtos.find(p => p.nome === venda.produto)?.preco || 0);
+        const valorDevido = valorTotal - venda.pago;
+
+        const valor = prompt(`Pagamento parcial para "${venda.produto}" de ${venda.cliente}. Valor devido: ${formatarReais(valorDevido)}.\nDigite o valor pago agora:`, valorDevido.toFixed(2));
+        if(valor !== null) {
+          const valorPago = parseFloat(valor);
+          if(isNaN(valorPago) || valorPago <= 0 || valorPago > valorDevido) {
+            alert('Valor inválido.');
+            return;
+          }
+          vendas[idx].pago += valorPago;
+          salvarVendas();
+          carregarVendasTabela();
+          carregarRelatorioLucro();
+          alert('Pagamento registrado.');
+        }
+      }
+    });
+
+    // Evento excluir venda
+    document.querySelectorAll('.btn-excluir-venda').forEach(btn => {
+      btn.onclick = (e) => {
+        const idx = parseInt(e.target.dataset.index);
+        if(confirm('Excluir essa venda/dívida?')) {
+          vendas.splice(idx,1);
+          salvarVendas();
+          carregarVendasTabela();
+          carregarRelatorioLucro();
+        }
+      }
+    });
+  }
+
+  // Form registrar venda (admin)
+  formRegistrarVenda.addEventListener('submit', (e) => {
+    e.preventDefault();
+    vendaMsgError.textContent = '';
+    vendaMsgSuccess.textContent = '';
+
+    const cliente = vendaClienteSelect.value;
+    const produto = vendaProdutoSelect.value;
+    const quantidade = parseInt(document.getElementById('venda-quantidade').value);
+    const pago = parseFloat(document.getElementById('venda-pago').value);
+
+    if(!cliente || !produto) {
+      vendaMsgError.textContent = 'Selecione cliente e produto.';
+      return;
+    }
+    if(isNaN(quantidade) || quantidade < 1) {
+      vendaMsgError.textContent = 'Quantidade deve ser pelo menos 1.';
+      return;
+    }
+    if(isNaN(pago) || pago < 0) {
+      vendaMsgError.textContent = 'Pagamento parcial inválido.';
+      return;
+    }
+
+    // Verifica se já existe dívida do cliente pro produto, soma quantidade e pago
+    const existente = vendas.find(v => v.cliente === cliente && v.produto === produto);
+    if(existente) {
+      existente.quantidade += quantidade;
+      existente.pago += pago;
+      existente.data = new Date().toISOString();
+    } else {
+      vendas.push({
+        cliente,
+        produto,
+        quantidade,
+        pago,
+        data: new Date().toISOString()
+      });
+    }
+
+    salvarVendas();
+    vendaMsgSuccess.textContent = 'Venda/dívida registrada com sucesso!';
+    formRegistrarVenda.reset();
+    carregarVendasTabela();
+    carregarRelatorioLucro();
+  });
+
+  // --- PAINEL ADMIN: RELATÓRIO DE LUCROS ---
+
+  function carregarRelatorioLucro() {
+    limparTbody(tabelaRelatoriosBody);
+    if(produtos.length === 0) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td colspan="5" style="text-align:center;">Nenhum produto cadastrado para relatório</td>`;
+      tabelaRelatoriosBody.appendChild(tr);
+      return;
+    }
+
+    produtos.forEach(p => {
+      // soma vendas totais
+      const vendasProduto = vendas.filter(v => v.produto === p.nome);
+      const totalVendido = vendasProduto.reduce((acc, v) => acc + v.quantidade, 0);
+      const receitaTotal = vendasProduto.reduce((acc, v) => {
+        const preco = p.preco || 0;
+        return acc + (v.quantidade * preco);
+      }, 0);
+      const custoTotal = totalVendido * (p.custo || 0);
+      const lucroTotal = receitaTotal - custoTotal;
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${p.nome}</td>
+        <td>${totalVendido}</td>
+        <td>${formatarReais(receitaTotal)}</td>
+        <td>${formatarReais(custoTotal)}</td>
+        <td>${formatarReais(lucroTotal)}</td>
+      `;
+      tabelaRelatoriosBody.appendChild(tr);
+    });
+  }
+
+  // --- PAINEL CLIENTE ---
+
+  // Carrega tabela produtos para cliente
+  function carregarProdutosClienteTabela() {
+    limparTbody(tabelaProdutosClienteBody);
+    if(produtos.length === 0) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td colspan="3" style="text-align:center;">Nenhum produto disponível</td>`;
+      tabelaProdutosClienteBody.appendChild(tr);
+      return;
+    }
+    produtos.forEach((p, idx) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${p.nome}</td>
+        <td>${formatarReais(p.preco)}</td>
+        <td><button class="action-btn btn-comprar" data-index="${idx}" style="background:#004aad;">Comprar</button></td>
+      `;
+      tabelaProdutosClienteBody.appendChild(tr);
+    });
+
+    document.querySelectorAll('.btn-comprar').forEach(btn => {
+      btn.onclick = e => {
+        const idx = parseInt(e.target.dataset.index);
+        compraProdutoSelect.value = produtos[idx].nome;
+        compraQuantidadeInput.value = '1';
+        compraPagoInput.value = '0';
+        compraMsgError.textContent = '';
+        compraMsgSuccess.textContent = '';
+        window.scrollTo({top: formRegistrarCompra.offsetTop, behavior: 'smooth'});
+      }
+    });
+  }
+
+  // Carrega select produtos para compra cliente
+  function carregarProdutosSelectCompra() {
+    limparSelect(compraProdutoSelect);
+    if(produtos.length === 0) {
+      const opt = document.createElement('option');
+      opt.textContent = 'Nenhum produto disponível';
+      opt.disabled = true;
+      compraProdutoSelect.appendChild(opt);
+      return;
+    }
+    produtos.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.nome;
+      opt.textContent = p.nome;
+      compraProdutoSelect.appendChild(opt);
+    });
+  }
+
+  // Carrega tabela dívidas do cliente
+  function carregarDividasClienteTabela() {
+    limparTbody(tabelaDividasClienteBody);
+    const dividasCliente = vendas.filter(v => v.cliente === usuarioLogado.username);
+    if(dividasCliente.length === 0) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td colspan="6" style="text-align:center;">Você não tem dívidas.</td>`;
+      tabelaDividasClienteBody.appendChild(tr);
+      return;
+    }
+    dividasCliente.forEach(v => {
+      const produto = produtos.find(p => p.nome === v.produto);
+      const valorTotal = v.quantidade * (produto?.preco || 0);
+      const valorDevido = valorTotal - v.pago;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${v.produto}</td>
+        <td>${v.quantidade}</td>
+        <td>${formatarReais(valorTotal)}</td>
+        <td>${formatarReais(v.pago)}</td>
+        <td>${formatarReais(valorDevido)}</td>
+        <td>${new Date(v.data).toLocaleDateString('pt-BR')}</td>
+      `;
+      tabelaDividasClienteBody.appendChild(tr);
+    });
+  }
+
+  // Registrar compra cliente (adiciona na venda/dívida)
+  formRegistrarCompra.addEventListener('submit', (e) => {
+    e.preventDefault();
+    compraMsgError.textContent = '';
+    compraMsgSuccess.textContent = '';
+
+    const produto = compraProdutoSelect.value;
+    const quantidade = parseInt(compraQuantidadeInput.value);
+    const pago = parseFloat(compraPagoInput.value);
+
+    if(!produto) {
+      compraMsgError.textContent = 'Selecione um produto.';
+      return;
+    }
+    if(isNaN(quantidade) || quantidade < 1) {
+      compraMsgError.textContent = 'Quantidade deve ser pelo menos 1.';
+      return;
+    }
+    if(isNaN(pago) || pago < 0) {
+      compraMsgError.textContent = 'Pagamento inválido.';
+      return;
+    }
+
+    // Se já existe dívida do usuário para o produto, soma
+    const existente = vendas.find(v => v.cliente === usuarioLogado.username && v.produto === produto);
+    if(existente) {
+      existente.quantidade += quantidade;
+      existente.pago += pago;
+      existente.data = new Date().toISOString();
+    } else {
+      vendas.push({
+        cliente: usuarioLogado.username,
+        produto,
+        quantidade,
+        pago,
+        data: new Date().toISOString()
+      });
+    }
+    salvarVendas();
+    compraMsgSuccess.textContent = 'Compra registrada com sucesso!';
+    formRegistrarCompra.reset();
+    carregarDividasClienteTabela();
+  });
+
+  // --- NAVEGAÇÃO DOS TABS ADMIN ---
+  function esconderTabs() {
+    tabContentProdutos.classList.add('hidden');
+    tabContentVendas.classList.add('hidden');
+    tabContentRelatorios.classList.add('hidden');
+    tabProdutosBtn.disabled = false;
+    tabVendasBtn.disabled = false;
+    tabRelatoriosBtn.disabled = false;
+  }
+  tabProdutosBtn.onclick = () => {
+    esconderTabs();
+    tabContentProdutos.classList.remove('hidden');
+    tabProdutosBtn.disabled = true;
+  };
+  tabVendasBtn.onclick = () => {
+    esconderTabs();
+    tabContentVendas.classList.remove('hidden');
+    tabVendasBtn.disabled = true;
+  };
+  tabRelatoriosBtn.onclick = () => {
+    esconderTabs();
+    tabContentRelatorios.classList.remove('hidden');
+    tabRelatoriosBtn.disabled = true;
+  };
+  // Inicia com aba produtos
+  esconderTabs();
+  tabContentProdutos.classList.remove('hidden');
+  tabProdutosBtn.disabled = true;
+
+  // Botão logout dentro do painel admin
+  btnVoltarAdmin.addEventListener('click', () => {
+    usuarioLogado = null;
+    sessionStorage.removeItem('usuarioLogado');
+    mostrarTela('login');
+  });
+  // Botão logout cliente
+  btnLogoutCliente.addEventListener('click', () => {
+    usuarioLogado = null;
+    sessionStorage.removeItem('usuarioLogado');
+    mostrarTela('login');
+  });
+
+  // Limpa mensagens de erro/sucesso
+  function limparMensagens() {
+    loginError.textContent = '';
+    cadUsuarioError.textContent = '';
+    cadUsuarioSuccess.textContent = '';
+    produtoMsgError.textContent = '';
+    produtoMsgSuccess.textContent = '';
+    vendaMsgError.textContent = '';
+    vendaMsgSuccess.textContent = '';
+    compraMsgError.textContent = '';
+    compraMsgSuccess.textContent = '';
+  }
+
+  // --- INICIAR APP ---
+
+  verificarLoginSessao();
+
+</script>
+
+</body>
+</html>
