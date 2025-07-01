@@ -1,986 +1,963 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no" />
-<title>VENDA DO OLIVEIRA - Sistema Futurístico</title>
-<style>
-  /* Reset & base */
-  * {
-    margin:0; padding:0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
-  body, html {
-    height: 100%; background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    color: #e0e0e0;
-    -webkit-font-smoothing: antialiased;
-  }
-  a {
-    color:#00e5ff; text-decoration:none;
-  }
-  a:hover {
-    text-decoration: underline;
-  }
-  button {
-    cursor: pointer; background: #00e5ff; border:none; padding: 10px 18px; border-radius: 8px; color:#012; font-weight: 700;
-    box-shadow: 0 0 12px #00e5ffaa;
-    transition: background 0.3s ease;
-  }
-  button:hover {
-    background: #00c3cc;
-  }
-  input, select {
-    padding: 8px 12px; border-radius: 6px; border: none; outline:none;
-    background: #001e2d; color:#00e5ff; font-weight: 600;
-    box-shadow: inset 0 0 6px #00e5ff88;
-    font-size: 16px;
-  }
-  input::placeholder {
-    color:#0099aaaa;
-  }
-  h1, h2, h3, h4 {
-    font-weight: 700;
-  }
-  /* Layout */
-  #app {
-    max-width: 480px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; background: #041e30cc; 
-    box-shadow: 0 0 40px #00e5ff55;
-    border-radius: 12px; padding: 20px;
-  }
-
-  /* Header */
-  header {
-    text-align: center; margin-bottom: 25px;
-    border-bottom: 2px solid #00e5ff55; padding-bottom: 12px;
-  }
-  header h1 {
-    font-size: 1.8rem; color:#00e5ff;
-    text-shadow: 0 0 10px #00e5ffbb;
-  }
-  /* Login form */
-  #login-container {
-    display: flex; flex-direction: column; gap: 15px;
-  }
-  #login-container label {
-    font-weight: 600; font-size: 0.9rem;
-    color: #00e5ffbb;
-  }
-  #login-container select {
-    margin-bottom: 12px;
-  }
-  #login-error {
-    color: #ff4444; font-weight: 700; text-align: center;
-    margin-top: 6px; min-height: 24px;
-  }
-
-  /* Panels */
-  .panel {
-    display: none;
-    flex-direction: column;
-    gap: 20px;
-    flex-grow: 1;
-  }
-  .panel.active {
-    display: flex;
-  }
-  nav.tabs {
-    display: flex;
-    gap: 8px;
-    border-bottom: 2px solid #00e5ff55;
-    margin-bottom: 10px;
-    flex-wrap: wrap;
-  }
-  nav.tabs button {
-    flex-grow: 1;
-    background: transparent;
-    color: #00e5ffaa;
-    font-weight: 700;
-    border-radius: 6px 6px 0 0;
-    box-shadow: none;
-    border-bottom: 3px solid transparent;
-    transition: all 0.3s ease;
-  }
-  nav.tabs button.active {
-    color: #00ffff;
-    background: #00475a;
-    box-shadow: 0 0 15px #00ffffaa;
-    border-bottom: 3px solid #00ffff;
-  }
-
-  /* Forms inside panels */
-  form {
-    display: flex; flex-direction: column; gap: 14px;
-    background: #002f4b88;
-    padding: 16px; border-radius: 10px;
-    box-shadow: 0 0 12px #00e5ff55;
-  }
-
-  form label {
-    font-weight: 600;
-    color: #00c3cc;
-  }
-  form input, form select {
-    width: 100%;
-  }
-
-  /* Tables */
-  table {
-    width: 100%; border-collapse: collapse;
-    background: #002f4bcc;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 0 10px #00e5ff44;
-  }
-  th, td {
-    padding: 12px 8px;
-    text-align: center;
-    border-bottom: 1px solid #00e5ff33;
-    color: #00e5ffcc;
-    font-weight: 600;
-    font-size: 0.9rem;
-  }
-  th {
-    background: #00475a;
-    box-shadow: 0 0 15px #00e5ffaa inset;
-  }
-  tr:hover {
-    background: #00475a99;
-  }
-
-  /* Scrollable tables */
-  .table-wrapper {
-    overflow-x: auto;
-  }
-
-  /* Scrollbar styling */
-  ::-webkit-scrollbar {
-    height: 8px;
-    width: 8px;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #00e5ffaa;
-    border-radius: 6px;
-  }
-  ::-webkit-scrollbar-track {
-    background: #001e2d;
-  }
-
-  /* Responsive */
-  @media(max-width: 520px) {
-    #app {
-      max-width: 100vw; height: 100vh; padding: 10px 12px;
-      border-radius: 0;
-      box-shadow: none;
-    }
-    table, form {
-      font-size: 14px;
-    }
-    nav.tabs button {
-      font-size: 14px;
-    }
-    header h1 {
-      font-size: 1.5rem;
-    }
-  }
-
-  /* Futuristics shapes and animation */
-  body::before {
-    content: "";
-    position: fixed; top: -150px; left: -150px; width: 500px; height: 500px;
-    background: radial-gradient(circle, #00e5ff77, transparent 70%);
-    filter: blur(60px);
-    z-index: 0;
-  }
-  body::after {
-    content: "";
-    position: fixed; bottom: -100px; right: -100px; width: 400px; height: 400px;
-    background: conic-gradient(from 0deg at 50% 50%, #00e5ff88 0deg 120deg, transparent 121deg 360deg);
-    filter: blur(50px);
-    z-index: 0;
-  }
-
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VENDA DO OLIVEIRA</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #0f0c29;
+            --secondary: #302b63;
+            --accent: #00d2ff;
+            --accent2: #ff00cc;
+            --text: #e0e0ff;
+            --card-bg: rgba(25, 20, 60, 0.7);
+            --success: #00ff9d;
+            --warning: #ffcc00;
+            --danger: #ff0066;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Exo 2', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(255, 0, 204, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 210, 255, 0.1) 0%, transparent 20%);
+            z-index: -1;
+        }
+        
+        .glow {
+            text-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent);
+        }
+        
+        .container {
+            max-width: 100%;
+            padding: 20px;
+            margin: 0 auto;
+        }
+        
+        /* Tela Inicial */
+        .login-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .logo {
+            margin-bottom: 40px;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .logo h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 15px rgba(0, 210, 255, 0.5);
+            margin-bottom: 10px;
+        }
+        
+        .logo p {
+            color: var(--accent);
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+        }
+        
+        .login-options {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .login-btn {
+            background: var(--card-bg);
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 210, 255, 0.3);
+            border-color: var(--accent);
+        }
+        
+        .login-btn i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+        
+        .login-btn h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+        
+        /* Painel Administrativo */
+        .admin-panel, .client-panel {
+            display: none;
+            min-height: 100vh;
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: var(--card-bg);
+            border-bottom: 1px solid rgba(0, 210, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .panel-header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .logout-btn {
+            background: rgba(255, 0, 102, 0.2);
+            border: 1px solid var(--danger);
+            color: var(--text);
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255, 0, 102, 0.4);
+        }
+        
+        .tabs {
+            display: flex;
+            overflow-x: auto;
+            padding: 15px 20px;
+            gap: 10px;
+            background: rgba(15, 12, 41, 0.8);
+            border-bottom: 1px solid rgba(0, 210, 255, 0.2);
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background: rgba(25, 20, 60, 0.5);
+            border-radius: 50px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        
+        .tab.active {
+            background: rgba(0, 210, 255, 0.2);
+            border-color: var(--accent);
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card h2 {
+            color: var(--accent);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card h2 i {
+            font-size: 1.8rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--accent);
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            background: rgba(15, 12, 41, 0.7);
+            color: var(--text);
+            font-size: 1rem;
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            color: var(--primary);
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 210, 255, 0.4);
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            border-radius: 15px;
+            border: 1px solid rgba(0, 210, 255, 0.2);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(15, 12, 41, 0.7);
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 210, 255, 0.2);
+        }
+        
+        th {
+            background: rgba(25, 20, 60, 0.8);
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background: rgba(0, 210, 255, 0.05);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(15, 12, 41, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(0, 210, 255, 0.2);
+        }
+        
+        .stat-card h3 {
+            color: var(--accent);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 10px 0;
+        }
+        
+        .chart-container {
+            height: 300px;
+            margin-top: 20px;
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .product-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 210, 255, 0.3);
+        }
+        
+        .product-image {
+            height: 150px;
+            background: linear-gradient(45deg, var(--secondary), var(--primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: var(--accent);
+        }
+        
+        .product-info {
+            padding: 20px;
+        }
+        
+        .product-info h3 {
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+        
+        .product-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--success);
+            margin: 10px 0;
+        }
+        
+        .request-btn {
+            width: 100%;
+            margin-top: 15px;
+        }
+        
+        /* Animações */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .logo h1 {
+                font-size: 2rem;
+            }
+            
+            .panel-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .stat-value {
+                font-size: 2rem;
+            }
+        }
+    </style>
 </head>
 <body>
-<div id="app">
-  <header>
-    <h1>VENDA DO OLIVEIRA</h1>
-  </header>
-
-  <!-- LOGIN -->
-  <section id="login-section">
-    <form id="login-form">
-      <label for="login-role">Entrar como:</label>
-      <select id="login-role" required>
-        <option value="">Selecione o perfil</option>
-        <option value="admin">Administrador</option>
-        <option value="cliente">Cliente</option>
-      </select>
-
-      <label for="login-username">Usuário:</label>
-      <input type="text" id="login-username" placeholder="Seu usuário" required autocomplete="username" />
-
-      <label for="login-password">Senha:</label>
-      <input type="password" id="login-password" placeholder="Sua senha" required autocomplete="current-password" />
-
-      <button type="submit">Entrar</button>
-    </form>
-    <div id="login-error"></div>
-  </section>
-
-  <!-- PAINEL ADMIN -->
-  <section id="admin-panel" class="panel" aria-label="Painel do Administrador">
-    <nav class="tabs" aria-label="Navegação do painel do administrador">
-      <button data-tab="produtos" class="active">Cadastrar Produtos</button>
-      <button data-tab="clientes">Cadastrar Clientes</button>
-      <button data-tab="devedores">Registrar Devedores</button>
-      <button data-tab="solicitacoes">Solicitações</button>
-      <button data-tab="estatisticas">Estatísticas</button>
-      <button id="logout-admin" style="background:#ff0044; box-shadow:0 0 12px #ff0044;">Sair</button>
-    </nav>
-
-    <!-- Aba produtos -->
-    <div id="tab-produtos" class="tab-content active" role="tabpanel">
-      <form id="form-produto">
-        <h2>Cadastrar Produto</h2>
-        <label for="produto-nome">Nome do produto:</label>
-        <input type="text" id="produto-nome" required placeholder="Ex: Smartphone XYZ" />
-
-        <label for="produto-custo">Custo (R$):</label>
-        <input type="number" min="0" step="0.01" id="produto-custo" required placeholder="Preço de custo" />
-
-        <label for="produto-venda">Preço de Venda (R$):</label>
-        <input type="number" min="0" step="0.01" id="produto-venda" required placeholder="Preço de venda" />
-
-        <button type="submit">Salvar Produto</button>
-      </form>
-      <div class="table-wrapper" style="margin-top: 20px;">
-        <table id="tabela-produtos" aria-label="Tabela de produtos cadastrados">
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Custo (R$)</th>
-              <th>Venda (R$)</th>
-              <th>Lucro Unitário (R$)</th>
-              <th>Qtd Vendida</th>
-              <th>Lucro Total (R$)</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- preenchido por JS -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Aba clientes -->
-    <div id="tab-clientes" class="tab-content" role="tabpanel" hidden>
-      <form id="form-cliente">
-        <h2>Cadastrar Cliente</h2>
-        <label for="cliente-nome">Nome do cliente:</label>
-        <input type="text" id="cliente-nome" required placeholder="Nome completo" />
-
-        <label for="cliente-usuario">Usuário (login):</label>
-        <input type="text" id="cliente-usuario" required placeholder="Login único" />
-
-        <label for="cliente-senha">Senha:</label>
-        <input type="password" id="cliente-senha" required placeholder="Senha segura" />
-
-        <button type="submit">Salvar Cliente</button>
-      </form>
-      <div class="table-wrapper" style="margin-top: 20px;">
-        <table id="tabela-clientes" aria-label="Tabela de clientes cadastrados">
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Usuário</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- preenchido por JS -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Aba devedores -->
-    <div id="tab-devedores" class="tab-content" role="tabpanel" hidden>
-      <form id="form-devedor">
-        <h2>Registrar Devedor</h2>
-
-        <label for="devedor-cliente">Cliente:</label>
-        <select id="devedor-cliente" required>
-          <!-- preenchido por JS -->
-        </select>
-
-        <label for="devedor-produto">Produto:</label>
-        <select id="devedor-produto" required>
-          <!-- preenchido por JS -->
-        </select>
-
-        <label for="devedor-quantidade">Quantidade:</label>
-        <input type="number" id="devedor-quantidade" min="1" value="1" required />
-
-        <label for="devedor-parcial">Pagamento Parcial (R$):</label>
-        <input type="number" id="devedor-parcial" min="0" value="0" step="0.01" required />
-
-        <button type="submit">Registrar Dívida</button>
-      </form>
-      <div class="table-wrapper" style="margin-top: 20px;">
-        <table id="tabela-devedores" aria-label="Tabela de devedores cadastrados">
-          <thead>
-            <tr>
-              <th>Cliente</th>
-              <th>Produto</th>
-              <th>Qtd</th>
-              <th>Valor Total (R$)</th>
-              <th>Pago (R$)</th>
-              <th>Saldo Devedor (R$)</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- preenchido por JS -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Aba solicitações -->
-    <div id="tab-solicitacoes" class="tab-content" role="tabpanel" hidden>
-      <h2>Solicitações de Compra</h2>
-      <div class="table-wrapper">
-        <table id="tabela-solicitacoes" aria-label="Tabela de solicitações feitas pelos clientes">
-          <thead>
-            <tr>
-              <th>Cliente</th>
-              <th>Produto</th>
-              <th>Qtd</th>
-              <th>Status</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- preenchido por JS -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Aba estatísticas -->
-    <div id="tab-estatisticas" class="tab-content" role="tabpanel" hidden>
-      <h2>Estatísticas Futurísticas</h2>
-      <section id="estatisticas-gerais" style="display:flex; flex-direction: column; gap: 12px;">
-
-        <div id="estat-produto-mais-vendido" style="background:#00394d; padding:12px; border-radius: 10px; box-shadow: 0 0 15px #00e5ffaa;">
-          <h3>Produto Mais Vendido</h3>
-          <p id="produto-mais-vendido-text">Carregando...</p>
+    <!-- Tela Inicial de Login -->
+    <div class="login-screen" id="loginScreen">
+        <div class="logo">
+            <h1 class="glow">VENDA DO OLIVEIRA</h1>
+            <p>SISTEMA DE VENDAS FUTURÍSTICO</p>
         </div>
-
-        <div id="estat-cliente-mais-comprou" style="background:#00394d; padding:12px; border-radius: 10px; box-shadow: 0 0 15px #00e5ffaa;">
-          <h3>Cliente que mais comprou</h3>
-          <p id="cliente-mais-comprou-text">Carregando...</p>
+        
+        <div class="login-options">
+            <div class="login-btn" onclick="showPanel('admin')">
+                <i class="fas fa-user-shield"></i>
+                <h2>Login Administrador</h2>
+                <p>Acesso completo ao sistema</p>
+            </div>
+            
+            <div class="login-btn" onclick="showPanel('client')">
+                <i class="fas fa-user"></i>
+                <h2>Login Cliente</h2>
+                <p>Solicite seus produtos</p>
+            </div>
         </div>
-
-        <div id="estat-lucro-total" style="background:#00394d; padding:12px; border-radius: 10px; box-shadow: 0 0 15px #00e5ffaa;">
-          <h3>Lucro Total (R$)</h3>
-          <p id="lucro-total-text">Carregando...</p>
+    </div>
+    
+    <!-- Painel Administrativo -->
+    <div class="admin-panel" id="adminPanel">
+        <div class="panel-header">
+            <h1><i class="fas fa-user-shield"></i> PAINEL ADMINISTRATIVO</h1>
+            <button class="logout-btn" onclick="showLoginScreen()"><i class="fas fa-sign-out-alt"></i> Sair</button>
         </div>
-
-        <div id="estat-gasto-total" style="background:#00394d; padding:12px; border-radius: 10px; box-shadow: 0 0 15px #00e5ffaa;">
-          <h3>Gasto Total (R$)</h3>
-          <p id="gasto-total-text">Carregando...</p>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="dashboard">Dashboard</div>
+            <div class="tab" data-tab="products">Cadastrar Produtos</div>
+            <div class="tab" data-tab="clients">Cadastrar Clientes</div>
+            <div class="tab" data-tab="debtors">Cadastrar Devedores</div>
+            <div class="tab" data-tab="requests">Solicitações</div>
+            <div class="tab" data-tab="stats">Estatísticas</div>
         </div>
-
-      </section>
+        
+        <div class="container">
+            <!-- Dashboard -->
+            <div class="tab-content active" id="dashboard">
+                <div class="card">
+                    <h2><i class="fas fa-tachometer-alt"></i> Visão Geral</h2>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>LUCRO TOTAL</h3>
+                            <div class="stat-value">R$ 18.450,00</div>
+                            <p><i class="fas fa-arrow-up" style="color: var(--success);"></i> 12% em relação ao mês anterior</p>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <h3>VENDAS DO MÊS</h3>
+                            <div class="stat-value">142</div>
+                            <p><i class="fas fa-arrow-up" style="color: var(--success);"></i> 8% em relação ao mês anterior</p>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <h3>CLIENTES ATIVOS</h3>
+                            <div class="stat-value">58</div>
+                            <p><i class="fas fa-arrow-up" style="color: var(--success);"></i> 5% em relação ao mês anterior</p>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <h3>SOLICITAÇÕES PENDENTES</h3>
+                            <div class="stat-value">24</div>
+                            <p><i class="fas fa-exclamation-circle" style="color: var(--warning);"></i> Requerem atenção</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2><i class="fas fa-chart-line"></i> Desempenho Mensal</h2>
+                    <div class="chart-container">
+                        <canvas id="monthlyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Cadastrar Produtos -->
+            <div class="tab-content" id="products">
+                <div class="card">
+                    <h2><i class="fas fa-box"></i> Cadastrar Novo Produto</h2>
+                    
+                    <div class="form-group">
+                        <label for="productName">Nome do Produto</label>
+                        <input type="text" id="productName" placeholder="Ex: Smartphone XYZ">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="productCategory">Categoria</label>
+                        <select id="productCategory">
+                            <option value="">Selecione uma categoria</option>
+                            <option value="eletronicos">Eletrônicos</option>
+                            <option value="moveis">Móveis</option>
+                            <option value="roupas">Roupas</option>
+                            <option value="alimentos">Alimentos</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="productPrice">Preço (R$)</label>
+                        <input type="number" id="productPrice" placeholder="Ex: 299.90">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="productCost">Custo (R$)</label>
+                        <input type="number" id="productCost" placeholder="Ex: 150.00">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="productStock">Estoque</label>
+                        <input type="number" id="productStock" placeholder="Ex: 100">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="productDescription">Descrição</label>
+                        <textarea id="productDescription" rows="3" placeholder="Descrição detalhada do produto"></textarea>
+                    </div>
+                    
+                    <button class="btn"><i class="fas fa-plus"></i> Cadastrar Produto</button>
+                </div>
+                
+                <div class="card">
+                    <h2><i class="fas fa-list"></i> Produtos Cadastrados</h2>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Produto</th>
+                                    <th>Categoria</th>
+                                    <th>Preço</th>
+                                    <th>Custo</th>
+                                    <th>Estoque</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Smartphone XYZ</td>
+                                    <td>Eletrônicos</td>
+                                    <td>R$ 1.299,90</td>
+                                    <td>R$ 850,00</td>
+                                    <td>42</td>
+                                    <td><button class="btn" style="padding: 8px 15px;"><i class="fas fa-edit"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td>Sofá 3 Lugares</td>
+                                    <td>Móveis</td>
+                                    <td>R$ 2.499,00</td>
+                                    <td>R$ 1.200,00</td>
+                                    <td>15</td>
+                                    <td><button class="btn" style="padding: 8px 15px;"><i class="fas fa-edit"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td>Camiseta Premium</td>
+                                    <td>Roupas</td>
+                                    <td>R$ 89,90</td>
+                                    <td>R$ 35,00</td>
+                                    <td>120</td>
+                                    <td><button class="btn" style="padding: 8px 15px;"><i class="fas fa-edit"></i></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Cadastrar Clientes -->
+            <div class="tab-content" id="clients">
+                <div class="card">
+                    <h2><i class="fas fa-user-plus"></i> Cadastrar Novo Cliente</h2>
+                    
+                    <div class="form-group">
+                        <label for="clientName">Nome Completo</label>
+                        <input type="text" id="clientName" placeholder="Ex: João Silva">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="clientEmail">Email</label>
+                        <input type="email" id="clientEmail" placeholder="Ex: joao@email.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="clientPhone">Telefone</label>
+                        <input type="tel" id="clientPhone" placeholder="Ex: (11) 99999-9999">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="clientLogin">Login</label>
+                        <input type="text" id="clientLogin" placeholder="Ex: joao.silva">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="clientPassword">Senha</label>
+                        <input type="password" id="clientPassword" placeholder="Crie uma senha segura">
+                    </div>
+                    
+                    <button class="btn"><i class="fas fa-user-plus"></i> Cadastrar Cliente</button>
+                </div>
+                
+                <div class="card">
+                    <h2><i class="fas fa-users"></i> Clientes Cadastrados</h2>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Email</th>
+                                    <th>Telefone</th>
+                                    <th>Última Compra</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>João Silva</td>
+                                    <td>joao@email.com</td>
+                                    <td>(11) 99999-9999</td>
+                                    <td>01/07/2025</td>
+                                    <td><button class="btn" style="padding: 8px 15px;"><i class="fas fa-edit"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td>Maria Oliveira</td>
+                                    <td>maria@email.com</td>
+                                    <td>(21) 98888-8888</td>
+                                    <td>28/06/2025</td>
+                                    <td><button class="btn" style="padding: 8px 15px;"><i class="fas fa-edit"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td>Carlos Santos</td>
+                                    <td>carlos@email.com</td>
+                                    <td>(31) 97777-7777</td>
+                                    <td>25/06/2025</td>
+                                    <td><button class="btn" style="padding: 8px 15px;"><i class="fas fa-edit"></i></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Estatísticas -->
+            <div class="tab-content" id="stats">
+                <div class="card">
+                    <h2><i class="fas fa-chart-pie"></i> Estatísticas de Vendas</h2>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>PRODUTO MAIS VENDIDO</h3>
+                            <p>Smartphone XYZ</p>
+                            <div class="stat-value">142 unidades</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <h3>CLIENTE QUE MAIS COMPRA</h3>
+                            <p>João Silva</p>
+                            <div class="stat-value">R$ 8.450,00</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2><i class="fas fa-shopping-basket"></i> Desempenho por Produto</h2>
+                    <div class="chart-container">
+                        <canvas id="productsChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2><i class="fas fa-user-tag"></i> Desempenho por Cliente</h2>
+                    <div class="chart-container">
+                        <canvas id="clientsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </section>
-
-  <!-- PAINEL CLIENTE -->
-  <section id="cliente-panel" class="panel" aria-label="Painel do Cliente" style="gap:15px;">
-    <div style="display:flex; justify-content: space-between; align-items: center;">
-      <h2>Bem-vindo(a), <span id="cliente-nome-display"></span></h2>
-      <button id="logout-cliente" style="background:#ff0044; box-shadow:0 0 12px #ff0044;">Sair</button>
+    
+    <!-- Painel do Cliente -->
+    <div class="client-panel" id="clientPanel">
+        <div class="panel-header">
+            <h1><i class="fas fa-user"></i> PAINEL DO CLIENTE</h1>
+            <button class="logout-btn" onclick="showLoginScreen()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+        </div>
+        
+        <div class="container">
+            <div class="card">
+                <h2><i class="fas fa-boxes"></i> Produtos Disponíveis</h2>
+                <p>Solicite os produtos que deseja comprar</p>
+                
+                <div class="products-grid">
+                    <div class="product-card">
+                        <div class="product-image">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div class="product-info">
+                            <h3>Smartphone XYZ</h3>
+                            <p>Smartphone de última geração com câmera tripla e 128GB de armazenamento.</p>
+                            <div class="product-price">R$ 1.299,90</div>
+                            <button class="btn request-btn"><i class="fas fa-cart-plus"></i> Solicitar Compra</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-image">
+                            <i class="fas fa-couch"></i>
+                        </div>
+                        <div class="product-info">
+                            <h3>Sofá 3 Lugares</h3>
+                            <p>Sofá reclinável em couro sintético, disponível em 3 cores.</p>
+                            <div class="product-price">R$ 2.499,00</div>
+                            <button class="btn request-btn"><i class="fas fa-cart-plus"></i> Solicitar Compra</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-image">
+                            <i class="fas fa-tshirt"></i>
+                        </div>
+                        <div class="product-info">
+                            <h3>Camiseta Premium</h3>
+                            <p>Camiseta 100% algodão com estampa exclusiva, disponível em vários tamanhos.</p>
+                            <div class="product-price">R$ 89,90</div>
+                            <button class="btn request-btn"><i class="fas fa-cart-plus"></i> Solicitar Compra</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-image">
+                            <i class="fas fa-laptop"></i>
+                        </div>
+                        <div class="product-info">
+                            <h3>Notebook Pro</h3>
+                            <p>Notebook com processador i7, 16GB RAM e SSD 512GB, tela Full HD.</p>
+                            <div class="product-price">R$ 4.599,00</div>
+                            <button class="btn request-btn"><i class="fas fa-cart-plus"></i> Solicitar Compra</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2><i class="fas fa-history"></i> Minhas Solicitações</h2>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Produto</th>
+                                <th>Data</th>
+                                <th>Status</th>
+                                <th>Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Smartphone XYZ</td>
+                                <td>01/07/2025</td>
+                                <td><span style="color: var(--success);">Aprovado</span></td>
+                                <td>R$ 1.299,90</td>
+                            </tr>
+                            <tr>
+                                <td>Camiseta Premium</td>
+                                <td>28/06/2025</td>
+                                <td><span style="color: var(--success);">Aprovado</span></td>
+                                <td>R$ 89,90</td>
+                            </tr>
+                            <tr>
+                                <td>Notebook Pro</td>
+                                <td>30/06/2025</td>
+                                <td><span style="color: var(--warning);">Pendente</span></td>
+                                <td>R$ 4.599,00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <h3>Produtos Disponíveis</h3>
-    <div class="table-wrapper" style="max-height: 320px; overflow-y: auto;">
-      <table id="tabela-produtos-cliente" aria-label="Tabela de produtos disponíveis para clientes">
-        <thead>
-          <tr>
-            <th>Produto</th>
-            <th>Preço (R$)</th>
-            <th>Ação</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- preenchido por JS -->
-        </tbody>
-      </table>
-    </div>
-  </section>
-</div>
-
-<script>
-  // Dados simulados no localStorage
-  // Senha dos usuários serão salvas como hash simples para não deixar em texto puro - (simples base64 para demo, NUNCA use assim em produção)
-  // Admin inicial fixo: usuário: admin senha: admin123
-  // Clientes e produtos criados dinamicamente
-
-  // Helpers
-  function shaBase64(str) {
-    // simples hash base64 (não seguro para produção, só demo)
-    return btoa(unescape(encodeURIComponent(str)));
-  }
-
-  // Carregar dados do localStorage ou iniciar vazio
-  function loadData() {
-    return {
-      usuarios: JSON.parse(localStorage.getItem('usuarios') || '[]'),
-      produtos: JSON.parse(localStorage.getItem('produtos') || '[]'),
-      devedores: JSON.parse(localStorage.getItem('devedores') || '[]'),
-      solicitacoes: JSON.parse(localStorage.getItem('solicitacoes') || '[]'),
-    };
-  }
-  function saveData(data) {
-    localStorage.setItem('usuarios', JSON.stringify(data.usuarios));
-    localStorage.setItem('produtos', JSON.stringify(data.produtos));
-    localStorage.setItem('devedores', JSON.stringify(data.devedores));
-    localStorage.setItem('solicitacoes', JSON.stringify(data.solicitacoes));
-  }
-
-  // Inicializar admin se não existir
-  function initAdmin(data) {
-    if (!data.usuarios.find(u => u.role === 'admin')) {
-      data.usuarios.push({
-        id: 'admin-1',
-        nome: 'Administrador Principal',
-        usuario: 'admin',
-        senha: shaBase64('admin123'),
-        role: 'admin'
-      });
-      saveData(data);
-    }
-  }
-
-  // Variáveis globais
-  let appData = loadData();
-  initAdmin(appData);
-  let usuarioLogado = null;
-
-  // Elements
-  const loginSection = document.getElementById('login-section');
-  const loginForm = document.getElementById('login-form');
-  const loginRole = document.getElementById('login-role');
-  const loginUser = document.getElementById('login-username');
-  const loginPass = document.getElementById('login-password');
-  const loginError = document.getElementById('login-error');
-
-  const adminPanel = document.getElementById('admin-panel');
-  const clientePanel = document.getElementById('cliente-panel');
-
-  const tabsButtons = adminPanel.querySelectorAll('nav.tabs button[data-tab]');
-  const tabContents = adminPanel.querySelectorAll('.tab-content');
-
-  // --- Função para alternar abas no admin
-  function ativarAba(tabName) {
-    tabsButtons.forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.tab === tabName);
-    });
-    tabContents.forEach(tab => {
-      tab.hidden = tab.id !== 'tab-' + tabName;
-      tab.classList.toggle('active', tab.id === 'tab-' + tabName);
-    });
-  }
-  tabsButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      ativarAba(btn.dataset.tab);
-    });
-  });
-
-  // Logout
-  document.getElementById('logout-admin').addEventListener('click', () => {
-    usuarioLogado = null;
-    loginForm.reset();
-    loginError.textContent = '';
-    toggleSections();
-  });
-  document.getElementById('logout-cliente').addEventListener('click', () => {
-    usuarioLogado = null;
-    loginForm.reset();
-    loginError.textContent = '';
-    toggleSections();
-  });
-
-  // Toggle visibilidade se está logado e qual painel mostrar
-  function toggleSections() {
-    if (!usuarioLogado) {
-      loginSection.style.display = 'flex';
-      adminPanel.style.display = 'none';
-      clientePanel.style.display = 'none';
-    } else if (usuarioLogado.role === 'admin') {
-      loginSection.style.display = 'none';
-      adminPanel.style.display = 'flex';
-      clientePanel.style.display = 'none';
-      ativarAba('produtos');
-      carregarProdutosTabela();
-      carregarClientesTabela();
-      carregarDevedoresTabela();
-      carregarSolicitacoesTabela();
-      carregarEstatisticas();
-      preencherSelectDevedores();
-    } else if (usuarioLogado.role === 'cliente') {
-      loginSection.style.display = 'none';
-      adminPanel.style.display = 'none';
-      clientePanel.style.display = 'flex';
-      document.getElementById('cliente-nome-display').textContent = usuarioLogado.nome;
-      carregarProdutosCliente();
-    }
-  }
-
-  toggleSections();
-
-  // LOGIN
-  loginForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    loginError.textContent = '';
-    const role = loginRole.value.trim();
-    const usuario = loginUser.value.trim();
-    const senha = loginPass.value.trim();
-
-    if (!role || !usuario || !senha) {
-      loginError.textContent = 'Preencha todos os campos!';
-      return;
-    }
-
-    const userFound = appData.usuarios.find(u => u.usuario === usuario && u.role === role);
-    if (!userFound) {
-      loginError.textContent = 'Usuário ou perfil inválido!';
-      return;
-    }
-    if (userFound.senha !== shaBase64(senha)) {
-      loginError.textContent = 'Senha incorreta!';
-      return;
-    }
-    usuarioLogado = userFound;
-    toggleSections();
-  });
-
-  // --- CADASTRO DE PRODUTOS ---
-  const formProduto = document.getElementById('form-produto');
-  formProduto.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    const nome = document.getElementById('produto-nome').value.trim();
-    const custo = parseFloat(document.getElementById('produto-custo').value);
-    const venda = parseFloat(document.getElementById('produto-venda').value);
-
-    if (!nome || isNaN(custo) || isNaN(venda) || custo < 0 || venda < 0) {
-      alert('Preencha os dados corretamente!');
-      return;
-    }
-
-    // Verificar se produto já existe (nome único)
-    if (appData.produtos.find(p => p.nome.toLowerCase() === nome.toLowerCase())) {
-      alert('Produto já cadastrado!');
-      return;
-    }
-
-    const novoProduto = {
-      id: 'p-' + Date.now(),
-      nome,
-      custo,
-      venda,
-      vendidos: 0, // quantidade vendida para estatísticas
-    };
-
-    appData.produtos.push(novoProduto);
-    saveData(appData);
-    formProduto.reset();
-    carregarProdutosTabela();
-    preencherSelectDevedores();
-    alert('Produto cadastrado com sucesso!');
-  });
-
-  // Preencher tabela de produtos admin
-  function carregarProdutosTabela() {
-    const tbody = document.querySelector('#tabela-produtos tbody');
-    tbody.innerHTML = '';
-    if (appData.produtos.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7">Nenhum produto cadastrado</td></tr>`;
-      return;
-    }
-    for (const p of appData.produtos) {
-      const lucroUnit = (p.venda - p.custo).toFixed(2);
-      const lucroTotal = (lucroUnit * p.vendidos).toFixed(2);
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${p.nome}</td>
-        <td>${p.custo.toFixed(2)}</td>
-        <td>${p.venda.toFixed(2)}</td>
-        <td>${lucroUnit}</td>
-        <td>${p.vendidos}</td>
-        <td>${lucroTotal}</td>
-        <td><button data-id="${p.id}" class="btn-delete-produto" style="background:#ff4444;">Excluir</button></td>
-      `;
-      tbody.appendChild(tr);
-    }
-    // Delete produto
-    document.querySelectorAll('.btn-delete-produto').forEach(btn => {
-      btn.onclick = () => {
-        if (confirm('Excluir produto? Esta ação não pode ser desfeita!')) {
-          appData.produtos = appData.produtos.filter(p => p.id !== btn.dataset.id);
-          saveData(appData);
-          carregarProdutosTabela();
-          preencherSelectDevedores();
+    <script>
+        // Funções para alternar entre telas
+        function showLoginScreen() {
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('clientPanel').style.display = 'none';
         }
-      };
-    });
-  }
-
-  // --- CADASTRO DE CLIENTES ---
-  const formCliente = document.getElementById('form-cliente');
-  formCliente.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    const nome = document.getElementById('cliente-nome').value.trim();
-    const usuario = document.getElementById('cliente-usuario').value.trim();
-    const senha = document.getElementById('cliente-senha').value.trim();
-
-    if (!nome || !usuario || !senha) {
-      alert('Preencha os dados corretamente!');
-      return;
-    }
-    if (appData.usuarios.find(u => u.usuario === usuario)) {
-      alert('Usuário já existe!');
-      return;
-    }
-
-    const novoCliente = {
-      id: 'c-' + Date.now(),
-      nome,
-      usuario,
-      senha: shaBase64(senha),
-      role: 'cliente',
-    };
-    appData.usuarios.push(novoCliente);
-    saveData(appData);
-    formCliente.reset();
-    carregarClientesTabela();
-    preencherSelectDevedores();
-    alert('Cliente cadastrado com sucesso!');
-  });
-
-  // Preencher tabela clientes admin
-  function carregarClientesTabela() {
-    const tbody = document.querySelector('#tabela-clientes tbody');
-    tbody.innerHTML = '';
-    const clientes = appData.usuarios.filter(u => u.role === 'cliente');
-    if (clientes.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="3">Nenhum cliente cadastrado</td></tr>`;
-      return;
-    }
-    for (const c of clientes) {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${c.nome}</td>
-        <td>${c.usuario}</td>
-        <td><button data-id="${c.id}" class="btn-delete-cliente" style="background:#ff4444;">Excluir</button></td>
-      `;
-      tbody.appendChild(tr);
-    }
-    // Delete cliente
-    document.querySelectorAll('.btn-delete-cliente').forEach(btn => {
-      btn.onclick = () => {
-        if (confirm('Excluir cliente? Esta ação não pode ser desfeita!')) {
-          // Remover cliente e dívidas e solicitações relacionadas
-          appData.usuarios = appData.usuarios.filter(u => u.id !== btn.dataset.id);
-          appData.devedores = appData.devedores.filter(d => d.clienteId !== btn.dataset.id);
-          appData.solicitacoes = appData.solicitacoes.filter(s => s.clienteId !== btn.dataset.id);
-          saveData(appData);
-          carregarClientesTabela();
-          carregarDevedoresTabela();
-          carregarSolicitacoesTabela();
-          preencherSelectDevedores();
-        }
-      };
-    });
-  }
-
-  // --- CADASTRO DE DEVEDORES (DÍVIDAS) ---
-  const formDevedor = document.getElementById('form-devedor');
-  const selectDevedorCliente = document.getElementById('devedor-cliente');
-  const selectDevedorProduto = document.getElementById('devedor-produto');
-
-  formDevedor.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    const clienteId = selectDevedorCliente.value;
-    const produtoId = selectDevedorProduto.value;
-    const quantidade = parseInt(document.getElementById('devedor-quantidade').value);
-    const pagamentoParcial = parseFloat(document.getElementById('devedor-parcial').value);
-
-    if (!clienteId || !produtoId || isNaN(quantidade) || quantidade < 1 || isNaN(pagamentoParcial) || pagamentoParcial < 0) {
-      alert('Preencha os dados corretamente!');
-      return;
-    }
-
-    // Busca produto para cálculo
-    const produto = appData.produtos.find(p => p.id === produtoId);
-    if (!produto) {
-      alert('Produto inválido!');
-      return;
-    }
-
-    const valorTotal = produto.venda * quantidade;
-    if (pagamentoParcial > valorTotal) {
-      alert('Pagamento parcial não pode ser maior que o valor total!');
-      return;
-    }
-
-    const novaDivida = {
-      id: 'd-' + Date.now(),
-      clienteId,
-      produtoId,
-      quantidade,
-      valorTotal,
-      pago: pagamentoParcial,
-    };
-
-    appData.devedores.push(novaDivida);
-    saveData(appData);
-    formDevedor.reset();
-    carregarDevedoresTabela();
-    alert('Dívida registrada!');
-  });
-
-  // Preencher selects no formulário de devedor
-  function preencherSelectDevedores() {
-    // clientes
-    selectDevedorCliente.innerHTML = '';
-    const clientes = appData.usuarios.filter(u => u.role === 'cliente');
-    if (clientes.length === 0) {
-      selectDevedorCliente.innerHTML = '<option disabled>Nenhum cliente cadastrado</option>';
-    } else {
-      selectDevedorCliente.innerHTML = clientes.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
-    }
-    // produtos
-    selectDevedorProduto.innerHTML = '';
-    if (appData.produtos.length === 0) {
-      selectDevedorProduto.innerHTML = '<option disabled>Nenhum produto cadastrado</option>';
-    } else {
-      selectDevedorProduto.innerHTML = appData.produtos.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
-    }
-  }
-
-  // Preencher tabela de devedores admin
-  function carregarDevedoresTabela() {
-    const tbody = document.querySelector('#tabela-devedores tbody');
-    tbody.innerHTML = '';
-    if (appData.devedores.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7">Nenhuma dívida registrada</td></tr>`;
-      return;
-    }
-    for (const d of appData.devedores) {
-      const cliente = appData.usuarios.find(u => u.id === d.clienteId);
-      const produto = appData.produtos.find(p => p.id === d.produtoId);
-      if (!cliente || !produto) continue;
-      const saldo = d.valorTotal - d.pago;
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${cliente.nome}</td>
-        <td>${produto.nome}</td>
-        <td>${d.quantidade}</td>
-        <td>${d.valorTotal.toFixed(2)}</td>
-        <td>${d.pago.toFixed(2)}</td>
-        <td>${saldo.toFixed(2)}</td>
-        <td><button data-id="${d.id}" class="btn-delete-divida" style="background:#ff4444;">Excluir</button></td>
-      `;
-      tbody.appendChild(tr);
-    }
-    // Delete dívida
-    document.querySelectorAll('.btn-delete-divida').forEach(btn => {
-      btn.onclick = () => {
-        if (confirm('Excluir dívida? Esta ação não pode ser desfeita!')) {
-          appData.devedores = appData.devedores.filter(d => d.id !== btn.dataset.id);
-          saveData(appData);
-          carregarDevedoresTabela();
-        }
-      };
-    });
-  }
-
-  // --- SOLICITAÇÕES DE COMPRA (CLIENTES) ---
-  // Cliente pode solicitar produtos da lista, salvando na appData.solicitacoes com status pendente
-
-  // Carregar produtos para cliente
-  const tabelaProdutosClienteBody = document.querySelector('#tabela-produtos-cliente tbody');
-
-  function carregarProdutosCliente() {
-    tabelaProdutosClienteBody.innerHTML = '';
-    if (appData.produtos.length === 0) {
-      tabelaProdutosClienteBody.innerHTML = `<tr><td colspan="3">Nenhum produto disponível</td></tr>`;
-      return;
-    }
-    for (const p of appData.produtos) {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${p.nome}</td>
-        <td>${p.venda.toFixed(2)}</td>
-        <td><button data-id="${p.id}" class="btn-solicitar-produto">Solicitar</button></td>
-      `;
-      tabelaProdutosClienteBody.appendChild(tr);
-    }
-    // Botão solicitar produto
-    document.querySelectorAll('.btn-solicitar-produto').forEach(btn => {
-      btn.onclick = () => {
-        const produtoId = btn.dataset.id;
-        const produto = appData.produtos.find(p => p.id === produtoId);
-        if (!produto) {
-          alert('Produto não encontrado!');
-          return;
-        }
-        // Perguntar quantidade
-        let qtdStr = prompt(`Informe a quantidade para solicitar do produto "${produto.nome}":`, "1");
-        if (!qtdStr) return;
-        let qtd = parseInt(qtdStr);
-        if (isNaN(qtd) || qtd < 1) {
-          alert('Quantidade inválida!');
-          return;
-        }
-        // Salvar solicitação
-        appData.solicitacoes.push({
-          id: 's-' + Date.now(),
-          clienteId: usuarioLogado.id,
-          produtoId,
-          quantidade: qtd,
-          status: 'pendente', // pendente, aprovado, rejeitado
-        });
-        saveData(appData);
-        carregarSolicitacoesTabela();
-        alert('Solicitação enviada!');
-      };
-    });
-  }
-
-  // Preencher tabela de solicitações admin
-  function carregarSolicitacoesTabela() {
-    const tbody = document.querySelector('#tabela-solicitacoes tbody');
-    tbody.innerHTML = '';
-    if (appData.solicitacoes.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="5">Nenhuma solicitação feita</td></tr>`;
-      return;
-    }
-    for (const s of appData.solicitacoes) {
-      const cliente = appData.usuarios.find(u => u.id === s.clienteId);
-      const produto = appData.produtos.find(p => p.id === s.produtoId);
-      if (!cliente || !produto) continue;
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${cliente.nome}</td>
-        <td>${produto.nome}</td>
-        <td>${s.quantidade}</td>
-        <td>${s.status}</td>
-        <td>
-          ${s.status === 'pendente' ? 
-            `<button data-id="${s.id}" class="btn-aprovar-solicitacao" style="background:#00cc00;">Aprovar</button> 
-            <button data-id="${s.id}" class="btn-rejeitar-solicitacao" style="background:#cc0000;">Rejeitar</button>` 
-            : '-'}
-        </td>
-      `;
-      tbody.appendChild(tr);
-    }
-
-    // Botões aprovar/rejeitar
-    document.querySelectorAll('.btn-aprovar-solicitacao').forEach(btn => {
-      btn.onclick = () => {
-        if (confirm('Aprovar esta solicitação?')) {
-          const id = btn.dataset.id;
-          const sol = appData.solicitacoes.find(s => s.id === id);
-          if (sol) {
-            sol.status = 'aprovado';
-            // Incrementa vendido no produto para estatística
-            const prod = appData.produtos.find(p => p.id === sol.produtoId);
-            if (prod) {
-              prod.vendidos += sol.quantidade;
+        
+        function showPanel(panel) {
+            document.getElementById('loginScreen').style.display = 'none';
+            
+            if(panel === 'admin') {
+                document.getElementById('adminPanel').style.display = 'block';
+                document.getElementById('clientPanel').style.display = 'none';
+            } else {
+                document.getElementById('adminPanel').style.display = 'none';
+                document.getElementById('clientPanel').style.display = 'block';
             }
-            saveData(appData);
-            carregarSolicitacoesTabela();
-            carregarProdutosTabela();
-            carregarEstatisticas();
-            alert('Solicitação aprovada!');
-          }
         }
-      };
-    });
-    document.querySelectorAll('.btn-rejeitar-solicitacao').forEach(btn => {
-      btn.onclick = () => {
-        if (confirm('Rejeitar esta solicitação?')) {
-          const id = btn.dataset.id;
-          const solIndex = appData.solicitacoes.findIndex(s => s.id === id);
-          if (solIndex !== -1) {
-            appData.solicitacoes[solIndex].status = 'rejeitado';
-            saveData(appData);
-            carregarSolicitacoesTabela();
-            alert('Solicitação rejeitada!');
-          }
-        }
-      };
-    });
-  }
-
-  // --- ESTATÍSTICAS ---
-  function carregarEstatisticas() {
-    // Produto mais vendido
-    if (appData.produtos.length === 0) {
-      document.getElementById('produto-mais-vendido-text').textContent = 'Nenhum produto cadastrado';
-      document.getElementById('cliente-mais-comprou-text').textContent = 'Nenhum cliente cadastrado';
-      document.getElementById('lucro-total-text').textContent = '0.00';
-      document.getElementById('gasto-total-text').textContent = '0.00';
-      return;
-    }
-
-    // Produto mais vendido
-    let maisVendido = appData.produtos.reduce((max, p) => p.vendidos > max.vendidos ? p : max, appData.produtos[0]);
-    document.getElementById('produto-mais-vendido-text').textContent = `${maisVendido.nome} (${maisVendido.vendidos} vendidos)`;
-
-    // Cliente que mais comprou
-    // Conta quantidade de solicitações aprovadas por cliente
-    const clientes = appData.usuarios.filter(u => u.role === 'cliente');
-    if (clientes.length === 0) {
-      document.getElementById('cliente-mais-comprou-text').textContent = 'Nenhum cliente cadastrado';
-    } else {
-      let compraPorCliente = {};
-      for (const c of clientes) {
-        compraPorCliente[c.id] = 0;
-      }
-      for (const s of appData.solicitacoes) {
-        if (s.status === 'aprovado') {
-          compraPorCliente[s.clienteId] = (compraPorCliente[s.clienteId] || 0) + s.quantidade;
-        }
-      }
-      let idMais = Object.keys(compraPorCliente).reduce((maxId, id) => compraPorCliente[id] > compraPorCliente[maxId] ? id : maxId, clientes[0].id);
-      let clienteMais = clientes.find(c => c.id === idMais);
-      let qtdMais = compraPorCliente[idMais];
-      document.getElementById('cliente-mais-comprou-text').textContent = `${clienteMais.nome} (${qtdMais} produtos comprados)`;
-    }
-
-    // Lucro total
-    let lucroTotal = 0;
-    for (const p of appData.produtos) {
-      lucroTotal += (p.venda - p.custo) * p.vendidos;
-    }
-    document.getElementById('lucro-total-text').textContent = lucroTotal.toFixed(2);
-
-    // Gasto total
-    let gastoTotal = 0;
-    for (const p of appData.produtos) {
-      gastoTotal += p.custo * p.vendidos;
-    }
-    document.getElementById('gasto-total-text').textContent = gastoTotal.toFixed(2);
-  }
-
-</script>
+        
+        // Funções para as abas
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove a classe ativa de todas as abas
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Adiciona a classe ativa à aba clicada
+                tab.classList.add('active');
+                
+                // Mostra o conteúdo correspondente
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // Inicialização de gráficos
+        window.onload = function() {
+            // Gráfico de desempenho mensal
+            const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+            const monthlyChart = new Chart(monthlyCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul'],
+                    datasets: [{
+                        label: 'Vendas (R$)',
+                        data: [12500, 14200, 13800, 16500, 17200, 15800, 18450],
+                        borderColor: '#00d2ff',
+                        backgroundColor: 'rgba(0, 210, 255, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#e0e0ff'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#e0e0ff'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#e0e0ff'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Gráfico de produtos
+            const productsCtx = document.getElementById('productsChart').getContext('2d');
+            const productsChart = new Chart(productsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Smartphone', 'Sofá', 'Camiseta', 'Notebook', 'Fones'],
+                    datasets: [{
+                        label: 'Unidades Vendidas',
+                        data: [142, 75, 210, 48, 89],
+                        backgroundColor: [
+                            'rgba(0, 210, 255, 0.7)',
+                            'rgba(255, 0, 204, 0.7)',
+                            'rgba(0, 255, 157, 0.7)',
+                            'rgba(255, 204, 0, 0.7)',
+                            'rgba(153, 102, 255, 0.7)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#e0e0ff'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#e0e0ff'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#e0e0ff'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Gráfico de clientes
+            const clientsCtx = document.getElementById('clientsChart').getContext('2d');
+            const clientsChart = new Chart(clientsCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['João Silva', 'Maria Oliveira', 'Carlos Santos', 'Outros'],
+                    datasets: [{
+                        label: 'Valor Gasto (R$)',
+                        data: [8450, 6450, 5200, 8350],
+                        backgroundColor: [
+                            'rgba(0, 210, 255, 0.7)',
+                            'rgba(255, 0, 204, 0.7)',
+                            'rgba(0, 255, 157, 0.7)',
+                            'rgba(255, 204, 0, 0.7)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: '#e0e0ff'
+                            }
+                        }
+                    }
+                }
+            });
+        };
+    </script>
 </body>
 </html>
