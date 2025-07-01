@@ -1,13 +1,38 @@
+Beleza, Gabriel! Vou criar um **index.html único** que simula múltiplas "páginas" usando tabs (SPA sem frameworks), super responsivo, ótimo pra celular, com várias melhorias:
+
+* Layout mobile-friendly com navegação fixa inferior tipo app
+* Correção de bugs (ex: sincronização dos valores)
+* Usabilidade: filtro, busca, ordenação básica nas tabelas
+* Dark mode top, persistente
+* Formulários inteligentes com preenchimento automático e validação
+* Dashboard com resumo + gráficos interativos (Chart.js)
+* Exportação CSV e PDF (com jsPDF)
+* Sistema simples de mensagens/alerts customizados
+* Limpeza visual, animações suaves, acessibilidade
+
+Tudo **num único index.html**, organizado em seções que aparecem e somem conforme a aba selecionada — perfeito pra celular e desktop.
+
+---
+
+### Código COMPLETO do `index.html`:
+
+```html
 <!DOCTYPE html>
 <html lang="pt-BR" class="scroll-smooth">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Controle de Vendas & Dívidas — Ultimate</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>Controle Vendas & Dívidas - Mobile Friendly</title>
+
+<!-- Tailwind CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- jsPDF -->
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
 <style>
-  /* Scrollbar custom */
+  /* Scrollbar para desktop */
   ::-webkit-scrollbar {
     width: 8px; height: 8px;
   }
@@ -18,18 +43,41 @@
   ::-webkit-scrollbar-thumb:hover {
     background-color: rgba(59, 130, 246, 0.8);
   }
-  /* Dark mode toggle animation */
-  #darkToggle {
-    transition: background-color 0.3s ease;
+  /* Animação fade para troca de abas */
+  .tab-content {
+    display: none;
+    animation: fadeIn 0.4s ease forwards;
+  }
+  .tab-content.active {
+    display: block;
+  }
+  @keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+  }
+  /* Nav bottom fixed */
+  nav#bottomNav {
+    box-shadow: 0 -2px 10px rgb(0 0 0 / 0.15);
+    z-index: 9999;
+  }
+  /* Botão ativo nav */
+  nav#bottomNav button.active svg path,
+  nav#bottomNav button.active svg circle {
+    stroke: #2563eb; /* blue-600 */
+    fill: #2563eb;
+  }
+  /* Smooth scroll body */
+  body {
+    scroll-behavior: smooth;
   }
 </style>
 </head>
 <body class="bg-gradient-to-br from-gray-100 to-white dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-gray-200 min-h-screen flex flex-col">
 
-<header class="bg-blue-700 dark:bg-blue-900 text-white p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between shadow-lg sticky top-0 z-50">
-  <h1 class="text-3xl font-extrabold mb-3 sm:mb-0 select-none">Controle de Vendas & Dívidas</h1>
+<header class="bg-blue-700 dark:bg-blue-900 text-white p-5 flex justify-between items-center shadow-lg sticky top-0 z-50 select-none">
+  <h1 class="text-xl sm:text-2xl font-extrabold">Controle Vendas & Dívidas</h1>
   <button id="darkToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro"
-    class="w-12 h-12 rounded-full bg-blue-300 dark:bg-yellow-400 flex items-center justify-center hover:ring-4 ring-yellow-400 transition">
+    class="w-10 h-10 rounded-full bg-blue-300 dark:bg-yellow-400 flex items-center justify-center hover:ring-4 ring-yellow-400 transition">
     <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
       <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m8.66-12.34l-.7.7M4.04 19.96l-.7-.7M21 12h-1M4 12H3m16.66 6.66l-.7-.7M4.04 4.04l-.7.7" />
     </svg>
@@ -39,41 +87,31 @@
   </button>
 </header>
 
-<main class="flex-grow max-w-7xl mx-auto p-6 space-y-8">
+<main class="flex-grow max-w-4xl mx-auto p-4 pb-20 space-y-8">
 
-  <!-- PRODUTOS -->
-  <section aria-labelledby="produtosTitle" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-    <h2 id="produtosTitle" class="text-2xl font-bold mb-4 text-blue-700 dark:text-blue-400">Cadastro de Produtos</h2>
-    <form id="produtoForm" class="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
-      <div>
-        <label for="nomeProduto" class="block font-semibold mb-1">Nome do Produto</label>
-        <input type="text" id="nomeProduto" required placeholder="Ex: Camisa Polo"
-          class="w-full p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
-      </div>
-      <div>
-        <label for="valorProduto" class="block font-semibold mb-1">Valor de Venda (R$)</label>
-        <input type="number" step="0.01" min="0" id="valorProduto" required placeholder="0.00"
-          class="w-full p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
-      </div>
-      <div>
-        <label for="custoProduto" class="block font-semibold mb-1">Custo (R$)</label>
-        <input type="number" step="0.01" min="0" id="custoProduto" required placeholder="0.00"
-          class="w-full p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
-      </div>
+  <!-- SEÇÕES (PÁGINAS) -->
+
+  <!-- 1. Produtos -->
+  <section id="tabProdutos" class="tab-content">
+    <h2 class="text-2xl font-bold mb-4 text-blue-700 dark:text-blue-400">Produtos</h2>
+    <form id="produtoForm" class="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-6">
+      <input type="text" id="nomeProduto" placeholder="Nome do Produto" required
+        class="p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
+      <input type="number" id="valorProduto" min="0" step="0.01" placeholder="Valor de Venda (R$)" required
+        class="p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
+      <input type="number" id="custoProduto" min="0" step="0.01" placeholder="Custo (R$)" required
+        class="p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
       <button type="submit"
-        class="bg-green-600 hover:bg-green-700 text-white font-bold rounded py-2 transition duration-200">
-        Adicionar Produto
-      </button>
+        class="bg-green-600 hover:bg-green-700 text-white font-bold rounded p-2 transition duration-200">Adicionar</button>
     </form>
-
-    <div class="mt-6 overflow-x-auto max-h-64 border border-gray-300 dark:border-gray-600 rounded">
-      <table class="w-full text-left text-sm border-collapse">
+    <div class="overflow-x-auto max-h-64 border border-gray-300 dark:border-gray-600 rounded shadow">
+      <table class="w-full text-sm border-collapse">
         <thead class="bg-blue-100 dark:bg-blue-800 sticky top-0">
           <tr>
             <th class="p-2 border-b border-gray-300 dark:border-gray-600">Produto</th>
             <th class="p-2 border-b border-gray-300 dark:border-gray-600">Valor (R$)</th>
             <th class="p-2 border-b border-gray-300 dark:border-gray-600">Custo (R$)</th>
-            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Ações</th>
+            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Excluir</th>
           </tr>
         </thead>
         <tbody id="produtosTabela"></tbody>
@@ -81,55 +119,43 @@
     </div>
   </section>
 
-  <!-- VENDAS -->
-  <section aria-labelledby="vendasTitle" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-    <h2 id="vendasTitle" class="text-2xl font-bold mb-4 text-blue-700 dark:text-blue-400">Registrar Venda</h2>
-    <form id="vendaForm" class="grid grid-cols-1 sm:grid-cols-6 gap-4 items-end">
-      <div>
-        <label for="devedorVenda" class="block font-semibold mb-1">Nome do Devedor</label>
-        <input list="devedores" id="devedorVenda" placeholder="Nome do Devedor" required
-          class="w-full p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
-        <datalist id="devedores"></datalist>
-      </div>
-      <div>
-        <label for="produtoVenda" class="block font-semibold mb-1">Produto</label>
-        <input list="produtosDatalist" id="produtoVenda" placeholder="Produto" required
-          class="w-full p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
-        <datalist id="produtosDatalist"></datalist>
-      </div>
-      <div>
-        <label for="quantidadeVenda" class="block font-semibold mb-1">Quantidade</label>
-        <input type="number" min="1" value="1" id="quantidadeVenda" required
-          class="w-full p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
-      </div>
-      <div>
-        <label for="valorVenda" class="block font-semibold mb-1">Valor Unitário (R$)</label>
-        <input type="number" min="0" step="0.01" id="valorVenda" required
-          class="w-full p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
-      </div>
-      <div>
-        <label for="vencimentoVenda" class="block font-semibold mb-1">Data de Vencimento</label>
-        <input type="date" id="vencimentoVenda" required
-          class="w-full p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
-      </div>
+  <!-- 2. Vendas -->
+  <section id="tabVendas" class="tab-content">
+    <h2 class="text-2xl font-bold mb-4 text-blue-700 dark:text-blue-400">Registrar Venda</h2>
+    <form id="vendaForm" class="grid grid-cols-1 sm:grid-cols-6 gap-3 mb-6">
+      <input list="devedores" id="devedorVenda" placeholder="Nome do Devedor" required
+        class="p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
+      <datalist id="devedores"></datalist>
+
+      <input list="produtosDatalist" id="produtoVenda" placeholder="Produto" required
+        class="p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
+      <datalist id="produtosDatalist"></datalist>
+
+      <input type="number" id="quantidadeVenda" min="1" value="1" required
+        class="p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
+      <input type="number" id="valorVenda" min="0" step="0.01" placeholder="Valor Unitário (R$)" required
+        class="p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
+      <input type="date" id="vencimentoVenda" required
+        class="p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
       <button type="submit"
-        class="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded py-2 transition duration-200">
-        Registrar Venda
-      </button>
+        class="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded p-2 transition duration-200">Registrar</button>
     </form>
 
-    <div class="mt-6 overflow-x-auto max-h-64 border border-gray-300 dark:border-gray-600 rounded">
-      <table class="w-full text-left text-sm border-collapse">
+    <input id="buscaVendas" type="search" placeholder="Buscar por devedor ou produto..."
+      class="w-full p-2 rounded border border-gray-300 dark:border-gray-600 mb-3 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
+
+    <div class="overflow-x-auto max-h-64 border border-gray-300 dark:border-gray-600 rounded shadow">
+      <table class="w-full text-sm border-collapse">
         <thead class="bg-blue-100 dark:bg-blue-800 sticky top-0">
           <tr>
-            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Devedor</th>
-            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Produto</th>
-            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Qtd</th>
-            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Valor (R$)</th>
-            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Custo (R$)</th>
-            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Lucro (R$)</th>
-            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Vencimento</th>
-            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Status</th>
+            <th class="p-2 border-b border-gray-300 dark:border-gray-600 cursor-pointer" data-sort="devedor">Devedor ▲▼</th>
+            <th class="p-2 border-b border-gray-300 dark:border-gray-600 cursor-pointer" data-sort="produto">Produto ▲▼</th>
+            <th class="p-2 border-b border-gray-300 dark:border-gray-600 cursor-default">Qtd</th>
+            <th class="p-2 border-b border-gray-300 dark:border-gray-600 cursor-default">Valor (R$)</th>
+            <th class="p-2 border-b border-gray-300 dark:border-gray-600 cursor-default">Custo (R$)</th>
+            <th class="p-2 border-b border-gray-300 dark:border-gray-600 cursor-default">Lucro (R$)</th>
+            <th class="p-2 border-b border-gray-300 dark:border-gray-600 cursor-default">Vencimento</th>
+            <th class="p-2 border-b border-gray-300 dark:border-gray-600 cursor-pointer" data-sort="status">Status ▲▼</th>
             <th class="p-2 border-b border-gray-300 dark:border-gray-600">Ações</th>
           </tr>
         </thead>
@@ -138,11 +164,11 @@
     </div>
   </section>
 
-  <!-- DASHBOARD -->
-  <section aria-labelledby="dashboardTitle" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-    <h2 id="dashboardTitle" class="text-2xl font-bold mb-6 text-blue-700 dark:text-blue-400">Resumo Financeiro & Gráficos</h2>
+  <!-- 3. Dashboard -->
+  <section id="tabDashboard" class="tab-content">
+    <h2 class="text-2xl font-bold mb-4 text-blue-700 dark:text-blue-400">Dashboard & Relatórios</h2>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 text-center">
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6 text-center">
       <div class="bg-blue-50 dark:bg-blue-900 rounded p-4 shadow">
         <h3 class="text-lg font-semibold mb-2">Total Recebido</h3>
         <p class="text-xl font-bold text-green-600 dark:text-green-400" id="totalRecebido">R$ 0,00</p>
@@ -152,7 +178,7 @@
         <p class="text-xl font-bold text-yellow-600 dark:text-yellow-400" id="totalAReceber">R$ 0,00</p>
       </div>
       <div class="bg-blue-50 dark:bg-blue-900 rounded p-4 shadow">
-        <h3 class="text-lg font-semibold mb-2">Total de Custos</h3>
+        <h3 class="text-lg font-semibold mb-2">Total Custos</h3>
         <p class="text-xl font-bold text-red-600 dark:text-red-400" id="totalCusto">R$ 0,00</p>
       </div>
       <div class="bg-blue-50 dark:bg-blue-900 rounded p-4 shadow">
@@ -161,84 +187,69 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
       <div>
-        <h3 class="text-xl font-semibold mb-4 text-center text-blue-700 dark:text-blue-400">Produtos mais vendidos</h3>
-        <canvas id="graficoProdutos"></canvas>
+        <h3 class="text-xl font-semibold mb-2 text-center text-blue-700 dark:text-blue-400">Produtos mais vendidos</h3>
+        <canvas id="graficoProdutos" class="rounded shadow"></canvas>
       </div>
       <div>
-        <h3 class="text-xl font-semibold mb-4 text-center text-blue-700 dark:text-blue-400">Status das vendas</h3>
-        <canvas id="graficoStatus"></canvas>
+        <h3 class="text-xl font-semibold mb-2 text-center text-blue-700 dark:text-blue-400">Status das Vendas</h3>
+        <canvas id="graficoStatus" class="rounded shadow"></canvas>
       </div>
     </div>
 
-    <div class="mt-8 flex justify-center gap-4">
-      <button id="exportCSV" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded transition">Exportar CSV</button>
-      <button id="exportPDF" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded transition">Exportar PDF</button>
+    <div class="mt-6 flex justify-center gap-4 flex-wrap">
+      <button id="exportCSV"
+        class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded transition">Exportar CSV</button>
+      <button id="exportPDF"
+        class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded transition">Exportar PDF</button>
+      <button id="limparDados"
+        class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded transition">Limpar Tudo</button>
     </div>
   </section>
 
 </main>
 
-<footer class="bg-blue-700 dark:bg-blue-900 text-white p-4 text-center select-none">
-  <small>© 2025 Controle Vendas & Dívidas - Criado com ❤️ por você e ChatGPT</small>
-</footer>
+<!-- Navegação bottom fixed -->
+<nav id="bottomNav" class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-300 dark:border-gray-700 flex justify-around py-2 sm:py-3">
+  <button aria-label="Produtos" class="tabBtn flex flex-col items-center gap-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 active" data-tab="tabProdutos" type="button">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>
+    <span class="text-xs">Produtos</span>
+  </button>
+  <button aria-label="Vendas" class="tabBtn flex flex-col items-center gap-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" data-tab="tabVendas" type="button">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3z"></path><path d="M7 7h10v10H7z" stroke="#2563eb"></path></svg>
+    <span class="text-xs">Vendas</span>
+  </button>
+  <button aria-label="Dashboard" class="tabBtn flex flex-col items-center gap-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" data-tab="tabDashboard" type="button">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M8 12l2 2 4-4"></path></svg>
+    <span class="text-xs">Dashboard</span>
+  </button>
+</nav>
 
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script>
 (() => {
-  // Estado app
+  'use strict';
+
+  // Estado
   let produtos = JSON.parse(localStorage.getItem('produtos')) || {};
   let vendas = JSON.parse(localStorage.getItem('vendas')) || [];
   let darkMode = localStorage.getItem('darkMode') === 'true';
 
-  // Referências DOM
-  const nomeProduto = document.getElementById('nomeProduto');
-  const valorProduto = document.getElementById('valorProduto');
-  const custoProduto = document.getElementById('custoProduto');
-  const produtoForm = document.getElementById('produtoForm');
-  const produtosTabela = document.getElementById('produtosTabela');
+  // Elementos DOM
+  const tabs = {
+    produtos: document.getElementById('tabProdutos'),
+    vendas: document.getElementById('tabVendas'),
+    dashboard: document.getElementById('tabDashboard')
+  };
+  const tabButtons = document.querySelectorAll('.tabBtn');
 
-  const devedorVenda = document.getElementById('devedorVenda');
-  const produtoVenda = document.getElementById('produtoVenda');
-  const quantidadeVenda = document.getElementById('quantidadeVenda');
-  const valorVenda = document.getElementById('valorVenda');
-  const vencimentoVenda = document.getElementById('vencimentoVenda');
-  const vendaForm = document.getElementById('vendaForm');
-  const vendasTabela = document.getElementById('vendasTabela');
-
-  const devedoresDatalist = document.getElementById('devedores');
-  const produtosDatalist = document.getElementById('produtosDatalist');
-
-  const totalRecebidoEl = document.getElementById('totalRecebido');
-  const totalAReceberEl = document.getElementById('totalAReceber');
-  const totalCustoEl = document.getElementById('totalCusto');
-  const lucroTotalEl = document.getElementById('lucroTotal');
-
-  const exportCSVBtn = document.getElementById('exportCSV');
-  const exportPDFBtn = document.getElementById('exportPDF');
-
+  // Dark mode toggle
   const darkToggleBtn = document.getElementById('darkToggle');
   const iconSun = document.getElementById('iconSun');
   const iconMoon = document.getElementById('iconMoon');
 
-  // Chart instances
-  let graficoProdutosChart = null;
-  let graficoStatusChart = null;
-
-  // Util
-  function salvarLocal() {
-    localStorage.setItem('produtos', JSON.stringify(produtos));
-    localStorage.setItem('vendas', JSON.stringify(vendas));
-    localStorage.setItem('darkMode', darkMode);
-  }
-  function formatarReal(num) {
-    return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-  }
-
-  // Dark mode init
   function aplicarDarkMode() {
-    if(darkMode) {
+    if (darkMode) {
       document.documentElement.classList.add('dark');
       iconSun.classList.remove('hidden');
       iconMoon.classList.add('hidden');
@@ -255,43 +266,21 @@
   };
   aplicarDarkMode();
 
-  // Atualizar produtos na tabela e datalist
-  function atualizarProdutos() {
-    produtosTabela.innerHTML = '';
-    Object.entries(produtos).forEach(([nome, prod]) => {
-      const tr = document.createElement('tr');
-      tr.className = 'border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition';
-
-      tr.innerHTML = `
-        <td class="p-2">${nome}</td>
-        <td class="p-2">${formatarReal(prod.valor)}</td>
-        <td class="p-2">${formatarReal(prod.custo)}</td>
-        <td class="p-2 text-center">
-          <button aria-label="Excluir produto ${nome}" class="text-red-600 hover:text-red-800 font-semibold" data-nome="${nome}">Excluir</button>
-        </td>`;
-      produtosTabela.appendChild(tr);
-    });
-
-    // Datalist produtos
-    produtosDatalist.innerHTML = Object.keys(produtos).map(p => `<option value="${p}">`).join('');
+  // Salvar localStorage
+  function salvarLocal() {
+    localStorage.setItem('produtos', JSON.stringify(produtos));
+    localStorage.setItem('vendas', JSON.stringify(vendas));
+    localStorage.setItem('darkMode', darkMode);
   }
 
-  produtosTabela.addEventListener('click', e => {
-    if(e.target.tagName === 'BUTTON') {
-      const nome = e.target.dataset.nome;
-      if(confirm(`Deseja realmente excluir o produto "${nome}"? Isso também removerá as vendas relacionadas.`)) {
-        delete produtos[nome];
-        // Remove vendas associadas
-        vendas = vendas.filter(v => v.produto !== nome);
-        atualizarProdutos();
-        atualizarVendas();
-        atualizarDevedores();
-        atualizarResumo();
-        salvarLocal();
-      }
-    }
-  });
+  // Função para renderizar produtos
+  const produtosTabela = document.getElementById('produtosTabela');
+  const produtosDatalist = document.getElementById('produtosDatalist');
 
-  produtoForm.addEventListener('submit', e => {
-    e.preventDefault();
-    const nome =
+  function renderProdutos() {
+    produtosTabela.innerHTML = '';
+    produtosDatalist.innerHTML = '';
+
+    Object.entries(produtos).forEach(([nome, prod]) => {
+      // Linha
+```
