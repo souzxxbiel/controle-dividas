@@ -2,1095 +2,985 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Controle Completo Produtos e Dívidas</title>
+<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no" />
+<title>VENDA DO OLIVEIRA - Sistema Futurístico</title>
 <style>
-  /* Reset e base */
+  /* Reset & base */
   * {
-    box-sizing: border-box;
+    margin:0; padding:0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0; background: #f0f2f5; color: #222;
-    min-height: 100vh;
-    display: flex; flex-direction: column;
+  body, html {
+    height: 100%; background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #e0e0e0;
+    -webkit-font-smoothing: antialiased;
   }
+  a {
+    color:#00e5ff; text-decoration:none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  button {
+    cursor: pointer; background: #00e5ff; border:none; padding: 10px 18px; border-radius: 8px; color:#012; font-weight: 700;
+    box-shadow: 0 0 12px #00e5ffaa;
+    transition: background 0.3s ease;
+  }
+  button:hover {
+    background: #00c3cc;
+  }
+  input, select {
+    padding: 8px 12px; border-radius: 6px; border: none; outline:none;
+    background: #001e2d; color:#00e5ff; font-weight: 600;
+    box-shadow: inset 0 0 6px #00e5ff88;
+    font-size: 16px;
+  }
+  input::placeholder {
+    color:#0099aaaa;
+  }
+  h1, h2, h3, h4 {
+    font-weight: 700;
+  }
+  /* Layout */
+  #app {
+    max-width: 480px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; background: #041e30cc; 
+    box-shadow: 0 0 40px #00e5ff55;
+    border-radius: 12px; padding: 20px;
+  }
+
+  /* Header */
   header {
-    background: #004aad;
-    color: white;
-    padding: 1rem 2rem;
-    display: flex; justify-content: space-between; align-items: center;
+    text-align: center; margin-bottom: 25px;
+    border-bottom: 2px solid #00e5ff55; padding-bottom: 12px;
   }
   header h1 {
-    margin: 0; font-weight: 700;
-    font-size: 1.5rem;
+    font-size: 1.8rem; color:#00e5ff;
+    text-shadow: 0 0 10px #00e5ffbb;
   }
-  nav button {
-    margin-left: 1rem;
-    background: #0066ff;
-    border: none;
-    color: white;
-    font-weight: 600;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  /* Login form */
+  #login-container {
+    display: flex; flex-direction: column; gap: 15px;
   }
-  nav button:hover {
-    background: #0052cc;
+  #login-container label {
+    font-weight: 600; font-size: 0.9rem;
+    color: #00e5ffbb;
   }
-  main {
-    flex: 1;
-    padding: 2rem;
-    max-width: 1200px;
-    margin: 0 auto 3rem;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 3px 12px rgb(0 0 0 / 0.1);
+  #login-container select {
+    margin-bottom: 12px;
   }
-  .hidden {
+  #login-error {
+    color: #ff4444; font-weight: 700; text-align: center;
+    margin-top: 6px; min-height: 24px;
+  }
+
+  /* Panels */
+  .panel {
     display: none;
+    flex-direction: column;
+    gap: 20px;
+    flex-grow: 1;
   }
-  h2 {
-    margin-top: 0;
+  .panel.active {
+    display: flex;
+  }
+  nav.tabs {
+    display: flex;
+    gap: 8px;
+    border-bottom: 2px solid #00e5ff55;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  nav.tabs button {
+    flex-grow: 1;
+    background: transparent;
+    color: #00e5ffaa;
     font-weight: 700;
-    color: #004aad;
+    border-radius: 6px 6px 0 0;
+    box-shadow: none;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
   }
+  nav.tabs button.active {
+    color: #00ffff;
+    background: #00475a;
+    box-shadow: 0 0 15px #00ffffaa;
+    border-bottom: 3px solid #00ffff;
+  }
+
+  /* Forms inside panels */
   form {
-    max-width: 500px;
+    display: flex; flex-direction: column; gap: 14px;
+    background: #002f4b88;
+    padding: 16px; border-radius: 10px;
+    box-shadow: 0 0 12px #00e5ff55;
   }
-  label {
-    display: block;
-    margin: 0.8rem 0 0.3rem;
+
+  form label {
     font-weight: 600;
+    color: #00c3cc;
   }
-  input[type=text],
-  input[type=password],
-  input[type=number],
-  select,
-  textarea {
+  form input, form select {
     width: 100%;
-    padding: 0.5rem;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    transition: border-color 0.3s ease;
   }
-  input[type=text]:focus,
-  input[type=password]:focus,
-  input[type=number]:focus,
-  select:focus,
-  textarea:focus {
-    outline: none;
-    border-color: #004aad;
-  }
-  button[type=submit], button.action-btn {
-    margin-top: 1rem;
-    background: #004aad;
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    font-weight: 700;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  button[type=submit]:hover, button.action-btn:hover {
-    background: #003580;
-  }
-  .error {
-    color: #cc0000;
-    margin-top: 0.5rem;
-    font-weight: 600;
-  }
-  .success {
-    color: #2b7a0b;
-    margin-top: 0.5rem;
-    font-weight: 600;
-  }
+
+  /* Tables */
   table {
-    border-collapse: collapse;
-    width: 100%;
-    margin-top: 1rem;
+    width: 100%; border-collapse: collapse;
+    background: #002f4bcc;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 10px #00e5ff44;
+  }
+  th, td {
+    padding: 12px 8px;
+    text-align: center;
+    border-bottom: 1px solid #00e5ff33;
+    color: #00e5ffcc;
+    font-weight: 600;
     font-size: 0.9rem;
   }
-  table th, table td {
-    padding: 0.6rem;
-    border: 1px solid #ddd;
-    text-align: left;
+  th {
+    background: #00475a;
+    box-shadow: 0 0 15px #00e5ffaa inset;
   }
-  table th {
-    background: #004aad;
-    color: white;
+  tr:hover {
+    background: #00475a99;
   }
-  .flex-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    align-items: center;
-  }
-  .flex-row > * {
-    flex: 1;
-  }
-  .small-input {
-    max-width: 150px;
-  }
-  .pagination {
-    margin-top: 1rem;
-    text-align: center;
-  }
-  .pagination button {
-    margin: 0 0.25rem;
-    padding: 0.4rem 0.75rem;
-    border-radius: 4px;
-    border: 1px solid #004aad;
-    background: white;
-    color: #004aad;
-    cursor: pointer;
-    font-weight: 700;
-  }
-  .pagination button.active {
-    background: #004aad;
-    color: white;
-  }
-  /* Scroll barra para tabela */
+
+  /* Scrollable tables */
   .table-wrapper {
     overflow-x: auto;
   }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #00e5ffaa;
+    border-radius: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #001e2d;
+  }
+
+  /* Responsive */
+  @media(max-width: 520px) {
+    #app {
+      max-width: 100vw; height: 100vh; padding: 10px 12px;
+      border-radius: 0;
+      box-shadow: none;
+    }
+    table, form {
+      font-size: 14px;
+    }
+    nav.tabs button {
+      font-size: 14px;
+    }
+    header h1 {
+      font-size: 1.5rem;
+    }
+  }
+
+  /* Futuristics shapes and animation */
+  body::before {
+    content: "";
+    position: fixed; top: -150px; left: -150px; width: 500px; height: 500px;
+    background: radial-gradient(circle, #00e5ff77, transparent 70%);
+    filter: blur(60px);
+    z-index: 0;
+  }
+  body::after {
+    content: "";
+    position: fixed; bottom: -100px; right: -100px; width: 400px; height: 400px;
+    background: conic-gradient(from 0deg at 50% 50%, #00e5ff88 0deg 120deg, transparent 121deg 360deg);
+    filter: blur(50px);
+    z-index: 0;
+  }
+
 </style>
 </head>
 <body>
-
-<header>
-  <h1>Controle Completo Produtos e Dívidas</h1>
-  <nav>
-    <button id="btn-login">Login</button>
-    <button id="btn-cadastrar-usuario">Cadastrar Usuário</button>
-    <button id="btn-logout" class="hidden">Logout</button>
-  </nav>
-</header>
-
-<main>
+<div id="app">
+  <header>
+    <h1>VENDA DO OLIVEIRA</h1>
+  </header>
 
   <!-- LOGIN -->
-  <section id="section-login">
-    <h2>Login</h2>
-    <form id="form-login" autocomplete="off">
-      <label for="login-username">Usuário</label>
-      <input id="login-username" type="text" required autofocus />
-      <label for="login-password">Senha</label>
-      <input id="login-password" type="password" required />
-      <button type="submit">Entrar</button>
-    </form>
-    <div id="login-error" class="error"></div>
-  </section>
-
-  <!-- CADASTRAR USUÁRIO -->
-  <section id="section-cadastrar-usuario" class="hidden">
-    <h2>Cadastrar Novo Usuário</h2>
-    <form id="form-cadastrar-usuario" autocomplete="off">
-      <label for="cad-username">Usuário</label>
-      <input id="cad-username" type="text" minlength="3" required />
-      <label for="cad-password">Senha</label>
-      <input id="cad-password" type="password" minlength="6" required />
-      <label for="cad-password-confirm">Confirmar Senha</label>
-      <input id="cad-password-confirm" type="password" minlength="6" required />
-      <label for="cad-user-type">Tipo de Usuário</label>
-      <select id="cad-user-type" required>
-        <option value="" disabled selected>Selecione o tipo</option>
+  <section id="login-section">
+    <form id="login-form">
+      <label for="login-role">Entrar como:</label>
+      <select id="login-role" required>
+        <option value="">Selecione o perfil</option>
         <option value="admin">Administrador</option>
         <option value="cliente">Cliente</option>
       </select>
-      <button type="submit">Cadastrar</button>
+
+      <label for="login-username">Usuário:</label>
+      <input type="text" id="login-username" placeholder="Seu usuário" required autocomplete="username" />
+
+      <label for="login-password">Senha:</label>
+      <input type="password" id="login-password" placeholder="Sua senha" required autocomplete="current-password" />
+
+      <button type="submit">Entrar</button>
     </form>
-    <div id="cad-usuario-error" class="error"></div>
-    <div id="cad-usuario-success" class="success"></div>
+    <div id="login-error"></div>
   </section>
 
   <!-- PAINEL ADMIN -->
-  <section id="section-painel-admin" class="hidden">
-    <h2>Painel Administrativo</h2>
-    <p>Olá, <span id="admin-user-name"></span> | <button id="btn-voltar-admin" class="action-btn" style="background:#cc0000;">Logout</button></p>
-
-    <nav>
-      <button id="tab-produtos" class="action-btn">Gerenciar Produtos</button>
-      <button id="tab-vendas" class="action-btn">Controle de Vendas e Dívidas</button>
-      <button id="tab-relatorios" class="action-btn">Relatórios de Lucro</button>
+  <section id="admin-panel" class="panel" aria-label="Painel do Administrador">
+    <nav class="tabs" aria-label="Navegação do painel do administrador">
+      <button data-tab="produtos" class="active">Cadastrar Produtos</button>
+      <button data-tab="clientes">Cadastrar Clientes</button>
+      <button data-tab="devedores">Registrar Devedores</button>
+      <button data-tab="solicitacoes">Solicitações</button>
+      <button data-tab="estatisticas">Estatísticas</button>
+      <button id="logout-admin" style="background:#ff0044; box-shadow:0 0 12px #ff0044;">Sair</button>
     </nav>
 
-    <section id="tab-content-produtos" class="tab-content">
-      <h3>Cadastro de Produtos</h3>
-      <form id="form-cadastrar-produto" autocomplete="off">
-        <label for="produto-nome">Nome do Produto</label>
-        <input id="produto-nome" type="text" required minlength="3" />
-        <label for="produto-custo">Custo Unitário (R$)</label>
-        <input id="produto-custo" type="number" min="0" step="0.01" required />
-        <label for="produto-preco">Preço de Venda (R$)</label>
-        <input id="produto-preco" type="number" min="0" step="0.01" required />
-        <button type="submit">Adicionar Produto</button>
+    <!-- Aba produtos -->
+    <div id="tab-produtos" class="tab-content active" role="tabpanel">
+      <form id="form-produto">
+        <h2>Cadastrar Produto</h2>
+        <label for="produto-nome">Nome do produto:</label>
+        <input type="text" id="produto-nome" required placeholder="Ex: Smartphone XYZ" />
+
+        <label for="produto-custo">Custo (R$):</label>
+        <input type="number" min="0" step="0.01" id="produto-custo" required placeholder="Preço de custo" />
+
+        <label for="produto-venda">Preço de Venda (R$):</label>
+        <input type="number" min="0" step="0.01" id="produto-venda" required placeholder="Preço de venda" />
+
+        <button type="submit">Salvar Produto</button>
       </form>
-      <div id="produto-msg-error" class="error"></div>
-      <div id="produto-msg-success" class="success"></div>
-      <div class="table-wrapper">
+      <div class="table-wrapper" style="margin-top: 20px;">
         <table id="tabela-produtos" aria-label="Tabela de produtos cadastrados">
           <thead>
             <tr>
-              <th>Produto</th>
-              <th>Custo Unitário (R$)</th>
-              <th>Preço de Venda (R$)</th>
+              <th>Nome</th>
+              <th>Custo (R$)</th>
+              <th>Venda (R$)</th>
+              <th>Lucro Unitário (R$)</th>
+              <th>Qtd Vendida</th>
+              <th>Lucro Total (R$)</th>
               <th>Ações</th>
             </tr>
           </thead>
-          <tbody></tbody>
+          <tbody>
+            <!-- preenchido por JS -->
+          </tbody>
         </table>
       </div>
-    </section>
+    </div>
 
-    <section id="tab-content-vendas" class="tab-content hidden">
-      <h3>Controle de Vendas e Dívidas</h3>
-      <form id="form-registrar-venda" autocomplete="off">
-        <label for="venda-cliente">Cliente</label>
-        <select id="venda-cliente" required></select>
-        <label for="venda-produto">Produto</label>
-        <select id="venda-produto" required></select>
-        <label for="venda-quantidade">Quantidade</label>
-        <input id="venda-quantidade" type="number" min="1" required />
-        <label for="venda-pago">Pagamento Parcial (R$)</label>
-        <input id="venda-pago" type="number" min="0" step="0.01" value="0" required />
-        <button type="submit">Registrar Venda/Dívida</button>
+    <!-- Aba clientes -->
+    <div id="tab-clientes" class="tab-content" role="tabpanel" hidden>
+      <form id="form-cliente">
+        <h2>Cadastrar Cliente</h2>
+        <label for="cliente-nome">Nome do cliente:</label>
+        <input type="text" id="cliente-nome" required placeholder="Nome completo" />
+
+        <label for="cliente-usuario">Usuário (login):</label>
+        <input type="text" id="cliente-usuario" required placeholder="Login único" />
+
+        <label for="cliente-senha">Senha:</label>
+        <input type="password" id="cliente-senha" required placeholder="Senha segura" />
+
+        <button type="submit">Salvar Cliente</button>
       </form>
-      <div id="venda-msg-error" class="error"></div>
-      <div id="venda-msg-success" class="success"></div>
-      <div class="table-wrapper">
-        <table id="tabela-vendas" aria-label="Tabela de vendas e dívidas">
+      <div class="table-wrapper" style="margin-top: 20px;">
+        <table id="tabela-clientes" aria-label="Tabela de clientes cadastrados">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Usuário</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- preenchido por JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Aba devedores -->
+    <div id="tab-devedores" class="tab-content" role="tabpanel" hidden>
+      <form id="form-devedor">
+        <h2>Registrar Devedor</h2>
+
+        <label for="devedor-cliente">Cliente:</label>
+        <select id="devedor-cliente" required>
+          <!-- preenchido por JS -->
+        </select>
+
+        <label for="devedor-produto">Produto:</label>
+        <select id="devedor-produto" required>
+          <!-- preenchido por JS -->
+        </select>
+
+        <label for="devedor-quantidade">Quantidade:</label>
+        <input type="number" id="devedor-quantidade" min="1" value="1" required />
+
+        <label for="devedor-parcial">Pagamento Parcial (R$):</label>
+        <input type="number" id="devedor-parcial" min="0" value="0" step="0.01" required />
+
+        <button type="submit">Registrar Dívida</button>
+      </form>
+      <div class="table-wrapper" style="margin-top: 20px;">
+        <table id="tabela-devedores" aria-label="Tabela de devedores cadastrados">
           <thead>
             <tr>
               <th>Cliente</th>
               <th>Produto</th>
-              <th>Quantidade</th>
+              <th>Qtd</th>
               <th>Valor Total (R$)</th>
-              <th>Valor Pago (R$)</th>
-              <th>Valor Devido (R$)</th>
-              <th>Data</th>
+              <th>Pago (R$)</th>
+              <th>Saldo Devedor (R$)</th>
               <th>Ações</th>
             </tr>
           </thead>
-          <tbody></tbody>
+          <tbody>
+            <!-- preenchido por JS -->
+          </tbody>
         </table>
       </div>
-    </section>
+    </div>
 
-    <section id="tab-content-relatorios" class="tab-content hidden">
-      <h3>Relatórios de Lucro por Produto</h3>
+    <!-- Aba solicitações -->
+    <div id="tab-solicitacoes" class="tab-content" role="tabpanel" hidden>
+      <h2>Solicitações de Compra</h2>
       <div class="table-wrapper">
-        <table id="tabela-relatorios" aria-label="Tabela de relatórios de lucro">
+        <table id="tabela-solicitacoes" aria-label="Tabela de solicitações feitas pelos clientes">
           <thead>
             <tr>
+              <th>Cliente</th>
               <th>Produto</th>
-              <th>Total Vendido (Qtd)</th>
-              <th>Receita Total (R$)</th>
-              <th>Custo Total (R$)</th>
-              <th>Lucro Total (R$)</th>
+              <th>Qtd</th>
+              <th>Status</th>
+              <th>Ações</th>
             </tr>
           </thead>
-          <tbody></tbody>
+          <tbody>
+            <!-- preenchido por JS -->
+          </tbody>
         </table>
       </div>
-    </section>
+    </div>
+
+    <!-- Aba estatísticas -->
+    <div id="tab-estatisticas" class="tab-content" role="tabpanel" hidden>
+      <h2>Estatísticas Futurísticas</h2>
+      <section id="estatisticas-gerais" style="display:flex; flex-direction: column; gap: 12px;">
+
+        <div id="estat-produto-mais-vendido" style="background:#00394d; padding:12px; border-radius: 10px; box-shadow: 0 0 15px #00e5ffaa;">
+          <h3>Produto Mais Vendido</h3>
+          <p id="produto-mais-vendido-text">Carregando...</p>
+        </div>
+
+        <div id="estat-cliente-mais-comprou" style="background:#00394d; padding:12px; border-radius: 10px; box-shadow: 0 0 15px #00e5ffaa;">
+          <h3>Cliente que mais comprou</h3>
+          <p id="cliente-mais-comprou-text">Carregando...</p>
+        </div>
+
+        <div id="estat-lucro-total" style="background:#00394d; padding:12px; border-radius: 10px; box-shadow: 0 0 15px #00e5ffaa;">
+          <h3>Lucro Total (R$)</h3>
+          <p id="lucro-total-text">Carregando...</p>
+        </div>
+
+        <div id="estat-gasto-total" style="background:#00394d; padding:12px; border-radius: 10px; box-shadow: 0 0 15px #00e5ffaa;">
+          <h3>Gasto Total (R$)</h3>
+          <p id="gasto-total-text">Carregando...</p>
+        </div>
+
+      </section>
+    </div>
   </section>
 
   <!-- PAINEL CLIENTE -->
-  <section id="section-painel-cliente" class="hidden">
-    <h2>Painel do Cliente</h2>
-    <p>Olá, <span id="cliente-user-name"></span> | <button id="btn-logout-cliente" class="action-btn" style="background:#cc0000;">Logout</button></p>
+  <section id="cliente-panel" class="panel" aria-label="Painel do Cliente" style="gap:15px;">
+    <div style="display:flex; justify-content: space-between; align-items: center;">
+      <h2>Bem-vindo(a), <span id="cliente-nome-display"></span></h2>
+      <button id="logout-cliente" style="background:#ff0044; box-shadow:0 0 12px #ff0044;">Sair</button>
+    </div>
 
-    <section>
-      <h3>Produtos Disponíveis</h3>
-      <div class="table-wrapper">
-        <table id="tabela-produtos-cliente" aria-label="Tabela de produtos disponíveis para cliente">
-          <thead>
-            <tr>
-              <th>Produto</th>
-              <th>Preço de Venda (R$)</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-
-      <h3>Registrar Compra</h3>
-      <form id="form-registrar-compra" autocomplete="off">
-        <label for="compra-produto">Produto</label>
-        <select id="compra-produto" required></select>
-        <label for="compra-quantidade">Quantidade</label>
-        <input id="compra-quantidade" type="number" min="1" value="1" required />
-        <label for="compra-pago">Pagamento Parcial (R$)</label>
-        <input id="compra-pago" type="number" min="0" step="0.01" value="0" required />
-        <button type="submit">Registrar Compra</button>
-      </form>
-      <div id="compra-msg-error" class="error"></div>
-      <div id="compra-msg-success" class="success"></div>
-
-      <h3>Minhas Dívidas</h3>
-      <div class="table-wrapper">
-        <table id="tabela-dividas-cliente" aria-label="Tabela de dívidas do cliente">
-          <thead>
-            <tr>
-              <th>Produto</th>
-              <th>Quantidade</th>
-              <th>Valor Total (R$)</th>
-              <th>Valor Pago (R$)</th>
-              <th>Valor Devido (R$)</th>
-              <th>Data</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
+    <h3>Produtos Disponíveis</h3>
+    <div class="table-wrapper" style="max-height: 320px; overflow-y: auto;">
+      <table id="tabela-produtos-cliente" aria-label="Tabela de produtos disponíveis para clientes">
+        <thead>
+          <tr>
+            <th>Produto</th>
+            <th>Preço (R$)</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- preenchido por JS -->
+        </tbody>
+      </table>
+    </div>
   </section>
-
-</main>
+</div>
 
 <script>
-  // --- DADOS E ESTADO ---
+  // Dados simulados no localStorage
+  // Senha dos usuários serão salvas como hash simples para não deixar em texto puro - (simples base64 para demo, NUNCA use assim em produção)
+  // Admin inicial fixo: usuário: admin senha: admin123
+  // Clientes e produtos criados dinamicamente
 
-  // Carrega usuários (admin e cliente demo padrão)
-  let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [
-    { username: 'admin', password: 'admin123', type: 'admin' },
-    { username: 'cliente1', password: 'cliente123', type: 'cliente' }
-  ];
-  localStorage.setItem('usuarios', JSON.stringify(usuarios));
+  // Helpers
+  function shaBase64(str) {
+    // simples hash base64 (não seguro para produção, só demo)
+    return btoa(unescape(encodeURIComponent(str)));
+  }
 
-  // Produtos
-  let produtos = JSON.parse(localStorage.getItem('produtos')) || [];
-  localStorage.setItem('produtos', JSON.stringify(produtos));
+  // Carregar dados do localStorage ou iniciar vazio
+  function loadData() {
+    return {
+      usuarios: JSON.parse(localStorage.getItem('usuarios') || '[]'),
+      produtos: JSON.parse(localStorage.getItem('produtos') || '[]'),
+      devedores: JSON.parse(localStorage.getItem('devedores') || '[]'),
+      solicitacoes: JSON.parse(localStorage.getItem('solicitacoes') || '[]'),
+    };
+  }
+  function saveData(data) {
+    localStorage.setItem('usuarios', JSON.stringify(data.usuarios));
+    localStorage.setItem('produtos', JSON.stringify(data.produtos));
+    localStorage.setItem('devedores', JSON.stringify(data.devedores));
+    localStorage.setItem('solicitacoes', JSON.stringify(data.solicitacoes));
+  }
 
-  // Vendas e dívidas
-  let vendas = JSON.parse(localStorage.getItem('vendas')) || [];
-  localStorage.setItem('vendas', JSON.stringify(vendas));
+  // Inicializar admin se não existir
+  function initAdmin(data) {
+    if (!data.usuarios.find(u => u.role === 'admin')) {
+      data.usuarios.push({
+        id: 'admin-1',
+        nome: 'Administrador Principal',
+        usuario: 'admin',
+        senha: shaBase64('admin123'),
+        role: 'admin'
+      });
+      saveData(data);
+    }
+  }
 
-  // Usuário logado atual
+  // Variáveis globais
+  let appData = loadData();
+  initAdmin(appData);
   let usuarioLogado = null;
 
-  // --- ELEMENTOS DO DOM ---
-  const btnLogin = document.getElementById('btn-login');
-  const btnCadastrarUsuario = document.getElementById('btn-cadastrar-usuario');
-  const btnLogout = document.getElementById('btn-logout');
-
-  // Sections
-  const sectionLogin = document.getElementById('section-login');
-  const sectionCadastrarUsuario = document.getElementById('section-cadastrar-usuario');
-  const sectionPainelAdmin = document.getElementById('section-painel-admin');
-  const sectionPainelCliente = document.getElementById('section-painel-cliente');
-
-  // Login form
-  const formLogin = document.getElementById('form-login');
+  // Elements
+  const loginSection = document.getElementById('login-section');
+  const loginForm = document.getElementById('login-form');
+  const loginRole = document.getElementById('login-role');
+  const loginUser = document.getElementById('login-username');
+  const loginPass = document.getElementById('login-password');
   const loginError = document.getElementById('login-error');
 
-  // Cadastro usuário form
-  const formCadastrarUsuario = document.getElementById('form-cadastrar-usuario');
-  const cadUsuarioError = document.getElementById('cad-usuario-error');
-  const cadUsuarioSuccess = document.getElementById('cad-usuario-success');
+  const adminPanel = document.getElementById('admin-panel');
+  const clientePanel = document.getElementById('cliente-panel');
 
-  // Admin UI
-  const adminUserNameSpan = document.getElementById('admin-user-name');
-  const btnVoltarAdmin = document.getElementById('btn-voltar-admin');
+  const tabsButtons = adminPanel.querySelectorAll('nav.tabs button[data-tab]');
+  const tabContents = adminPanel.querySelectorAll('.tab-content');
 
-  const tabProdutosBtn = document.getElementById('tab-produtos');
-  const tabVendasBtn = document.getElementById('tab-vendas');
-  const tabRelatoriosBtn = document.getElementById('tab-relatorios');
-
-  const tabContentProdutos = document.getElementById('tab-content-produtos');
-  const tabContentVendas = document.getElementById('tab-content-vendas');
-  const tabContentRelatorios = document.getElementById('tab-content-relatorios');
-
-  // Produto form
-  const formCadastrarProduto = document.getElementById('form-cadastrar-produto');
-  const produtoMsgError = document.getElementById('produto-msg-error');
-  const produtoMsgSuccess = document.getElementById('produto-msg-success');
-  const tabelaProdutosBody = document.querySelector('#tabela-produtos tbody');
-
-  // Vendas form (admin)
-  const formRegistrarVenda = document.getElementById('form-registrar-venda');
-  const vendaMsgError = document.getElementById('venda-msg-error');
-  const vendaMsgSuccess = document.getElementById('venda-msg-success');
-  const vendaClienteSelect = document.getElementById('venda-cliente');
-  const vendaProdutoSelect = document.getElementById('venda-produto');
-  const tabelaVendasBody = document.querySelector('#tabela-vendas tbody');
-
-  // Relatórios tabela
-  const tabelaRelatoriosBody = document.querySelector('#tabela-relatorios tbody');
-
-  // Cliente UI
-  const clienteUserNameSpan = document.getElementById('cliente-user-name');
-  const btnLogoutCliente = document.getElementById('btn-logout-cliente');
-
-  const tabelaProdutosClienteBody = document.querySelector('#tabela-produtos-cliente tbody');
-  const compraProdutoSelect = document.getElementById('compra-produto');
-  const formRegistrarCompra = document.getElementById('form-registrar-compra');
-  const compraMsgError = document.getElementById('compra-msg-error');
-  const compraMsgSuccess = document.getElementById('compra-msg-success');
-  const compraQuantidadeInput = document.getElementById('compra-quantidade');
-  const compraPagoInput = document.getElementById('compra-pago');
-  const tabelaDividasClienteBody = document.querySelector('#tabela-dividas-cliente tbody');
-
-  // --- FUNÇÕES DE UTILIDADE ---
-
-  function salvarUsuarios() {
-    localStorage.setItem('usuarios', JSON.stringify(usuarios));
+  // --- Função para alternar abas no admin
+  function ativarAba(tabName) {
+    tabsButtons.forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === tabName);
+    });
+    tabContents.forEach(tab => {
+      tab.hidden = tab.id !== 'tab-' + tabName;
+      tab.classList.toggle('active', tab.id === 'tab-' + tabName);
+    });
   }
-  function salvarProdutos() {
-    localStorage.setItem('produtos', JSON.stringify(produtos));
-  }
-  function salvarVendas() {
-    localStorage.setItem('vendas', JSON.stringify(vendas));
-  }
-
-  // Formata número para moeda BRL
-  function formatarReais(valor) {
-    return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-  }
-
-  // Limpa tabelas
-  function limparTbody(tbody) {
-    while(tbody.firstChild) {
-      tbody.removeChild(tbody.firstChild);
-    }
-  }
-
-  // --- LOGIN E CADASTRO ---
-
-  function mostrarTela(tela) {
-    // Esconder todas as sections
-    sectionLogin.classList.add('hidden');
-    sectionCadastrarUsuario.classList.add('hidden');
-    sectionPainelAdmin.classList.add('hidden');
-    sectionPainelCliente.classList.add('hidden');
-
-    btnLogin.classList.remove('hidden');
-    btnCadastrarUsuario.classList.remove('hidden');
-    btnLogout.classList.add('hidden');
-
-    switch(tela) {
-      case 'login':
-        sectionLogin.classList.remove('hidden');
-        break;
-      case 'cadastro-usuario':
-        sectionCadastrarUsuario.classList.remove('hidden');
-        break;
-      case 'admin-panel':
-        sectionPainelAdmin.classList.remove('hidden');
-        btnLogin.classList.add('hidden');
-        btnCadastrarUsuario.classList.add('hidden');
-        btnLogout.classList.remove('hidden');
-        break;
-      case 'cliente-panel':
-        sectionPainelCliente.classList.remove('hidden');
-        btnLogin.classList.add('hidden');
-        btnCadastrarUsuario.classList.add('hidden');
-        btnLogout.classList.remove('hidden');
-        break;
-    }
-  }
-
-  function verificarLoginSessao() {
-    const sessao = sessionStorage.getItem('usuarioLogado');
-    if(sessao) {
-      usuarioLogado = JSON.parse(sessao);
-      if(usuarioLogado.type === 'admin') {
-        adminUserNameSpan.textContent = usuarioLogado.username;
-        carregarProdutosTabela();
-        carregarClientesSelect();
-        carregarProdutosSelectVenda();
-        carregarVendasTabela();
-        carregarRelatorioLucro();
-        mostrarTela('admin-panel');
-      } else {
-        clienteUserNameSpan.textContent = usuarioLogado.username;
-        carregarProdutosClienteTabela();
-        carregarProdutosSelectCompra();
-        carregarDividasClienteTabela();
-        mostrarTela('cliente-panel');
-      }
-    } else {
-      mostrarTela('login');
-    }
-  }
-
-  // --- EVENTOS DE NAVEGAÇÃO ---
-
-  btnLogin.addEventListener('click', () => {
-    limparMensagens();
-    mostrarTela('login');
+  tabsButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      ativarAba(btn.dataset.tab);
+    });
   });
-  btnCadastrarUsuario.addEventListener('click', () => {
-    limparMensagens();
-    mostrarTela('cadastro-usuario');
-  });
-  btnLogout.addEventListener('click', () => {
+
+  // Logout
+  document.getElementById('logout-admin').addEventListener('click', () => {
     usuarioLogado = null;
-    sessionStorage.removeItem('usuarioLogado');
-    mostrarTela('login');
+    loginForm.reset();
+    loginError.textContent = '';
+    toggleSections();
+  });
+  document.getElementById('logout-cliente').addEventListener('click', () => {
+    usuarioLogado = null;
+    loginForm.reset();
+    loginError.textContent = '';
+    toggleSections();
   });
 
-  // --- LOGIN FORM ---
+  // Toggle visibilidade se está logado e qual painel mostrar
+  function toggleSections() {
+    if (!usuarioLogado) {
+      loginSection.style.display = 'flex';
+      adminPanel.style.display = 'none';
+      clientePanel.style.display = 'none';
+    } else if (usuarioLogado.role === 'admin') {
+      loginSection.style.display = 'none';
+      adminPanel.style.display = 'flex';
+      clientePanel.style.display = 'none';
+      ativarAba('produtos');
+      carregarProdutosTabela();
+      carregarClientesTabela();
+      carregarDevedoresTabela();
+      carregarSolicitacoesTabela();
+      carregarEstatisticas();
+      preencherSelectDevedores();
+    } else if (usuarioLogado.role === 'cliente') {
+      loginSection.style.display = 'none';
+      adminPanel.style.display = 'none';
+      clientePanel.style.display = 'flex';
+      document.getElementById('cliente-nome-display').textContent = usuarioLogado.nome;
+      carregarProdutosCliente();
+    }
+  }
 
-  formLogin.addEventListener('submit', (e) => {
+  toggleSections();
+
+  // LOGIN
+  loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
     loginError.textContent = '';
-    const username = document.getElementById('login-username').value.trim();
-    const password = document.getElementById('login-password').value;
+    const role = loginRole.value.trim();
+    const usuario = loginUser.value.trim();
+    const senha = loginPass.value.trim();
 
-    const user = usuarios.find(u => u.username === username && u.password === password);
-    if(user) {
-      usuarioLogado = user;
-      sessionStorage.setItem('usuarioLogado', JSON.stringify(user));
-      if(user.type === 'admin') {
-        adminUserNameSpan.textContent = user.username;
-        carregarProdutosTabela();
-        carregarClientesSelect();
-        carregarProdutosSelectVenda();
-        carregarVendasTabela();
-        carregarRelatorioLucro();
-        mostrarTela('admin-panel');
-      } else {
-        clienteUserNameSpan.textContent = user.username;
-        carregarProdutosClienteTabela();
-        carregarProdutosSelectCompra();
-        carregarDividasClienteTabela();
-        mostrarTela('cliente-panel');
-      }
-      formLogin.reset();
-    } else {
-      loginError.textContent = 'Usuário ou senha incorretos.';
+    if (!role || !usuario || !senha) {
+      loginError.textContent = 'Preencha todos os campos!';
+      return;
     }
+
+    const userFound = appData.usuarios.find(u => u.usuario === usuario && u.role === role);
+    if (!userFound) {
+      loginError.textContent = 'Usuário ou perfil inválido!';
+      return;
+    }
+    if (userFound.senha !== shaBase64(senha)) {
+      loginError.textContent = 'Senha incorreta!';
+      return;
+    }
+    usuarioLogado = userFound;
+    toggleSections();
   });
 
-  // --- CADASTRO USUÁRIO FORM ---
-
-  formCadastrarUsuario.addEventListener('submit', (e) => {
+  // --- CADASTRO DE PRODUTOS ---
+  const formProduto = document.getElementById('form-produto');
+  formProduto.addEventListener('submit', (e) => {
     e.preventDefault();
-    cadUsuarioError.textContent = '';
-    cadUsuarioSuccess.textContent = '';
-
-    const username = document.getElementById('cad-username').value.trim();
-    const password = document.getElementById('cad-password').value;
-    const passwordConfirm = document.getElementById('cad-password-confirm').value;
-    const userType = document.getElementById('cad-user-type').value;
-
-    if(username.length < 3) {
-      cadUsuarioError.textContent = 'Usuário deve ter pelo menos 3 caracteres.';
-      return;
-    }
-    if(password.length < 6) {
-      cadUsuarioError.textContent = 'Senha deve ter pelo menos 6 caracteres.';
-      return;
-    }
-    if(password !== passwordConfirm) {
-      cadUsuarioError.textContent = 'Senhas não conferem.';
-      return;
-    }
-    if(!userType) {
-      cadUsuarioError.textContent = 'Selecione o tipo de usuário.';
-      return;
-    }
-    if(usuarios.some(u => u.username === username)) {
-      cadUsuarioError.textContent = 'Usuário já existe.';
-      return;
-    }
-
-    usuarios.push({ username, password, type: userType });
-    salvarUsuarios();
-    cadUsuarioSuccess.textContent = 'Usuário cadastrado com sucesso!';
-    formCadastrarUsuario.reset();
-  });
-
-  // --- PAINEL ADMIN: GESTÃO DE PRODUTOS ---
-
-  // Carrega produtos na tabela admin
-  function carregarProdutosTabela() {
-    limparTbody(tabelaProdutosBody);
-    if(produtos.length === 0) {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td colspan="4" style="text-align:center;">Nenhum produto cadastrado</td>`;
-      tabelaProdutosBody.appendChild(tr);
-      return;
-    }
-    produtos.forEach((p, idx) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${p.nome}</td>
-        <td>${formatarReais(p.custo)}</td>
-        <td>${formatarReais(p.preco)}</td>
-        <td>
-          <button class="action-btn btn-editar-produto" data-index="${idx}" style="background:#007bff;">Editar</button>
-          <button class="action-btn btn-excluir-produto" data-index="${idx}" style="background:#cc0000;">Excluir</button>
-        </td>
-      `;
-      tabelaProdutosBody.appendChild(tr);
-    });
-
-    // Eventos dos botões editar e excluir
-    document.querySelectorAll('.btn-excluir-produto').forEach(btn => {
-      btn.onclick = (e) => {
-        const idx = parseInt(e.target.dataset.index);
-        if(confirm(`Excluir o produto "${produtos[idx].nome}"?`)) {
-          produtos.splice(idx,1);
-          salvarProdutos();
-          carregarProdutosTabela();
-          carregarProdutosSelectVenda();
-          carregarProdutosClienteTabela();
-          carregarProdutosSelectCompra();
-          carregarRelatorioLucro();
-        }
-      }
-    });
-
-    document.querySelectorAll('.btn-editar-produto').forEach(btn => {
-      btn.onclick = (e) => {
-        const idx = parseInt(e.target.dataset.index);
-        const p = produtos[idx];
-        // Preenche o formulário com dados para editar
-        document.getElementById('produto-nome').value = p.nome;
-        document.getElementById('produto-custo').value = p.custo;
-        document.getElementById('produto-preco').value = p.preco;
-        produtoMsgSuccess.textContent = '';
-        produtoMsgError.textContent = '';
-        // Muda o botão para salvar edição e guarda índice
-        formCadastrarProduto.dataset.editIndex = idx;
-        formCadastrarProduto.querySelector('button[type=submit]').textContent = 'Salvar Alteração';
-        window.scrollTo({top:0, behavior:'smooth'});
-      }
-    });
-  }
-
-  // Form cadastrar/editar produto
-  formCadastrarProduto.addEventListener('submit', (e) => {
-    e.preventDefault();
-    produtoMsgError.textContent = '';
-    produtoMsgSuccess.textContent = '';
 
     const nome = document.getElementById('produto-nome').value.trim();
     const custo = parseFloat(document.getElementById('produto-custo').value);
-    const preco = parseFloat(document.getElementById('produto-preco').value);
+    const venda = parseFloat(document.getElementById('produto-venda').value);
 
-    if(nome.length < 3) {
-      produtoMsgError.textContent = 'Nome do produto deve ter ao menos 3 caracteres.';
-      return;
-    }
-    if(isNaN(custo) || custo < 0) {
-      produtoMsgError.textContent = 'Informe um custo válido (>= 0).';
-      return;
-    }
-    if(isNaN(preco) || preco < 0) {
-      produtoMsgError.textContent = 'Informe um preço válido (>= 0).';
+    if (!nome || isNaN(custo) || isNaN(venda) || custo < 0 || venda < 0) {
+      alert('Preencha os dados corretamente!');
       return;
     }
 
-    if(formCadastrarProduto.dataset.editIndex !== undefined) {
-      // Editar produto
-      const idx = parseInt(formCadastrarProduto.dataset.editIndex);
-      produtos[idx] = { nome, custo, preco };
-      delete formCadastrarProduto.dataset.editIndex;
-      formCadastrarProduto.querySelector('button[type=submit]').textContent = 'Adicionar Produto';
-      produtoMsgSuccess.textContent = 'Produto alterado com sucesso!';
-    } else {
-      // Novo produto
-      if(produtos.some(p => p.nome.toLowerCase() === nome.toLowerCase())) {
-        produtoMsgError.textContent = 'Produto já cadastrado.';
-        return;
-      }
-      produtos.push({ nome, custo, preco });
-      produtoMsgSuccess.textContent = 'Produto cadastrado com sucesso!';
+    // Verificar se produto já existe (nome único)
+    if (appData.produtos.find(p => p.nome.toLowerCase() === nome.toLowerCase())) {
+      alert('Produto já cadastrado!');
+      return;
     }
 
-    salvarProdutos();
-    formCadastrarProduto.reset();
+    const novoProduto = {
+      id: 'p-' + Date.now(),
+      nome,
+      custo,
+      venda,
+      vendidos: 0, // quantidade vendida para estatísticas
+    };
+
+    appData.produtos.push(novoProduto);
+    saveData(appData);
+    formProduto.reset();
     carregarProdutosTabela();
-    carregarProdutosSelectVenda();
-    carregarProdutosClienteTabela();
-    carregarProdutosSelectCompra();
-    carregarRelatorioLucro();
+    preencherSelectDevedores();
+    alert('Produto cadastrado com sucesso!');
   });
 
-  // --- PAINEL ADMIN: GERENCIAR VENDAS/DÍVIDAS ---
-
-  // Carrega clientes no select vendas (exclui admins)
-  function carregarClientesSelect() {
-    limparSelect(vendaClienteSelect);
-    const clientes = usuarios.filter(u => u.type === 'cliente');
-    if(clientes.length === 0) {
-      const opt = document.createElement('option');
-      opt.textContent = 'Nenhum cliente cadastrado';
-      opt.disabled = true;
-      vendaClienteSelect.appendChild(opt);
+  // Preencher tabela de produtos admin
+  function carregarProdutosTabela() {
+    const tbody = document.querySelector('#tabela-produtos tbody');
+    tbody.innerHTML = '';
+    if (appData.produtos.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7">Nenhum produto cadastrado</td></tr>`;
       return;
     }
-    clientes.forEach(c => {
-      const opt = document.createElement('option');
-      opt.value = c.username;
-      opt.textContent = c.username;
-      vendaClienteSelect.appendChild(opt);
-    });
-  }
-  // Carrega produtos no select vendas
-  function carregarProdutosSelectVenda() {
-    limparSelect(vendaProdutoSelect);
-    if(produtos.length === 0) {
-      const opt = document.createElement('option');
-      opt.textContent = 'Nenhum produto cadastrado';
-      opt.disabled = true;
-      vendaProdutoSelect.appendChild(opt);
-      return;
-    }
-    produtos.forEach(p => {
-      const opt = document.createElement('option');
-      opt.value = p.nome;
-      opt.textContent = p.nome;
-      vendaProdutoSelect.appendChild(opt);
-    });
-  }
-
-  // Limpa options de um select
-  function limparSelect(select) {
-    while(select.firstChild) {
-      select.removeChild(select.firstChild);
-    }
-  }
-
-  // Carregar tabela vendas
-  function carregarVendasTabela() {
-    limparTbody(tabelaVendasBody);
-    if(vendas.length === 0) {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td colspan="8" style="text-align:center;">Nenhuma venda ou dívida registrada</td>`;
-      tabelaVendasBody.appendChild(tr);
-      return;
-    }
-    vendas.forEach((v, idx) => {
-      const valorTotal = v.quantidade * (produtos.find(p => p.nome === v.produto)?.preco || 0);
-      const valorDevido = valorTotal - v.pago;
+    for (const p of appData.produtos) {
+      const lucroUnit = (p.venda - p.custo).toFixed(2);
+      const lucroTotal = (lucroUnit * p.vendidos).toFixed(2);
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${v.cliente}</td>
-        <td>${v.produto}</td>
-        <td>${v.quantidade}</td>
-        <td>${formatarReais(valorTotal)}</td>
-        <td>${formatarReais(v.pago)}</td>
-        <td>${formatarReais(valorDevido)}</td>
-        <td>${new Date(v.data).toLocaleDateString('pt-BR')}</td>
+        <td>${p.nome}</td>
+        <td>${p.custo.toFixed(2)}</td>
+        <td>${p.venda.toFixed(2)}</td>
+        <td>${lucroUnit}</td>
+        <td>${p.vendidos}</td>
+        <td>${lucroTotal}</td>
+        <td><button data-id="${p.id}" class="btn-delete-produto" style="background:#ff4444;">Excluir</button></td>
+      `;
+      tbody.appendChild(tr);
+    }
+    // Delete produto
+    document.querySelectorAll('.btn-delete-produto').forEach(btn => {
+      btn.onclick = () => {
+        if (confirm('Excluir produto? Esta ação não pode ser desfeita!')) {
+          appData.produtos = appData.produtos.filter(p => p.id !== btn.dataset.id);
+          saveData(appData);
+          carregarProdutosTabela();
+          preencherSelectDevedores();
+        }
+      };
+    });
+  }
+
+  // --- CADASTRO DE CLIENTES ---
+  const formCliente = document.getElementById('form-cliente');
+  formCliente.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const nome = document.getElementById('cliente-nome').value.trim();
+    const usuario = document.getElementById('cliente-usuario').value.trim();
+    const senha = document.getElementById('cliente-senha').value.trim();
+
+    if (!nome || !usuario || !senha) {
+      alert('Preencha os dados corretamente!');
+      return;
+    }
+    if (appData.usuarios.find(u => u.usuario === usuario)) {
+      alert('Usuário já existe!');
+      return;
+    }
+
+    const novoCliente = {
+      id: 'c-' + Date.now(),
+      nome,
+      usuario,
+      senha: shaBase64(senha),
+      role: 'cliente',
+    };
+    appData.usuarios.push(novoCliente);
+    saveData(appData);
+    formCliente.reset();
+    carregarClientesTabela();
+    preencherSelectDevedores();
+    alert('Cliente cadastrado com sucesso!');
+  });
+
+  // Preencher tabela clientes admin
+  function carregarClientesTabela() {
+    const tbody = document.querySelector('#tabela-clientes tbody');
+    tbody.innerHTML = '';
+    const clientes = appData.usuarios.filter(u => u.role === 'cliente');
+    if (clientes.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="3">Nenhum cliente cadastrado</td></tr>`;
+      return;
+    }
+    for (const c of clientes) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${c.nome}</td>
+        <td>${c.usuario}</td>
+        <td><button data-id="${c.id}" class="btn-delete-cliente" style="background:#ff4444;">Excluir</button></td>
+      `;
+      tbody.appendChild(tr);
+    }
+    // Delete cliente
+    document.querySelectorAll('.btn-delete-cliente').forEach(btn => {
+      btn.onclick = () => {
+        if (confirm('Excluir cliente? Esta ação não pode ser desfeita!')) {
+          // Remover cliente e dívidas e solicitações relacionadas
+          appData.usuarios = appData.usuarios.filter(u => u.id !== btn.dataset.id);
+          appData.devedores = appData.devedores.filter(d => d.clienteId !== btn.dataset.id);
+          appData.solicitacoes = appData.solicitacoes.filter(s => s.clienteId !== btn.dataset.id);
+          saveData(appData);
+          carregarClientesTabela();
+          carregarDevedoresTabela();
+          carregarSolicitacoesTabela();
+          preencherSelectDevedores();
+        }
+      };
+    });
+  }
+
+  // --- CADASTRO DE DEVEDORES (DÍVIDAS) ---
+  const formDevedor = document.getElementById('form-devedor');
+  const selectDevedorCliente = document.getElementById('devedor-cliente');
+  const selectDevedorProduto = document.getElementById('devedor-produto');
+
+  formDevedor.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const clienteId = selectDevedorCliente.value;
+    const produtoId = selectDevedorProduto.value;
+    const quantidade = parseInt(document.getElementById('devedor-quantidade').value);
+    const pagamentoParcial = parseFloat(document.getElementById('devedor-parcial').value);
+
+    if (!clienteId || !produtoId || isNaN(quantidade) || quantidade < 1 || isNaN(pagamentoParcial) || pagamentoParcial < 0) {
+      alert('Preencha os dados corretamente!');
+      return;
+    }
+
+    // Busca produto para cálculo
+    const produto = appData.produtos.find(p => p.id === produtoId);
+    if (!produto) {
+      alert('Produto inválido!');
+      return;
+    }
+
+    const valorTotal = produto.venda * quantidade;
+    if (pagamentoParcial > valorTotal) {
+      alert('Pagamento parcial não pode ser maior que o valor total!');
+      return;
+    }
+
+    const novaDivida = {
+      id: 'd-' + Date.now(),
+      clienteId,
+      produtoId,
+      quantidade,
+      valorTotal,
+      pago: pagamentoParcial,
+    };
+
+    appData.devedores.push(novaDivida);
+    saveData(appData);
+    formDevedor.reset();
+    carregarDevedoresTabela();
+    alert('Dívida registrada!');
+  });
+
+  // Preencher selects no formulário de devedor
+  function preencherSelectDevedores() {
+    // clientes
+    selectDevedorCliente.innerHTML = '';
+    const clientes = appData.usuarios.filter(u => u.role === 'cliente');
+    if (clientes.length === 0) {
+      selectDevedorCliente.innerHTML = '<option disabled>Nenhum cliente cadastrado</option>';
+    } else {
+      selectDevedorCliente.innerHTML = clientes.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+    }
+    // produtos
+    selectDevedorProduto.innerHTML = '';
+    if (appData.produtos.length === 0) {
+      selectDevedorProduto.innerHTML = '<option disabled>Nenhum produto cadastrado</option>';
+    } else {
+      selectDevedorProduto.innerHTML = appData.produtos.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
+    }
+  }
+
+  // Preencher tabela de devedores admin
+  function carregarDevedoresTabela() {
+    const tbody = document.querySelector('#tabela-devedores tbody');
+    tbody.innerHTML = '';
+    if (appData.devedores.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7">Nenhuma dívida registrada</td></tr>`;
+      return;
+    }
+    for (const d of appData.devedores) {
+      const cliente = appData.usuarios.find(u => u.id === d.clienteId);
+      const produto = appData.produtos.find(p => p.id === d.produtoId);
+      if (!cliente || !produto) continue;
+      const saldo = d.valorTotal - d.pago;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${cliente.nome}</td>
+        <td>${produto.nome}</td>
+        <td>${d.quantidade}</td>
+        <td>${d.valorTotal.toFixed(2)}</td>
+        <td>${d.pago.toFixed(2)}</td>
+        <td>${saldo.toFixed(2)}</td>
+        <td><button data-id="${d.id}" class="btn-delete-divida" style="background:#ff4444;">Excluir</button></td>
+      `;
+      tbody.appendChild(tr);
+    }
+    // Delete dívida
+    document.querySelectorAll('.btn-delete-divida').forEach(btn => {
+      btn.onclick = () => {
+        if (confirm('Excluir dívida? Esta ação não pode ser desfeita!')) {
+          appData.devedores = appData.devedores.filter(d => d.id !== btn.dataset.id);
+          saveData(appData);
+          carregarDevedoresTabela();
+        }
+      };
+    });
+  }
+
+  // --- SOLICITAÇÕES DE COMPRA (CLIENTES) ---
+  // Cliente pode solicitar produtos da lista, salvando na appData.solicitacoes com status pendente
+
+  // Carregar produtos para cliente
+  const tabelaProdutosClienteBody = document.querySelector('#tabela-produtos-cliente tbody');
+
+  function carregarProdutosCliente() {
+    tabelaProdutosClienteBody.innerHTML = '';
+    if (appData.produtos.length === 0) {
+      tabelaProdutosClienteBody.innerHTML = `<tr><td colspan="3">Nenhum produto disponível</td></tr>`;
+      return;
+    }
+    for (const p of appData.produtos) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${p.nome}</td>
+        <td>${p.venda.toFixed(2)}</td>
+        <td><button data-id="${p.id}" class="btn-solicitar-produto">Solicitar</button></td>
+      `;
+      tabelaProdutosClienteBody.appendChild(tr);
+    }
+    // Botão solicitar produto
+    document.querySelectorAll('.btn-solicitar-produto').forEach(btn => {
+      btn.onclick = () => {
+        const produtoId = btn.dataset.id;
+        const produto = appData.produtos.find(p => p.id === produtoId);
+        if (!produto) {
+          alert('Produto não encontrado!');
+          return;
+        }
+        // Perguntar quantidade
+        let qtdStr = prompt(`Informe a quantidade para solicitar do produto "${produto.nome}":`, "1");
+        if (!qtdStr) return;
+        let qtd = parseInt(qtdStr);
+        if (isNaN(qtd) || qtd < 1) {
+          alert('Quantidade inválida!');
+          return;
+        }
+        // Salvar solicitação
+        appData.solicitacoes.push({
+          id: 's-' + Date.now(),
+          clienteId: usuarioLogado.id,
+          produtoId,
+          quantidade: qtd,
+          status: 'pendente', // pendente, aprovado, rejeitado
+        });
+        saveData(appData);
+        carregarSolicitacoesTabela();
+        alert('Solicitação enviada!');
+      };
+    });
+  }
+
+  // Preencher tabela de solicitações admin
+  function carregarSolicitacoesTabela() {
+    const tbody = document.querySelector('#tabela-solicitacoes tbody');
+    tbody.innerHTML = '';
+    if (appData.solicitacoes.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5">Nenhuma solicitação feita</td></tr>`;
+      return;
+    }
+    for (const s of appData.solicitacoes) {
+      const cliente = appData.usuarios.find(u => u.id === s.clienteId);
+      const produto = appData.produtos.find(p => p.id === s.produtoId);
+      if (!cliente || !produto) continue;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${cliente.nome}</td>
+        <td>${produto.nome}</td>
+        <td>${s.quantidade}</td>
+        <td>${s.status}</td>
         <td>
-          <button class="action-btn btn-pagamento" data-index="${idx}" style="background:#006600;">Pagamento</button>
-          <button class="action-btn btn-excluir-venda" data-index="${idx}" style="background:#cc0000;">Excluir</button>
+          ${s.status === 'pendente' ? 
+            `<button data-id="${s.id}" class="btn-aprovar-solicitacao" style="background:#00cc00;">Aprovar</button> 
+            <button data-id="${s.id}" class="btn-rejeitar-solicitacao" style="background:#cc0000;">Rejeitar</button>` 
+            : '-'}
         </td>
       `;
-      tabelaVendasBody.appendChild(tr);
-    });
+      tbody.appendChild(tr);
+    }
 
-    // Eventos pagamento parcial
-    document.querySelectorAll('.btn-pagamento').forEach(btn => {
-      btn.onclick = (e) => {
-        const idx = parseInt(e.target.dataset.index);
-        const venda = vendas[idx];
-        const valorTotal = venda.quantidade * (produtos.find(p => p.nome === venda.produto)?.preco || 0);
-        const valorDevido = valorTotal - venda.pago;
-
-        const valor = prompt(`Pagamento parcial para "${venda.produto}" de ${venda.cliente}. Valor devido: ${formatarReais(valorDevido)}.\nDigite o valor pago agora:`, valorDevido.toFixed(2));
-        if(valor !== null) {
-          const valorPago = parseFloat(valor);
-          if(isNaN(valorPago) || valorPago <= 0 || valorPago > valorDevido) {
-            alert('Valor inválido.');
-            return;
+    // Botões aprovar/rejeitar
+    document.querySelectorAll('.btn-aprovar-solicitacao').forEach(btn => {
+      btn.onclick = () => {
+        if (confirm('Aprovar esta solicitação?')) {
+          const id = btn.dataset.id;
+          const sol = appData.solicitacoes.find(s => s.id === id);
+          if (sol) {
+            sol.status = 'aprovado';
+            // Incrementa vendido no produto para estatística
+            const prod = appData.produtos.find(p => p.id === sol.produtoId);
+            if (prod) {
+              prod.vendidos += sol.quantidade;
+            }
+            saveData(appData);
+            carregarSolicitacoesTabela();
+            carregarProdutosTabela();
+            carregarEstatisticas();
+            alert('Solicitação aprovada!');
           }
-          vendas[idx].pago += valorPago;
-          salvarVendas();
-          carregarVendasTabela();
-          carregarRelatorioLucro();
-          alert('Pagamento registrado.');
+        }
+      };
+    });
+    document.querySelectorAll('.btn-rejeitar-solicitacao').forEach(btn => {
+      btn.onclick = () => {
+        if (confirm('Rejeitar esta solicitação?')) {
+          const id = btn.dataset.id;
+          const solIndex = appData.solicitacoes.findIndex(s => s.id === id);
+          if (solIndex !== -1) {
+            appData.solicitacoes[solIndex].status = 'rejeitado';
+            saveData(appData);
+            carregarSolicitacoesTabela();
+            alert('Solicitação rejeitada!');
+          }
+        }
+      };
+    });
+  }
+
+  // --- ESTATÍSTICAS ---
+  function carregarEstatisticas() {
+    // Produto mais vendido
+    if (appData.produtos.length === 0) {
+      document.getElementById('produto-mais-vendido-text').textContent = 'Nenhum produto cadastrado';
+      document.getElementById('cliente-mais-comprou-text').textContent = 'Nenhum cliente cadastrado';
+      document.getElementById('lucro-total-text').textContent = '0.00';
+      document.getElementById('gasto-total-text').textContent = '0.00';
+      return;
+    }
+
+    // Produto mais vendido
+    let maisVendido = appData.produtos.reduce((max, p) => p.vendidos > max.vendidos ? p : max, appData.produtos[0]);
+    document.getElementById('produto-mais-vendido-text').textContent = `${maisVendido.nome} (${maisVendido.vendidos} vendidos)`;
+
+    // Cliente que mais comprou
+    // Conta quantidade de solicitações aprovadas por cliente
+    const clientes = appData.usuarios.filter(u => u.role === 'cliente');
+    if (clientes.length === 0) {
+      document.getElementById('cliente-mais-comprou-text').textContent = 'Nenhum cliente cadastrado';
+    } else {
+      let compraPorCliente = {};
+      for (const c of clientes) {
+        compraPorCliente[c.id] = 0;
+      }
+      for (const s of appData.solicitacoes) {
+        if (s.status === 'aprovado') {
+          compraPorCliente[s.clienteId] = (compraPorCliente[s.clienteId] || 0) + s.quantidade;
         }
       }
-    });
+      let idMais = Object.keys(compraPorCliente).reduce((maxId, id) => compraPorCliente[id] > compraPorCliente[maxId] ? id : maxId, clientes[0].id);
+      let clienteMais = clientes.find(c => c.id === idMais);
+      let qtdMais = compraPorCliente[idMais];
+      document.getElementById('cliente-mais-comprou-text').textContent = `${clienteMais.nome} (${qtdMais} produtos comprados)`;
+    }
 
-    // Evento excluir venda
-    document.querySelectorAll('.btn-excluir-venda').forEach(btn => {
-      btn.onclick = (e) => {
-        const idx = parseInt(e.target.dataset.index);
-        if(confirm('Excluir essa venda/dívida?')) {
-          vendas.splice(idx,1);
-          salvarVendas();
-          carregarVendasTabela();
-          carregarRelatorioLucro();
-        }
-      }
-    });
+    // Lucro total
+    let lucroTotal = 0;
+    for (const p of appData.produtos) {
+      lucroTotal += (p.venda - p.custo) * p.vendidos;
+    }
+    document.getElementById('lucro-total-text').textContent = lucroTotal.toFixed(2);
+
+    // Gasto total
+    let gastoTotal = 0;
+    for (const p of appData.produtos) {
+      gastoTotal += p.custo * p.vendidos;
+    }
+    document.getElementById('gasto-total-text').textContent = gastoTotal.toFixed(2);
   }
-
-  // Form registrar venda (admin)
-  formRegistrarVenda.addEventListener('submit', (e) => {
-    e.preventDefault();
-    vendaMsgError.textContent = '';
-    vendaMsgSuccess.textContent = '';
-
-    const cliente = vendaClienteSelect.value;
-    const produto = vendaProdutoSelect.value;
-    const quantidade = parseInt(document.getElementById('venda-quantidade').value);
-    const pago = parseFloat(document.getElementById('venda-pago').value);
-
-    if(!cliente || !produto) {
-      vendaMsgError.textContent = 'Selecione cliente e produto.';
-      return;
-    }
-    if(isNaN(quantidade) || quantidade < 1) {
-      vendaMsgError.textContent = 'Quantidade deve ser pelo menos 1.';
-      return;
-    }
-    if(isNaN(pago) || pago < 0) {
-      vendaMsgError.textContent = 'Pagamento parcial inválido.';
-      return;
-    }
-
-    // Verifica se já existe dívida do cliente pro produto, soma quantidade e pago
-    const existente = vendas.find(v => v.cliente === cliente && v.produto === produto);
-    if(existente) {
-      existente.quantidade += quantidade;
-      existente.pago += pago;
-      existente.data = new Date().toISOString();
-    } else {
-      vendas.push({
-        cliente,
-        produto,
-        quantidade,
-        pago,
-        data: new Date().toISOString()
-      });
-    }
-
-    salvarVendas();
-    vendaMsgSuccess.textContent = 'Venda/dívida registrada com sucesso!';
-    formRegistrarVenda.reset();
-    carregarVendasTabela();
-    carregarRelatorioLucro();
-  });
-
-  // --- PAINEL ADMIN: RELATÓRIO DE LUCROS ---
-
-  function carregarRelatorioLucro() {
-    limparTbody(tabelaRelatoriosBody);
-    if(produtos.length === 0) {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td colspan="5" style="text-align:center;">Nenhum produto cadastrado para relatório</td>`;
-      tabelaRelatoriosBody.appendChild(tr);
-      return;
-    }
-
-    produtos.forEach(p => {
-      // soma vendas totais
-      const vendasProduto = vendas.filter(v => v.produto === p.nome);
-      const totalVendido = vendasProduto.reduce((acc, v) => acc + v.quantidade, 0);
-      const receitaTotal = vendasProduto.reduce((acc, v) => {
-        const preco = p.preco || 0;
-        return acc + (v.quantidade * preco);
-      }, 0);
-      const custoTotal = totalVendido * (p.custo || 0);
-      const lucroTotal = receitaTotal - custoTotal;
-
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${p.nome}</td>
-        <td>${totalVendido}</td>
-        <td>${formatarReais(receitaTotal)}</td>
-        <td>${formatarReais(custoTotal)}</td>
-        <td>${formatarReais(lucroTotal)}</td>
-      `;
-      tabelaRelatoriosBody.appendChild(tr);
-    });
-  }
-
-  // --- PAINEL CLIENTE ---
-
-  // Carrega tabela produtos para cliente
-  function carregarProdutosClienteTabela() {
-    limparTbody(tabelaProdutosClienteBody);
-    if(produtos.length === 0) {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td colspan="3" style="text-align:center;">Nenhum produto disponível</td>`;
-      tabelaProdutosClienteBody.appendChild(tr);
-      return;
-    }
-    produtos.forEach((p, idx) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${p.nome}</td>
-        <td>${formatarReais(p.preco)}</td>
-        <td><button class="action-btn btn-comprar" data-index="${idx}" style="background:#004aad;">Comprar</button></td>
-      `;
-      tabelaProdutosClienteBody.appendChild(tr);
-    });
-
-    document.querySelectorAll('.btn-comprar').forEach(btn => {
-      btn.onclick = e => {
-        const idx = parseInt(e.target.dataset.index);
-        compraProdutoSelect.value = produtos[idx].nome;
-        compraQuantidadeInput.value = '1';
-        compraPagoInput.value = '0';
-        compraMsgError.textContent = '';
-        compraMsgSuccess.textContent = '';
-        window.scrollTo({top: formRegistrarCompra.offsetTop, behavior: 'smooth'});
-      }
-    });
-  }
-
-  // Carrega select produtos para compra cliente
-  function carregarProdutosSelectCompra() {
-    limparSelect(compraProdutoSelect);
-    if(produtos.length === 0) {
-      const opt = document.createElement('option');
-      opt.textContent = 'Nenhum produto disponível';
-      opt.disabled = true;
-      compraProdutoSelect.appendChild(opt);
-      return;
-    }
-    produtos.forEach(p => {
-      const opt = document.createElement('option');
-      opt.value = p.nome;
-      opt.textContent = p.nome;
-      compraProdutoSelect.appendChild(opt);
-    });
-  }
-
-  // Carrega tabela dívidas do cliente
-  function carregarDividasClienteTabela() {
-    limparTbody(tabelaDividasClienteBody);
-    const dividasCliente = vendas.filter(v => v.cliente === usuarioLogado.username);
-    if(dividasCliente.length === 0) {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td colspan="6" style="text-align:center;">Você não tem dívidas.</td>`;
-      tabelaDividasClienteBody.appendChild(tr);
-      return;
-    }
-    dividasCliente.forEach(v => {
-      const produto = produtos.find(p => p.nome === v.produto);
-      const valorTotal = v.quantidade * (produto?.preco || 0);
-      const valorDevido = valorTotal - v.pago;
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${v.produto}</td>
-        <td>${v.quantidade}</td>
-        <td>${formatarReais(valorTotal)}</td>
-        <td>${formatarReais(v.pago)}</td>
-        <td>${formatarReais(valorDevido)}</td>
-        <td>${new Date(v.data).toLocaleDateString('pt-BR')}</td>
-      `;
-      tabelaDividasClienteBody.appendChild(tr);
-    });
-  }
-
-  // Registrar compra cliente (adiciona na venda/dívida)
-  formRegistrarCompra.addEventListener('submit', (e) => {
-    e.preventDefault();
-    compraMsgError.textContent = '';
-    compraMsgSuccess.textContent = '';
-
-    const produto = compraProdutoSelect.value;
-    const quantidade = parseInt(compraQuantidadeInput.value);
-    const pago = parseFloat(compraPagoInput.value);
-
-    if(!produto) {
-      compraMsgError.textContent = 'Selecione um produto.';
-      return;
-    }
-    if(isNaN(quantidade) || quantidade < 1) {
-      compraMsgError.textContent = 'Quantidade deve ser pelo menos 1.';
-      return;
-    }
-    if(isNaN(pago) || pago < 0) {
-      compraMsgError.textContent = 'Pagamento inválido.';
-      return;
-    }
-
-    // Se já existe dívida do usuário para o produto, soma
-    const existente = vendas.find(v => v.cliente === usuarioLogado.username && v.produto === produto);
-    if(existente) {
-      existente.quantidade += quantidade;
-      existente.pago += pago;
-      existente.data = new Date().toISOString();
-    } else {
-      vendas.push({
-        cliente: usuarioLogado.username,
-        produto,
-        quantidade,
-        pago,
-        data: new Date().toISOString()
-      });
-    }
-    salvarVendas();
-    compraMsgSuccess.textContent = 'Compra registrada com sucesso!';
-    formRegistrarCompra.reset();
-    carregarDividasClienteTabela();
-  });
-
-  // --- NAVEGAÇÃO DOS TABS ADMIN ---
-  function esconderTabs() {
-    tabContentProdutos.classList.add('hidden');
-    tabContentVendas.classList.add('hidden');
-    tabContentRelatorios.classList.add('hidden');
-    tabProdutosBtn.disabled = false;
-    tabVendasBtn.disabled = false;
-    tabRelatoriosBtn.disabled = false;
-  }
-  tabProdutosBtn.onclick = () => {
-    esconderTabs();
-    tabContentProdutos.classList.remove('hidden');
-    tabProdutosBtn.disabled = true;
-  };
-  tabVendasBtn.onclick = () => {
-    esconderTabs();
-    tabContentVendas.classList.remove('hidden');
-    tabVendasBtn.disabled = true;
-  };
-  tabRelatoriosBtn.onclick = () => {
-    esconderTabs();
-    tabContentRelatorios.classList.remove('hidden');
-    tabRelatoriosBtn.disabled = true;
-  };
-  // Inicia com aba produtos
-  esconderTabs();
-  tabContentProdutos.classList.remove('hidden');
-  tabProdutosBtn.disabled = true;
-
-  // Botão logout dentro do painel admin
-  btnVoltarAdmin.addEventListener('click', () => {
-    usuarioLogado = null;
-    sessionStorage.removeItem('usuarioLogado');
-    mostrarTela('login');
-  });
-  // Botão logout cliente
-  btnLogoutCliente.addEventListener('click', () => {
-    usuarioLogado = null;
-    sessionStorage.removeItem('usuarioLogado');
-    mostrarTela('login');
-  });
-
-  // Limpa mensagens de erro/sucesso
-  function limparMensagens() {
-    loginError.textContent = '';
-    cadUsuarioError.textContent = '';
-    cadUsuarioSuccess.textContent = '';
-    produtoMsgError.textContent = '';
-    produtoMsgSuccess.textContent = '';
-    vendaMsgError.textContent = '';
-    vendaMsgSuccess.textContent = '';
-    compraMsgError.textContent = '';
-    compraMsgSuccess.textContent = '';
-  }
-
-  // --- INICIAR APP ---
-
-  verificarLoginSessao();
 
 </script>
-
 </body>
 </html>
