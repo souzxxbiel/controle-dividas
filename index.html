@@ -1,1049 +1,974 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="scroll-smooth" >
+<html lang="pt-BR" class="scroll-smooth">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<title>Controle Avançado de Vendas & Dívidas</title>
-
-<!-- Tailwind CDN + configuração -->
-<script src="https://cdn.tailwindcss.com"></script>
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- jsPDF -->
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+<title>Controle de Vendas & Dívidas — Premium</title>
+<meta name="description" content="App completo para controle de produtos, vendas e dívidas, com dashboard, gráficos, exportação e dark mode." />
 <style>
-  /* Scrollbar custom */
-  ::-webkit-scrollbar {
-    width: 10px; height: 10px;
+  /* Reset e base */
+  *, *::before, *::after {box-sizing: border-box;}
+  body {
+    margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    background: #f9fafb; color: #111;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
   }
-  ::-webkit-scrollbar-thumb {
-    background-color: rgba(59,130,246,0.4);
-    border-radius: 10px;
+  html.dark body {
+    background: #121212; color: #eee;
   }
-  ::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(59,130,246,0.75);
+  main {flex-grow: 1; padding-bottom: 64px;}
+  button {
+    cursor: pointer; border: none; background: none;
   }
-  /* Fade transitions for tabs */
-  .tab-content {
-    opacity: 0;
-    pointer-events: none;
-    position: absolute;
-    inset: 0;
-    transition: opacity 0.4s ease;
+  button:focus-visible {
+    outline: 2px solid #2563eb; outline-offset: 2px;
   }
-  .tab-content.active {
-    opacity: 1;
-    pointer-events: all;
+  /* Container */
+  section {
+    max-width: 700px; margin: auto; padding: 1rem;
+  }
+  h2 {
+    font-size: 1.4rem; font-weight: 700; margin-bottom: .75rem;
+  }
+  label {
+    display: block; margin-bottom: .3rem; font-weight: 600;
+  }
+  input, select {
+    width: 100%; padding: .5rem; margin-bottom: 1rem; font-size: 1rem;
+    border: 1px solid #ccc; border-radius: 6px;
+    background: #fff; color: #111;
+    transition: border-color 0.3s;
+  }
+  html.dark input, html.dark select {
+    background: #222; color: #eee; border-color: #555;
+  }
+  input:focus, select:focus {
+    border-color: #2563eb; outline: none;
+  }
+  form {
+    background: #fff; padding: 1rem; border-radius: 8px;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.05);
+  }
+  html.dark form {
+    background: #1e1e1e;
+    box-shadow: 0 2px 10px rgb(0 0 0 / 0.7);
+  }
+  /* Botões principais */
+  .btn-primary {
+    background-color: #2563eb; color: white;
+    padding: 0.7rem 1.2rem; border-radius: 8px;
+    font-weight: 700; font-size: 1rem;
+    user-select: none;
+    transition: background-color 0.3s ease;
+  }
+  .btn-primary:hover {
+    background-color: #1d4ed8;
+  }
+  .btn-primary:disabled {
+    background-color: #94a3b8; cursor: not-allowed;
+  }
+  /* Tabela */
+  table {
+    width: 100%; border-collapse: collapse; margin-top: 1rem;
+  }
+  th, td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+    font-size: 0.9rem;
+    vertical-align: middle;
+  }
+  html.dark th, html.dark td {
+    border-color: #444;
+  }
+  th {
+    background: #f3f4f6; color: #111;
+    user-select: none;
+    cursor: pointer;
     position: relative;
   }
-  /* Bottom nav styles */
+  html.dark th {
+    background: #222;
+    color: #eee;
+  }
+  th[aria-pressed="true"]::after {
+    content: "▲";
+    position: absolute;
+    right: 0.75rem;
+    font-size: 0.8rem;
+    color: #2563eb;
+  }
+  th[aria-pressed="false"]::after {
+    content: "▼";
+    position: absolute;
+    right: 0.75rem;
+    font-size: 0.8rem;
+    color: #aaa;
+  }
+  tr:hover {
+    background-color: #e0e7ff;
+  }
+  html.dark tr:hover {
+    background-color: #2a2a4a;
+  }
+  .text-center {
+    text-align: center;
+  }
+  .text-yellow {
+    color: #ca8a04;
+  }
+  .text-green {
+    color: #16a34a;
+  }
+  .text-red {
+    color: #dc2626;
+  }
+  /* Inputs inline para tabelas e formulários */
+  input[type="number"], input[type="date"] {
+    width: auto;
+  }
+  /* Rodapé Tabs */
   nav#bottomNav {
-    box-shadow: 0 -3px 12px rgb(0 0 0 / 0.15);
-    z-index: 99999;
-    backdrop-filter: saturate(180%) blur(15px);
-    background-color: rgba(255 255 255 / 0.95);
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: #fff; border-top: 1px solid #ddd;
+    display: flex; justify-content: space-around;
+    padding: 0.4rem 0;
+    z-index: 1000;
   }
-  body.dark nav#bottomNav {
-    background-color: rgba(17 24 39 / 0.85);
+  html.dark nav#bottomNav {
+    background: #121212;
+    border-color: #444;
   }
-  nav#bottomNav button.active svg path,
-  nav#bottomNav button.active svg circle {
-    stroke: #2563eb; /* blue-600 */
-    fill: #2563eb;
+  nav#bottomNav button {
+    flex-grow: 1;
+    display: flex; flex-direction: column; align-items: center;
+    color: #6b7280;
+    font-size: 0.75rem;
+    gap: 0.15rem;
+    padding: 0.35rem 0;
+    user-select: none;
+    transition: color 0.3s;
   }
-  /* Accessible focus */
-  button:focus-visible, input:focus-visible {
-    outline: 2px solid #2563eb;
-    outline-offset: 2px;
+  nav#bottomNav button.active, nav#bottomNav button:hover, nav#bottomNav button:focus-visible {
+    color: #2563eb;
   }
-  /* Notifications */
+  nav#bottomNav svg {
+    width: 1.4rem; height: 1.4rem;
+    stroke-width: 2.2;
+  }
+  /* Notificação */
   #notification {
     position: fixed;
-    top: 1rem; right: 1rem;
-    background: #2563eb;
+    bottom: 80px;
+    left: 50%; transform: translateX(-50%);
+    background-color: #2563eb;
     color: white;
-    padding: 0.75rem 1.25rem;
-    border-radius: 8px;
+    padding: 0.7rem 1.3rem;
+    border-radius: 9999px;
     font-weight: 600;
-    box-shadow: 0 3px 8px rgb(37 99 235 / 0.7);
+    font-size: 0.95rem;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.3s ease;
-    z-index: 100000;
-    user-select: none;
+    transition: opacity 0.4s ease;
+    z-index: 1100;
   }
   #notification.show {
     opacity: 1;
-    pointer-events: all;
+    pointer-events: auto;
   }
-  /* Loader spinner */
-  #loader {
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #2563eb;
+  /* Dark Mode toggle */
+  #darkToggle {
+    position: fixed;
+    top: 0.8rem; right: 1rem;
+    background: none;
     border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    animation: spin 1s linear infinite;
-    margin-left: 0.75rem;
+    padding: 0.4rem;
+    transition: background-color 0.3s;
   }
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+  #darkToggle:hover, #darkToggle:focus-visible {
+    background-color: #2563eb;
+    color: white;
+    outline: none;
+  }
+  #darkToggle svg {
+    width: 1.6rem;
+    height: 1.6rem;
+    stroke-width: 2;
+  }
+  /* Forms flex */
+  .form-row {
+    display: flex; gap: 1rem; flex-wrap: wrap;
+  }
+  .form-row > div {
+    flex: 1 1 120px;
+    min-width: 120px;
+  }
+  /* Responsive */
+  @media (max-width: 500px) {
+    nav#bottomNav button span {
+      font-size: 0.65rem;
+    }
+    th, td {
+      font-size: 0.85rem;
+      padding: 0.35rem 0.5rem;
+    }
   }
 </style>
 </head>
-<body class="bg-gradient-to-br from-gray-100 to-white dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-gray-200 min-h-screen flex flex-col relative font-sans">
+<body>
+<button id="darkToggle" aria-label="Alternar modo claro/escuro" title="Alternar modo claro/escuro" type="button">
+  <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" >
+    <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/>
+  </svg>
+  <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" class="hidden" >
+    <circle cx="12" cy="12" r="5" />
+    <path stroke-linecap="round" stroke-linejoin="round" d="M12 1v2m0 18v2m11-11h-2M3 12H1m16.95 5.95l-1.414-1.414M6.464 6.464L5.05 5.05m12.728 0l-1.414 1.414M6.464 17.536l-1.414 1.414"/>
+  </svg>
+</button>
 
-<!-- Notification -->
-<div id="notification" role="alert" aria-live="assertive"></div>
-
-<header class="bg-blue-700 dark:bg-blue-900 text-white p-5 flex justify-between items-center shadow-lg sticky top-0 z-50 select-none">
-  <h1 class="text-xl sm:text-2xl font-extrabold" id="mainTitle" tabindex="0">Controle Avançado de Vendas & Dívidas</h1>
-  <button id="darkToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro"
-    class="w-10 h-10 rounded-full bg-blue-300 dark:bg-yellow-400 flex items-center justify-center hover:ring-4 ring-yellow-400 transition focus-visible:outline-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2">
-    <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m8.66-12.34l-.7.7M4.04 19.96l-.7-.7M21 12h-1M4 12H3m16.66 6.66l-.7-.7M4.04 4.04l-.7.7" />
-    </svg>
-    <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
-    </svg>
-  </button>
-</header>
-
-<main class="flex-grow max-w-5xl mx-auto p-4 pb-24 relative min-h-[600px]">
-
-  <!-- Seções SPA -->
-  <section id="tabProdutos" class="tab-content active" aria-labelledby="produtosTitle" role="tabpanel" tabindex="0">
-    <h2 id="produtosTitle" class="text-2xl font-bold mb-5 text-blue-700 dark:text-blue-400">Produtos</h2>
-    <form id="produtoForm" class="grid grid-cols-1 sm:grid-cols-5 gap-3 mb-6" novalidate>
-      <input
-        type="text" id="nomeProduto" name="nomeProduto" aria-label="Nome do Produto" placeholder="Nome do Produto"
-        pattern=".{3,50}" title="Nome deve ter entre 3 e 50 caracteres"
-        required
-        class="p-3 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
-        autocomplete="off"
-      />
-      <input
-        type="number" id="valorProduto" name="valorProduto" aria-label="Valor de Venda (R$)" min="0" step="0.01" placeholder="Valor de Venda (R$)"
-        required
-        class="p-3 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
-      />
-      <input
-        type="number" id="custoProduto" name="custoProduto" aria-label="Custo (R$)" min="0" step="0.01" placeholder="Custo (R$)"
-        required
-        class="p-3 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
-      />
-      <button
-        type="submit"
-        class="bg-green-600 hover:bg-green-700 text-white font-bold rounded p-3 transition duration-200 disabled:opacity-60"
-        aria-disabled="false"
-      >Adicionar Produto</button>
-      <button
-        type="reset"
-        class="bg-gray-400 hover:bg-gray-500 text-white font-bold rounded p-3 transition duration-200"
-      >Limpar</button>
+<main>
+  <!-- Aba Produtos -->
+  <section id="tabProdutos" tabindex="0" role="tabpanel" aria-label="Produtos">
+    <h2>Produtos</h2>
+    <form id="produtoForm" aria-describedby="produtoFormDesc">
+      <div id="produtoFormDesc" class="sr-only">Formulário para adicionar novo produto com nome, valor e custo.</div>
+      <label for="nomeProduto">Nome do Produto</label>
+      <input id="nomeProduto" name="nomeProduto" type="text" minlength="3" maxlength="50" placeholder="Ex: Camiseta" required autocomplete="off" />
+      <div class="form-row">
+        <div>
+          <label for="valorProduto">Valor Unitário (R$)</label>
+          <input id="valorProduto" name="valorProduto" type="number" min="0" step="0.01" placeholder="0,00" required />
+        </div>
+        <div>
+          <label for="custoProduto">Custo Unitário (R$)</label>
+          <input id="custoProduto" name="custoProduto" type="number" min="0" step="0.01" placeholder="0,00" required />
+        </div>
+      </div>
+      <button class="btn-primary" type="submit">Adicionar Produto</button>
     </form>
 
-    <div class="overflow-x-auto max-h-[320px] border border-gray-300 dark:border-gray-600 rounded shadow">
-      <table class="w-full text-sm border-collapse" aria-describedby="produtosTitle">
-        <thead class="bg-blue-100 dark:bg-blue-800 sticky top-0 z-10">
-          <tr>
-            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Produto</th>
-            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Valor (R$)</th>
-            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Custo (R$)</th>
-            <th class="p-2 border-b border-gray-300 dark:border-gray-600" aria-label="Excluir Produto"></th>
-          </tr>
-        </thead>
-        <tbody id="produtosTabela" tabindex="0" aria-live="polite" aria-relevant="all"></tbody>
-      </table>
-    </div>
+    <table aria-describedby="produtosTabelaDesc" aria-live="polite" role="grid">
+      <caption id="produtosTabelaDesc" class="sr-only">Lista de produtos cadastrados</caption>
+      <thead>
+        <tr>
+          <th scope="col">Nome</th>
+          <th scope="col">Valor</th>
+          <th scope="col">Custo</th>
+          <th scope="col" class="text-center">Excluir</th>
+        </tr>
+      </thead>
+      <tbody id="produtosTabela"></tbody>
+    </table>
   </section>
 
-  <section id="tabVendas" class="tab-content" aria-labelledby="vendasTitle" role="tabpanel" tabindex="0" hidden>
-    <h2 id="vendasTitle" class="text-2xl font-bold mb-5 text-blue-700 dark:text-blue-400">Registrar Venda</h2>
-    <form id="vendaForm" class="grid grid-cols-1 sm:grid-cols-7 gap-3 mb-6" novalidate>
-      <input
-        list="devedores" id="devedorVenda" name="devedorVenda" aria-label="Nome do Devedor" placeholder="Nome do Devedor"
-        required autocomplete="off"
-        class="p-3 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
-      />
+  <!-- Aba Vendas -->
+  <section id="tabVendas" tabindex="0" role="tabpanel" aria-label="Vendas" hidden>
+    <h2>Vendas & Dívidas</h2>
+    <form id="vendaForm" aria-describedby="vendaFormDesc">
+      <div id="vendaFormDesc" class="sr-only">Formulário para registrar vendas e dívidas.</div>
+      <label for="devedorVenda">Nome do Devedor</label>
+      <input id="devedorVenda" name="devedorVenda" type="text" placeholder="Ex: João" required autocomplete="off" list="devedores" />
       <datalist id="devedores"></datalist>
 
-      <input
-        list="produtosDatalist" id="produtoVenda" name="produtoVenda" aria-label="Produto" placeholder="Produto"
-        required autocomplete="off"
-        class="p-3 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
-      />
+      <label for="produtoVenda">Produto</label>
+      <input id="produtoVenda" name="produtoVenda" type="text" placeholder="Selecione um produto" required autocomplete="off" list="produtosDatalist" />
       <datalist id="produtosDatalist"></datalist>
 
-      <input
-        type="number" id="quantidadeVenda" name="quantidadeVenda" min="1" value="1" aria-label="Quantidade"
-        required
-        class="p-3 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
-      />
-      <input
-        type="number" id="valorVenda" name="valorVenda" min="0" step="0.01" placeholder="Valor Unitário (R$)" aria-label="Valor Unitário (R$)"
-        required
-        class="p-3 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
-      />
-      <input
-        type="date" id="vencimentoVenda" name="vencimentoVenda" aria-label="Data de Vencimento" required
-        class="p-3 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
-      />
-      <button
-        type="submit"
-        class="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded p-3 transition duration-200 disabled:opacity-60"
-        aria-disabled="false"
-      >Registrar Venda</button>
+      <div class="form-row">
+        <div>
+          <label for="quantidadeVenda">Quantidade</label>
+          <input id="quantidadeVenda" name="quantidadeVenda" type="number" min="1" step="1" value="1" required />
+        </div>
+        <div>
+          <label for="valorVenda">Valor Unitário (R$)</label>
+          <input id="valorVenda" name="valorVenda" type="number" min="0" step="0.01" placeholder="0,00" required />
+        </div>
+      </div>
+
+      <label for="vencimentoVenda">Data de Vencimento</label>
+      <input id="vencimentoVenda" name="vencimentoVenda" type="date" required />
+
+      <button class="btn-primary" type="submit">Registrar Venda</button>
     </form>
 
-    <input
-      id="buscaVendas" type="search" aria-label="Buscar vendas" placeholder="Buscar por devedor ou produto..."
-      class="w-full p-3 rounded border border-gray-300 dark:border-gray-600 mb-3 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
-      autocomplete="off"
-    />
+    <input id="buscaVendas" type="search" placeholder="Buscar vendas por nome ou produto..." aria-label="Buscar vendas" style="margin-top: 1rem; width: 100%; padding: 0.5rem; border-radius: 8px; border: 1px solid #ccc;" />
 
-    <div class="overflow-x-auto max-h-[320px] border border-gray-300 dark:border-gray-600 rounded shadow">
-      <table class="w-full text-sm border-collapse" aria-describedby="vendasTitle">
-        <thead class="bg-blue-100 dark:bg-blue-800 sticky top-0 z-10">
-          <tr>
-            <th scope="col" tabindex="0" role="button" aria-pressed="false" class="p-2 border-b border-gray-300 dark:border-gray-600 cursor-pointer" data-sort="devedor" title="Ordenar por Devedor">Devedor ▲▼</th>
-            <th scope="col" tabindex="0" role="button" aria-pressed="false" class="p-2 border-b border-gray-300 dark:border-gray-600 cursor-pointer" data-sort="produto" title="Ordenar por Produto">Produto ▲▼</th>
-            <th scope="col" class="p-2 border-b border-gray-300 dark:border-gray-600">Qtd</th>
-            <th scope="col" class="p-2 border-b border-gray-300 dark:border-gray-600">Valor (R$)</th>
-            <th scope="col" class="p-2 border-b border-gray-300 dark:border-gray-600">Custo (R$)</th>
-            <th scope="col" class="p-2 border-b border-gray-300 dark:border-gray-600">Lucro (R$)</th>
-            <th scope="col" tabindex="0" role="button" aria-pressed="false" class="p-2 border-b border-gray-300 dark:border-gray-600 cursor-pointer" data-sort="vencimento" title="Ordenar por Vencimento">Vencimento ▲▼</th>
-            <th scope="col" tabindex="0" role="button" aria-pressed="false" class="p-2 border-b border-gray-300 dark:border-gray-600 cursor-pointer" data-sort="status" title="Ordenar por Status">Status ▲▼</th>
-            <th scope="col" class="p-2 border-b border-gray-300 dark:border-gray-600">Ações</th>
-          </tr>
-        </thead>
-        <tbody id="vendasTabela" tabindex="0" aria-live="polite" aria-relevant="all"></tbody>
-      </table>
-    </div>
+    <table aria-describedby="vendasTabelaDesc" aria-live="polite" role="grid" style="margin-top: 1rem;">
+      <caption id="vendasTabelaDesc" class="sr-only">Lista de vendas e dívidas registradas</caption>
+      <thead>
+        <tr>
+          <th scope="col" data-sort="devedor" tabindex="0" role="button" aria-pressed="false" aria-label="Ordenar por Devedor">Devedor</th>
+          <th scope="col" data-sort="produto" tabindex="0" role="button" aria-pressed="false" aria-label="Ordenar por Produto">Produto</th>
+          <th scope="col" data-sort="quantidade" tabindex="0" role="button" aria-pressed="false" aria-label="Ordenar por Quantidade" class="text-center">Qtd</th>
+          <th scope="col" data-sort="valor" tabindex="0" role="button" aria-pressed="false" aria-label="Ordenar por Valor Unitário">Valor Unit.</th>
+          <th scope="col" class="text-center">Custo Total</th>
+          <th scope="col" class="text-center">Lucro</th>
+          <th scope="col" data-sort="vencimento" tabindex="0" role="button" aria-pressed="false" aria-label="Ordenar por Data de Vencimento">Vencimento</th>
+          <th scope="col" data-sort="status" tabindex="0" role="button" aria-pressed="false" aria-label="Ordenar por Status">Status</th>
+          <th scope="col" class="text-center">Ações</th>
+        </tr>
+      </thead>
+      <tbody id="vendasTabela"></tbody>
+    </table>
   </section>
 
-  <section id="tabDashboard" class="tab-content" aria-labelledby="dashboardTitle" role="tabpanel" tabindex="0" hidden>
-    <h2 id="dashboardTitle" class="text-2xl font-bold mb-6 text-blue-700 dark:text-blue-400">Dashboard & Relatórios</h2>
-
-    <div class="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-8 text-center">
-      <div class="bg-blue-50 dark:bg-blue-900 rounded p-4 shadow">
-        <h3 class="text-lg font-semibold mb-2">Total Recebido</h3>
-        <p class="text-xl font-bold text-green-600 dark:text-green-400" id="totalRecebido">R$ 0,00</p>
+  <!-- Aba Dashboard -->
+  <section id="tabDashboard" tabindex="0" role="tabpanel" aria-label="Dashboard" hidden>
+    <h2>Dashboard & Estatísticas</h2>
+    <div style="display:flex; flex-wrap: wrap; gap:1rem; margin-bottom: 1rem;">
+      <div style="flex:1 1 150px; background:#2563eb; color:#fff; border-radius: 12px; padding: 1rem; box-shadow: 0 3px 8px rgb(37 99 235 / 0.4);">
+        <strong>Total Recebido</strong>
+        <p id="totalRecebido" style="font-size:1.5rem; margin-top: 0.3rem;">R$ 0,00</p>
       </div>
-      <div class="bg-blue-50 dark:bg-blue-900 rounded p-4 shadow">
-        <h3 class="text-lg font-semibold mb-2">Total a Receber</h3>
-        <p class="text-xl font-bold text-yellow-600 dark:text-yellow-400" id="totalAReceber">R$ 0,00</p>
+      <div style="flex:1 1 150px; background:#fbbf24; color:#000; border-radius: 12px; padding: 1rem; box-shadow: 0 3px 8px rgb(251 191 36 / 0.4);">
+        <strong>Total a Receber</strong>
+        <p id="totalAReceber" style="font-size:1.5rem; margin-top: 0.3rem;">R$ 0,00</p>
       </div>
-      <div class="bg-blue-50 dark:bg-blue-900 rounded p-4 shadow">
-        <h3 class="text-lg font-semibold mb-2">Total Custos</h3>
-        <p class="text-xl font-bold text-red-600 dark:text-red-400" id="totalCusto">R$ 0,00</p>
+      <div style="flex:1 1 150px; background:#dc2626; color:#fff; border-radius: 12px; padding: 1rem; box-shadow: 0 3px 8px rgb(220 38 38 / 0.4);">
+        <strong>Custo Total</strong>
+        <p id="totalCusto" style="font-size:1.5rem; margin-top: 0.3rem;">R$ 0,00</p>
       </div>
-      <div class="bg-blue-50 dark:bg-blue-900 rounded p-4 shadow">
-        <h3 class="text-lg font-semibold mb-2">Lucro Total</h3>
-        <p class="text-xl font-bold text-indigo-600 dark:text-indigo-400" id="lucroTotal">R$ 0,00</p>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
-      <div>
-        <h3 class="text-xl font-semibold mb-4 text-center text-blue-700 dark:text-blue-400">Produtos mais vendidos</h3>
-        <canvas id="graficoProdutos" class="rounded shadow" aria-label="Gráfico de barras dos produtos mais vendidos" role="img"></canvas>
-      </div>
-      <div>
-        <h3 class="text-xl font-semibold mb-4 text-center text-blue-700 dark:text-blue-400">Status das Vendas</h3>
-        <canvas id="graficoStatus" class="rounded shadow" aria-label="Gráfico de pizza do status das vendas" role="img"></canvas>
+      <div style="flex:1 1 150px; background:#16a34a; color:#fff; border-radius: 12px; padding: 1rem; box-shadow: 0 3px 8px rgb(22 163 74 / 0.4);">
+        <strong>Lucro Total</strong>
+        <p id="lucroTotal" style="font-size:1.5rem; margin-top: 0.3rem;">R$ 0,00</p>
       </div>
     </div>
+    <canvas id="graficoProdutos" aria-label="Gráfico de barras de produtos mais vendidos" role="img" style="max-width: 100%; height: 280px;"></canvas>
+    <canvas id="graficoStatus" aria-label="Gráfico de pizza dos status das vendas" role="img" style="max-width: 100%; height: 280px; margin-top: 1rem;"></canvas>
 
-    <div class="mt-8 flex justify-center gap-4 flex-wrap">
-      <button id="exportCSV"
-        class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded transition focus-visible:outline-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2"
-      >Exportar CSV</button>
-      <button id="exportPDF"
-        class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded transition focus-visible:outline-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2"
-      >Exportar PDF</button>
-      <button id="limparDados"
-        class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded transition focus-visible:outline-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2"
-      >Limpar Tudo</button>
+    <div style="margin-top: 1.5rem; display:flex; gap:1rem; flex-wrap: wrap; justify-content:center;">
+      <button id="exportCsvBtn" class="btn-primary" style="flex:1 1 200px;">Exportar CSV</button>
+      <button id="exportPdfBtn" class="btn-primary" style="flex:1 1 200px;">Exportar PDF</button>
     </div>
   </section>
-
 </main>
 
-<nav id="bottomNav" class="fixed bottom-0 left-0 right-0 flex justify-around py-3">
-  <button aria-label="Produtos" class="tabBtn flex flex-col items-center gap-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 active focus-visible:outline-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2" data-tab="tabProdutos" type="button" role="tab" aria-selected="true" tabindex="0">
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>
-    <span class="text-xs select-none">Produtos</span>
+<nav id="bottomNav" role="tablist" aria-label="Navegação das abas">
+  <button role="tab" aria-selected="true" aria-controls="tabProdutos" data-tab="tabProdutos" tabindex="0" title="Produtos" aria-label="Ir para aba Produtos">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24" >
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7" />
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3 7l9 6 9-6" />
+    </svg>
+    <span>Produtos</span>
   </button>
-  <button aria-label="Vendas" class="tabBtn flex flex-col items-center gap-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 focus-visible:outline-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2" data-tab="tabVendas" type="button" role="tab" aria-selected="false" tabindex="-1">
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h18v18H3z"></path><path d="M7 7h10v10H7z" stroke="#2563eb"></path></svg>
-    <span class="text-xs select-none">Vendas</span>
+  <button role="tab" aria-selected="false" aria-controls="tabVendas" data-tab="tabVendas" tabindex="-1" title="Vendas e Dívidas" aria-label="Ir para aba Vendas e Dívidas">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24" >
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 6h10M7 14h8m-5 4h3" />
+    </svg>
+    <span>Vendas</span>
   </button>
-  <button aria-label="Dashboard" class="tabBtn flex flex-col items-center gap-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 focus-visible:outline-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2" data-tab="tabDashboard" type="button" role="tab" aria-selected="false" tabindex="-1">
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M8 12l2 2 4-4"></path></svg>
-    <span class="text-xs select-none">Dashboard</span>
+  <button role="tab" aria-selected="false" aria-controls="tabDashboard" data-tab="tabDashboard" tabindex="-1" title="Dashboard" aria-label="Ir para aba Dashboard">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24" >
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18h18" />
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-6h6v6" />
+    </svg>
+    <span>Dashboard</span>
   </button>
 </nav>
 
+<div id="notification" role="alert" aria-live="assertive" aria-atomic="true"></div>
+
+<!-- Dependências via CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
 <script>
 (() => {
-  "use strict";
+  'use strict';
 
-  // ======== UTILITÁRIOS ========
-
-  // Formatador moeda BRL
-  const formatBRL = (value) => {
-    return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  // Utilitários
+  const formatBRL = n => n.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+  const formatDateBR = d => {
+    if (!d) return '';
+    const dt = new Date(d);
+    if (isNaN(dt)) return '';
+    return dt.toLocaleDateString('pt-BR');
   };
+  const compareDate = (a,b) => new Date(a) - new Date(b);
 
-  // Mostrar notificação temporária
-  const notification = document.getElementById("notification");
-  let notificationTimeout = null;
-  function showNotification(message, duration = 3000) {
-    if (notificationTimeout) clearTimeout(notificationTimeout);
-    notification.textContent = message;
-    notification.classList.add("show");
-    notificationTimeout = setTimeout(() => {
-      notification.classList.remove("show");
-    }, duration);
+  // Elements
+  const tabs = {
+    produtos: document.getElementById('tabProdutos'),
+    vendas: document.getElementById('tabVendas'),
+    dashboard: document.getElementById('tabDashboard')
+  };
+  const tabButtons = [...document.querySelectorAll('nav#bottomNav button')];
+
+  // Notificação
+  const notificationEl = document.getElementById('notification');
+  let notifTimeout = null;
+  function showNotification(msg) {
+    notificationEl.textContent = msg;
+    notificationEl.classList.add('show');
+    clearTimeout(notifTimeout);
+    notifTimeout = setTimeout(() => notificationEl.classList.remove('show'), 3000);
   }
 
-  // Debounce
-  function debounce(fn, delay) {
-    let timer = null;
-    return (...args) => {
-      clearTimeout(timer);
-      timer = setTimeout(() => fn(...args), delay);
+  // Dark Mode Toggle
+  const darkToggle = document.getElementById('darkToggle');
+  const iconMoon = document.getElementById('iconMoon');
+  const iconSun = document.getElementById('iconSun');
+
+  function setDarkMode(dark) {
+    if (dark) {
+      document.documentElement.classList.add('dark');
+      iconMoon.classList.add('hidden');
+      iconSun.classList.remove('hidden');
+    } else {
+      document.documentElement.classList.remove('dark');
+      iconMoon.classList.remove('hidden');
+      iconSun.classList.add('hidden');
+    }
+    localStorage.setItem('darkMode', dark ? '1' : '0');
+  }
+
+  darkToggle.addEventListener('click', () => {
+    const dark = document.documentElement.classList.contains('dark');
+    setDarkMode(!dark);
+  });
+
+  // Inicializa modo dark baseado no localStorage
+  setDarkMode(localStorage.getItem('darkMode') === '1');
+
+  // SPA Navegação entre abas
+  function setActiveTab(tabId) {
+    for (const key in tabs) {
+      const section = tabs[key];
+      const isActive = section.id === tabId;
+      section.hidden = !isActive;
+      section.classList.toggle('active', isActive);
+      const btn = tabButtons.find(b => b.dataset.tab === tabId);
+      if(btn){
+        tabButtons.forEach(b => {
+          b.classList.remove('active');
+          b.setAttribute('aria-selected', 'false');
+          b.tabIndex = -1;
+        });
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        btn.tabIndex = 0;
+        btn.focus();
+      }
+    }
+  }
+
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      setActiveTab(btn.dataset.tab);
+    });
+    btn.addEventListener('keydown', (e) => {
+      let idx = tabButtons.indexOf(e.currentTarget);
+      if(e.key === 'ArrowRight') {
+        idx = (idx + 1) % tabButtons.length;
+        tabButtons[idx].focus();
+      } else if(e.key === 'ArrowLeft') {
+        idx = (idx - 1 + tabButtons.length) % tabButtons.length;
+        tabButtons[idx].focus();
+      } else if(e.key === 'Enter' || e.key === ' ') {
+        setActiveTab(e.currentTarget.dataset.tab);
+      }
+    });
+  });
+
+  // Inicializa aba Produtos
+  const produtoForm = document.getElementById('produtoForm');
+  const produtosTabela = document.getElementById('produtosTabela');
+  const nomeProdutoInput = document.getElementById('nomeProduto');
+  const valorProdutoInput = document.getElementById('valorProduto');
+  const custoProdutoInput = document.getElementById('custoProduto');
+
+  // Aba Vendas elementos
+  const vendaForm = document.getElementById('vendaForm');
+  const vendasTabela = document.getElementById('vendasTabela');
+  const buscaVendasInput = document.getElementById('buscaVendas');
+  const devedoresDatalist = document.getElementById('devedores');
+  const produtosDatalist = document.getElementById('produtosDatalist');
+  const devedorVendaInput = document.getElementById('devedorVenda');
+  const produtoVendaInput = document.getElementById('produtoVenda');
+  const quantidadeVendaInput = document.getElementById('quantidadeVenda');
+  const valorVendaInput = document.getElementById('valorVenda');
+  const vencimentoVendaInput = document.getElementById('vencimentoVenda');
+
+  // Dashboard elementos
+  const totalRecebidoEl = document.getElementById('totalRecebido');
+  const totalAReceberEl = document.getElementById('totalAReceber');
+  const totalCustoEl = document.getElementById('totalCusto');
+  const lucroTotalEl = document.getElementById('lucroTotal');
+  const graficoProdutosCtx = document.getElementById('graficoProdutos').getContext('2d');
+  const graficoStatusCtx = document.getElementById('graficoStatus').getContext('2d');
+
+  // Dados
+  let produtos = {};
+  let vendas = [];
+  let ordenacao = { campo: null, asc: true };
+
+  // Salvar e carregar localStorage
+  function salvarDados() {
+    localStorage.setItem('controleProdutos', JSON.stringify(produtos));
+    localStorage.setItem('controleVendas', JSON.stringify(vendas));
+  }
+  function carregarDados() {
+    const p = localStorage.getItem('controleProdutos');
+    if (p) produtos = JSON.parse(p);
+    const v = localStorage.getItem('controleVendas');
+    if (v) vendas = JSON.parse(v);
+  }
+
+  // Renderiza produtos na tabela
+  function renderProdutos() {
+    produtosTabela.innerHTML = '';
+    produtosDatalist.innerHTML = '';
+    for (const [nome, info] of Object.entries(produtos)) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${nome}</td>
+        <td>${formatBRL(info.valor)}</td>
+        <td>${formatBRL(info.custo)}</td>
+        <td class="text-center">
+          <button aria-label="Excluir produto ${nome}" title="Excluir produto ${nome}" class="btnExcluirProduto" data-nome="${nome}" style="color:#dc2626;font-weight:bold;font-size:1.1rem;">&#10060;</button>
+        </td>
+      `;
+      produtosTabela.appendChild(tr);
+
+      // datalist produto para venda
+      const opt = document.createElement('option');
+      opt.value = nome;
+      produtosDatalist.appendChild(opt);
+    }
+  }
+
+  // Renderiza devedores para datalist
+  function renderDevedores() {
+    devedoresDatalist.innerHTML = '';
+    const nomes = [...new Set(vendas.map(v => v.devedor).filter(Boolean))].sort();
+    nomes.forEach(n => {
+      const opt = document.createElement('option');
+      opt.value = n;
+      devedoresDatalist.appendChild(opt);
+    });
+  }
+
+  // Render vendas tabela com busca, ordenação e filtro
+  function renderVendasTabela() {
+    const busca = buscaVendasInput.value.trim().toLowerCase();
+    let vendasFiltradas = vendas.slice();
+
+    // Busca
+    if (busca.length > 0) {
+      vendasFiltradas = vendasFiltradas.filter(v =>
+        v.devedor.toLowerCase().includes(busca) || v.produto.toLowerCase().includes(busca)
+      );
+    }
+
+    // Ordenação
+    if (ordenacao.campo) {
+      vendasFiltradas.sort((a, b) => {
+        let va = a[ordenacao.campo];
+        let vb = b[ordenacao.campo];
+
+        if (ordenacao.campo === 'vencimento') {
+          va = new Date(va);
+          vb = new Date(vb);
+          return ordenacao.asc ? va - vb : vb - va;
+        }
+        if (typeof va === 'string') {
+          va = va.toLowerCase();
+          vb = vb.toLowerCase();
+          return ordenacao.asc ? va.localeCompare(vb) : vb.localeCompare(va);
+        }
+        if (typeof va === 'number') {
+          return ordenacao.asc ? va - vb : vb - va;
+        }
+        return 0;
+      });
+    }
+
+    vendasTabela.innerHTML = '';
+    if (vendasFiltradas.length === 0) {
+      vendasTabela.innerHTML = `<tr><td colspan="9" class="text-center" style="padding:1rem; color:#777;">Nenhuma venda encontrada.</td></tr>`;
+      return;
+    }
+
+    vendasFiltradas.forEach(v => {
+      const tr = document.createElement('tr');
+
+      // status cores
+      const statusColor = {
+        "Pendente": "text-yellow",
+        "Recebido": "text-green",
+        "Cancelado": "text-red"
+      }[v.status] || "";
+
+      const custoTotal = produtos[v.produto] ? produtos[v.produto].custo * v.quantidade : 0;
+      const lucro = (v.valor * v.quantidade) - custoTotal;
+
+      tr.innerHTML = `
+        <td>${v.devedor}</td>
+        <td>${v.produto}</td>
+        <td class="text-center">${v.quantidade}</td>
+        <td>${formatBRL(v.valor)}</td>
+        <td class="text-center">${formatBRL(custoTotal)}</td>
+        <td class="text-center">${formatBRL(lucro)}</td>
+        <td>${formatDateBR(v.vencimento)}</td>
+        <td class="${statusColor} font-semibold">${v.status}</td>
+        <td class="text-center" style="white-space: nowrap;">
+          ${v.status === 'Pendente' ? `<button title="Marcar como Recebido" aria-label="Marcar venda de ${v.devedor} como Recebido" class="btnRecebido" data-id="${v.id}" style="color:#16a34a; font-weight: bold;">&#10004;</button>` : ""}
+          ${v.status !== 'Cancelado' ? `<button title="Cancelar venda" aria-label="Cancelar venda de ${v.devedor}" class="btnCancelar" data-id="${v.id}" style="color:#dc2626; font-weight: bold;">&#10060;</button>` : ""}
+        </td>
+      `;
+      vendasTabela.appendChild(tr);
+    });
+
+    // Ações dos botões na tabela
+    document.querySelectorAll('.btnRecebido').forEach(btn => {
+      btn.onclick = () => {
+        const venda = vendas.find(v => v.id === btn.dataset.id);
+        if (venda && venda.status === 'Pendente') {
+          venda.status = 'Recebido';
+          salvarDados();
+          renderVendasTabela();
+          renderDashboard();
+          renderDevedores();
+          showNotification("Venda marcada como Recebida.");
+        }
+      };
+    });
+    document.querySelectorAll('.btnCancelar').forEach(btn => {
+      btn.onclick = () => {
+        const venda = vendas.find(v => v.id === btn.dataset.id);
+        if (venda && venda.status !== 'Cancelado') {
+          if (confirm("Deseja cancelar esta venda? Esta ação não pode ser desfeita.")) {
+            venda.status = 'Cancelado';
+            salvarDados();
+            renderVendasTabela();
+            renderDashboard();
+            renderDevedores();
+            showNotification("Venda cancelada.");
+          }
+        }
+      };
+    });
+  }
+
+  // Render dashboard
+  let chartProdutos = null;
+  let chartStatus = null;
+  function renderDashboard() {
+    // Totais
+    const totalRecebido = vendas.filter(v => v.status === 'Recebido').reduce((acc, v) => acc + v.valor * v.quantidade, 0);
+    const totalAReceber = vendas.filter(v => v.status === 'Pendente').reduce((acc, v) => acc + v.valor * v.quantidade, 0);
+    const totalCusto = vendas.filter(v => v.status !== 'Cancelado').reduce((acc, v) => {
+      if (produtos[v.produto]) return acc + produtos[v.produto].custo * v.quantidade;
+      return acc;
+    }, 0);
+    const lucroTotal = totalRecebido - totalCusto;
+
+    totalRecebidoEl.textContent = formatBRL(totalRecebido);
+    totalAReceberEl.textContent = formatBRL(totalAReceber);
+    totalCustoEl.textContent = formatBRL(totalCusto);
+    lucroTotalEl.textContent = formatBRL(lucroTotal);
+
+    // Gráfico Produtos mais vendidos (soma quantidades vendas não canceladas)
+    const produtoQuantidades = {};
+    vendas.forEach(v => {
+      if (v.status !== 'Cancelado') {
+        produtoQuantidades[v.produto] = (produtoQuantidades[v.produto] || 0) + v.quantidade;
+      }
+    });
+    const labelsProd = Object.keys(produtoQuantidades);
+    const dataProd = Object.values(produtoQuantidades);
+
+    if (chartProdutos) chartProdutos.destroy();
+    chartProdutos = new Chart(graficoProdutosCtx, {
+      type: 'bar',
+      data: {
+        labels: labelsProd,
+        datasets: [{
+          label: 'Quantidade Vendida',
+          data: dataProd,
+          backgroundColor: 'rgba(37, 99, 235, 0.7)',
+          borderRadius: 6,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: true }
+        },
+        scales: {
+          y: { beginAtZero: true, stepSize: 1 }
+        }
+      }
+    });
+
+    // Gráfico Status vendas
+    const statusCount = { Pendente: 0, Recebido: 0, Cancelado: 0 };
+    vendas.forEach(v => {
+      statusCount[v.status] = (statusCount[v.status] || 0) + 1;
+    });
+
+    if (chartStatus) chartStatus.destroy();
+    chartStatus = new Chart(graficoStatusCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Pendente', 'Recebido', 'Cancelado'],
+        datasets: [{
+          data: [statusCount.Pendente, statusCount.Recebido, statusCount.Cancelado],
+          backgroundColor: [
+            'rgba(251, 191, 36, 0.8)',
+            'rgba(22, 163, 74, 0.8)',
+            'rgba(220, 38, 38, 0.8)'
+          ],
+          borderColor: 'rgba(255, 255, 255, 0.9)',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: document.documentElement.classList.contains('dark') ? '#eee' : '#333',
+              font: { weight: 'bold' }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Export CSV
+  function exportCSV() {
+    let csv = 'Categoria;Nome;Quantidade;Valor Unitário (R$);Custo Unitário (R$);Total (R$);Status;Vencimento\n';
+    vendas.forEach(v => {
+      const custoUnit = produtos[v.produto] ? produtos[v.produto].custo : 0;
+      const total = v.valor * v.quantidade;
+      csv += `Venda;${v.produto};${v.quantidade};${v.valor.toFixed(2).replace('.', ',')};${custoUnit.toFixed(2).replace('.', ',')};${total.toFixed(2).replace('.', ',')};${v.status};${formatDateBR(v.vencimento)}\n`;
+    });
+    const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'controle_vendas.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // Export PDF via jsPDF + autotable
+  async function exportPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+    doc.text('Relatório de Vendas & Dívidas', 14, 20);
+
+    const body = vendas.map(v => {
+      const custoUnit = produtos[v.produto] ? produtos[v.produto].custo : 0;
+      const total = v.valor * v.quantidade;
+      return [
+        v.devedor,
+        v.produto,
+        v.quantidade.toString(),
+        formatBRL(v.valor),
+        formatBRL(custoUnit),
+        formatBRL(total),
+        v.status,
+        formatDateBR(v.vencimento)
+      ];
+    });
+
+    doc.autoTable({
+      head: [['Devedor','Produto','Qtd','Valor Unit.','Custo Unit.','Total','Status','Vencimento']],
+      body,
+      startY: 30,
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: '#2563eb', textColor: '#fff' },
+      theme: 'striped',
+      margin: { left: 14, right: 14 }
+    });
+
+    doc.save('relatorio_vendas.pdf');
+  }
+
+  // IDs para vendas
+  function generateId() {
+    return 'v' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  }
+
+  // Atualiza input valorVenda ao mudar produtoVenda
+  produtoVendaInput.addEventListener('input', () => {
+    const nome = produtoVendaInput.value.trim();
+    if (produtos[nome]) {
+      valorVendaInput.value = produtos[nome].valor.toFixed(2);
+    }
+  });
+
+  // Atualiza datalist devedores após mudança de vendas
+  function atualizarDevedores() {
+    renderDevedores();
+  }
+
+  // Form produtos submit
+  produtoForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const nome = nomeProdutoInput.value.trim();
+    const valor = parseFloat(valorProdutoInput.value);
+    const custo = parseFloat(custoProdutoInput.value);
+    if (!nome || isNaN(valor) || isNaN(custo) || valor < 0 || custo < 0) {
+      alert("Preencha corretamente todos os campos.");
+      return;
+    }
+    if (produtos[nome]) {
+      if (!confirm(`Produto "${nome}" já existe. Deseja atualizar os valores?`)) return;
+    }
+    produtos[nome] = { valor, custo };
+    salvarDados();
+    renderProdutos();
+    nomeProdutoInput.value = '';
+    valorProdutoInput.value = '';
+    custoProdutoInput.value = '';
+    showNotification(`Produto "${nome}" salvo.`);
+  });
+
+  // Exclusão produtos
+  produtosTabela.addEventListener('click', e => {
+    if (e.target.classList.contains('btnExcluirProduto')) {
+      const nome = e.target.dataset.nome;
+      if (confirm(`Deseja excluir o produto "${nome}"? Isso removerá também as vendas associadas.`)) {
+        delete produtos[nome];
+        // Remover vendas associadas
+        vendas = vendas.filter(v => v.produto !== nome);
+        salvarDados();
+        renderProdutos();
+        renderVendasTabela();
+        renderDashboard();
+        atualizarDevedores();
+        showNotification(`Produto "${nome}" excluído.`);
+      }
+    }
+  });
+
+  // Form vendas submit
+  vendaForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const devedor = devedorVendaInput.value.trim();
+    const produto = produtoVendaInput.value.trim();
+    const quantidade = parseInt(quantidadeVendaInput.value);
+    const valor = parseFloat(valorVendaInput.value);
+    const vencimento = vencimentoVendaInput.value;
+
+    if (!devedor || !produto || isNaN(quantidade) || quantidade < 1 || isNaN(valor) || valor < 0 || !vencimento) {
+      alert('Preencha corretamente todos os campos da venda.');
+      return;
+    }
+    if (!produtos[produto]) {
+      alert(`Produto "${produto}" não está cadastrado.`);
+      return;
+    }
+
+    const vendaNova = {
+      id: generateId(),
+      devedor,
+      produto,
+      quantidade,
+      valor,
+      vencimento,
+      status: 'Pendente',
+      criadoEm: new Date().toISOString()
     };
-  }
 
-  // Data ISO para DD/MM/YYYY
-  function formatDateBR(dateISO) {
-    if (!dateISO) return "";
-    const d = new Date(dateISO);
-    return d.toLocaleDateString("pt-BR");
-  }
+    vendas.push(vendaNova);
+    salvarDados();
+    renderVendasTabela();
+    renderDashboard();
+    atualizarDevedores();
 
-  // Compara datas para ordenar
-  function compareDate(a, b) {
-    return new Date(a).getTime() - new Date(b).getTime();
-  }
+    vendaForm.reset();
+    quantidadeVendaInput.value = '1';
+    valorVendaInput.value = '';
+    showNotification('Venda registrada com sucesso.');
+  });
 
-  // ======== CLASSES PRINCIPAIS ========
+  // Busca vendas debounce
+  let buscaTimeout = null;
+  buscaVendasInput.addEventListener('input', () => {
+    clearTimeout(buscaTimeout);
+    buscaTimeout = setTimeout(() => renderVendasTabela(), 300);
+  });
 
-  class Produto {
-    constructor(nome, valor, custo) {
-      this.nome = nome;
-      this.valor = parseFloat(valor);
-      this.custo = parseFloat(custo);
-    }
-  }
-
-  class Venda {
-    constructor(devedor, produto, quantidade, valor, vencimento, status = "Pendente") {
-      this.id = Date.now() + Math.random().toString(36).substring(2, 9);
-      this.devedor = devedor;
-      this.produto = produto;
-      this.quantidade = Number(quantidade);
-      this.valor = parseFloat(valor);
-      this.vencimento = vencimento;
-      this.status = status; // Pendente | Recebido | Cancelado
-    }
-    get custo() {
-      const p = app.produtos[this.produto];
-      return p ? p.custo * this.quantidade : 0;
-    }
-    get lucro() {
-      return (this.valor * this.quantidade) - this.custo;
-    }
-    get total() {
-      return this.valor * this.quantidade;
-    }
-  }
-
-  // ======== APP ========
-
-  const app = {
-    produtos: {},
-    vendas: [],
-    ordenacao: {
-      campo: null,
-      asc: true,
-    },
-
-    // Inicializa
-    init() {
-      this.loadData();
-      this.cacheDom();
-      this.bindEvents();
-      this.renderAll();
-      this.setupDarkMode();
-    },
-
-    // Elementos fixos
-    cacheDom() {
-      // Produtos
-      this.produtoForm = document.getElementById("produtoForm");
-      this.nomeProdutoInput = document.getElementById("nomeProduto");
-      this.valorProdutoInput = document.getElementById("valorProduto");
-      this.custoProdutoInput = document.getElementById("custoProduto");
-      this.produtosTabela = document.getElementById("produtosTabela");
-
-      // Vendas
-      this.vendaForm = document.getElementById("vendaForm");
-      this.devedorVendaInput = document.getElementById("devedorVenda");
-      this.produtoVendaInput = document.getElementById("produtoVenda");
-      this.quantidadeVendaInput = document.getElementById("quantidadeVenda");
-      this.valorVendaInput = document.getElementById("valorVenda");
-      this.vencimentoVendaInput = document.getElementById("vencimentoVenda");
-      this.vendasTabela = document.getElementById("vendasTabela");
-      this.buscaVendasInput = document.getElementById("buscaVendas");
-
-      this.devedoresDatalist = document.getElementById("devedores");
-      this.produtosDatalist = document.getElementById("produtosDatalist");
-
-      // Tabs
-      this.tabs = {
-        produtos: document.getElementById("tabProdutos"),
-        vendas: document.getElementById("tabVendas"),
-        dashboard: document.getElementById("tabDashboard"),
-      };
-      this.tabButtons = document.querySelectorAll(".tabBtn");
-
-      // Dashboard
-      this.totalRecebidoEl = document.getElementById("totalRecebido");
-      this.totalAReceberEl = document.getElementById("totalAReceber");
-      this.totalCustoEl = document.getElementById("totalCusto");
-      this.lucroTotalEl = document.getElementById("lucroTotal");
-
-      this.exportCSVBtn = document.getElementById("exportCSV");
-      this.exportPDFBtn = document.getElementById("exportPDF");
-      this.limparDadosBtn = document.getElementById("limparDados");
-
-      // Dark mode
-      this.darkToggleBtn = document.getElementById("darkToggle");
-      this.iconSun = document.getElementById("iconSun");
-      this.iconMoon = document.getElementById("iconMoon");
-
-      // Gráficos
-      this.chartProdutos = null;
-      this.chartStatus = null;
-    },
-
-    // Eventos
-    bindEvents() {
-      // Form produtos
-      this.produtoForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        this.adicionarProduto();
-      });
-
-      this.produtoForm.addEventListener("reset", () => {
-        this.clearProdutoFormErrors();
-      });
-
-      // Form vendas
-      this.vendaForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        this.adicionarVenda();
-      });
-
-      // Busca vendas (debounce)
-      this.buscaVendasInput.addEventListener("input", debounce(() => {
-        this.renderVendasTabela();
-      }, 300));
-
-      // Ordenação cabeçalhos
-      this.vendasTabela.parentElement.querySelectorAll("th[data-sort]").forEach((th) => {
-        th.addEventListener("click", () => {
-          this.toggleSort(th.dataset.sort);
-        });
-        th.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            this.toggleSort(th.dataset.sort);
-          }
-        });
-      });
-
-      // Tabs navegação
-      this.tabButtons.forEach((btn) => {
-        btn.addEventListener("click", () => {
-          this.setActiveTab(btn.dataset.tab);
-        });
-        btn.addEventListener("keydown", (e) => {
-          // Navegação por teclado entre tabs
-          let idx = Array.from(this.tabButtons).indexOf(btn);
-          if (e.key === "ArrowRight") {
-            e.preventDefault();
-            let next = this.tabButtons[(idx + 1) % this.tabButtons.length];
-            next.focus();
-          }
-          if (e.key === "ArrowLeft") {
-            e.preventDefault();
-            let prev = this.tabButtons[(idx - 1 + this.tabButtons.length) % this.tabButtons.length];
-            prev.focus();
-          }
-        });
-      });
-
-      // Exportar CSV
-      this.exportCSVBtn.addEventListener("click", () => this.exportCSV());
-
-      // Exportar PDF
-      this.exportPDFBtn.addEventListener("click", () => this.exportPDF());
-
-      // Limpar dados
-      this.limparDadosBtn.addEventListener("click", () => {
-        if (confirm("Confirma apagar TODOS os dados? Esta ação não pode ser desfeita.")) {
-          this.produtos = {};
-          this.vendas = [];
-          this.salvar();
-          this.renderAll();
-          showNotification("Dados apagados com sucesso!");
-        }
-      });
-
-      // Dark mode toggle
-      this.darkToggleBtn.addEventListener("click", () => {
-        this.darkMode = !this.darkMode;
-        this.aplicarDarkMode();
-        this.salvar();
-      });
-
-      // Atualiza valor unitário na venda quando produto selecionado
-      this.produtoVendaInput.addEventListener("input", () => {
-        let prod = this.produtos[this.produtoVendaInput.value];
-        if (prod) {
-          this.valorVendaInput.value = prod.valor.toFixed(2);
-        }
-      });
-    },
-
-    // Estado localStorage
-    loadData() {
-      const produtosJSON = localStorage.getItem("produtos");
-      const vendasJSON = localStorage.getItem("vendas");
-      const darkModeLS = localStorage.getItem("darkMode");
-
-      this.produtos = produtosJSON ? JSON.parse(produtosJSON) : {};
-      this.vendas = vendasJSON ? JSON.parse(vendasJSON).map(v => new Venda(v.devedor, v.produto, v.quantidade, v.valor, v.vencimento, v.status)) : [];
-      this.darkMode = darkModeLS === "true";
-    },
-
-    salvar() {
-      localStorage.setItem("produtos", JSON.stringify(this.produtos));
-      localStorage.setItem("vendas", JSON.stringify(this.vendas));
-      localStorage.setItem("darkMode", this.darkMode ? "true" : "false");
-    },
-
-    aplicarDarkMode() {
-      if (this.darkMode) {
-        document.documentElement.classList.add("dark");
-        this.iconSun.classList.remove("hidden");
-        this.iconMoon.classList.add("hidden");
+  // Ordenar vendas por coluna clicada
+  document.querySelectorAll('#tabVendas thead th[data-sort]').forEach(th => {
+    th.addEventListener('click', () => {
+      const campo = th.dataset.sort;
+      if (ordenacao.campo === campo) {
+        ordenacao.asc = !ordenacao.asc;
       } else {
-        document.documentElement.classList.remove("dark");
-        this.iconSun.classList.add("hidden");
-        this.iconMoon.classList.remove("hidden");
+        ordenacao.campo = campo;
+        ordenacao.asc = true;
       }
-    },
-
-    setupDarkMode() {
-      this.aplicarDarkMode();
-    },
-
-    // Limpa erros do formulário produtos
-    clearProdutoFormErrors() {
-      this.nomeProdutoInput.setCustomValidity("");
-      this.valorProdutoInput.setCustomValidity("");
-      this.custoProdutoInput.setCustomValidity("");
-    },
-
-    // Adiciona produto novo
-    adicionarProduto() {
-      this.clearProdutoFormErrors();
-      const nome = this.nomeProdutoInput.value.trim();
-      const valor = parseFloat(this.valorProdutoInput.value);
-      const custo = parseFloat(this.custoProdutoInput.value);
-
-      if (!nome || nome.length < 3 || nome.length > 50) {
-        this.nomeProdutoInput.setCustomValidity("Nome deve ter entre 3 e 50 caracteres.");
-        this.nomeProdutoInput.reportValidity();
-        return;
-      }
-      if (isNaN(valor) || valor < 0) {
-        this.valorProdutoInput.setCustomValidity("Valor inválido, deve ser >= 0.");
-        this.valorProdutoInput.reportValidity();
-        return;
-      }
-      if (isNaN(custo) || custo < 0) {
-        this.custoProdutoInput.setCustomValidity("Custo inválido, deve ser >= 0.");
-        this.custoProdutoInput.reportValidity();
-        return;
-      }
-      if (this.produtos[nome]) {
-        this.nomeProdutoInput.setCustomValidity("Produto já existe!");
-        this.nomeProdutoInput.reportValidity();
-        return;
-      }
-
-      this.produtos[nome] = new Produto(nome, valor, custo);
-      this.salvar();
-      this.renderProdutos();
-      this.produtoForm.reset();
-      showNotification(`Produto "${nome}" adicionado!`);
-    },
-
-    // Render produtos na tabela e datalist
-    renderProdutos() {
-      this.produtosTabela.innerHTML = "";
-      this.produtosDatalist.innerHTML = "";
-
-      for (const [nome, prod] of Object.entries(this.produtos)) {
-        // Tabela
-        const tr = document.createElement("tr");
-        tr.className = "hover:bg-blue-50 dark:hover:bg-blue-900 transition";
-
-        tr.innerHTML = `
-          <td class="p-2 border-b border-gray-300 dark:border-gray-600">${nome}</td>
-          <td class="p-2 border-b border-gray-300 dark:border-gray-600">${formatBRL(prod.valor)}</td>
-          <td class="p-2 border-b border-gray-300 dark:border-gray-600">${formatBRL(prod.custo)}</td>
-          <td class="p-2 border-b border-gray-300 dark:border-gray-600 text-center">
-            <button aria-label="Excluir produto ${nome}" title="Excluir produto ${nome}" class="text-red-600 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-600 rounded" data-produto="${nome}">
-              &#10060;
-            </button>
-          </td>
-        `;
-        this.produtosTabela.appendChild(tr);
-
-        // Datalist
-        const option = document.createElement("option");
-        option.value = nome;
-        this.produtosDatalist.appendChild(option);
-      }
-
-      // Atualizar campo valor unitário na venda se estiver preenchido
-      if (this.produtoVendaInput.value && this.produtos[this.produtoVendaInput.value]) {
-        this.valorVendaInput.value = this.produtos[this.produtoVendaInput.value].valor.toFixed(2);
-      }
-
-      // Bind exclusão
-      this.produtosTabela.querySelectorAll("button[data-produto]").forEach(btn => {
-        btn.onclick = () => {
-          const nome = btn.dataset.produto;
-          if (confirm(`Excluir produto "${nome}"? Isso removerá também vendas relacionadas.`)) {
-            this.excluirProduto(nome);
-          }
-        };
+      // Ajustar aria-pressed em cabeçalhos
+      document.querySelectorAll('#tabVendas thead th[data-sort]').forEach(h => {
+        h.setAttribute('aria-pressed', h.dataset.sort === campo ? ordenacao.asc.toString() : 'false');
       });
-
-      this.renderDevedoresDatalist();
-    },
-
-    excluirProduto(nome) {
-      delete this.produtos[nome];
-      // Remove vendas que usam este produto
-      this.vendas = this.vendas.filter(v => v.produto !== nome);
-      this.salvar();
-      this.renderAll();
-      showNotification(`Produto "${nome}" e vendas relacionadas excluídas.`);
-    },
-
-    // Render datalist de devedores (únicos)
-    renderDevedoresDatalist() {
-      this.devedoresDatalist.innerHTML = "";
-      const devedoresSet = new Set(this.vendas.map(v => v.devedor));
-      devedoresSet.forEach(d => {
-        const option = document.createElement("option");
-        option.value = d;
-        this.devedoresDatalist.appendChild(option);
-      });
-    },
-
-    // Adiciona venda nova
-    adicionarVenda() {
-      const devedor = this.devedorVendaInput.value.trim();
-      const produto = this.produtoVendaInput.value.trim();
-      const quantidade = parseInt(this.quantidadeVendaInput.value, 10);
-      const valor = parseFloat(this.valorVendaInput.value);
-      const vencimento = this.vencimentoVendaInput.value;
-
-      // Validações básicas
-      if (!devedor) {
-        alert("Informe o nome do devedor.");
-        this.devedorVendaInput.focus();
-        return;
+      renderVendasTabela();
+    });
+    th.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        th.click();
       }
-      if (!produto || !this.produtos[produto]) {
-        alert("Informe um produto válido.");
-        this.produtoVendaInput.focus();
-        return;
-      }
-      if (isNaN(quantidade) || quantidade < 1) {
-        alert("Informe uma quantidade válida (>= 1).");
-        this.quantidadeVendaInput.focus();
-        return;
-      }
-      if (isNaN(valor) || valor < 0) {
-        alert("Informe um valor válido (>= 0).");
-        this.valorVendaInput.focus();
-        return;
-      }
-      if (!vencimento) {
-        alert("Informe a data de vencimento.");
-        this.vencimentoVendaInput.focus();
-        return;
-      }
+    });
+  });
 
-      // Cria venda e adiciona
-      const venda = new Venda(devedor, produto, quantidade, valor, vencimento);
-      this.vendas.push(venda);
-      this.salvar();
-      this.renderVendasTabela();
-      this.vendaForm.reset();
-      this.valorVendaInput.value = "";
+  // Export buttons
+  document.getElementById('exportCsvBtn').addEventListener('click', exportCSV);
+  document.getElementById('exportPdfBtn').addEventListener('click', exportPDF);
 
-      showNotification(`Venda registrada para ${devedor} - ${produto}.`);
-      this.renderDevedoresDatalist();
-    },
+  // Inicialização geral
+  function init() {
+    carregarDados();
+    renderProdutos();
+    renderVendasTabela();
+    renderDashboard();
+    atualizarDevedores();
+    setActiveTab('tabProdutos');
+  }
+  init();
 
-    // Render tabela vendas (filtrada e ordenada)
-    renderVendasTabela() {
-      const busca = this.buscaVendasInput.value.toLowerCase();
-
-      // Ordena
-      let vendasOrdenadas = [...this.vendas];
-      if (this.ordenacao.campo) {
-        const campo = this.ordenacao.campo;
-        const asc = this.ordenacao.asc ? 1 : -1;
-        vendasOrdenadas.sort((a, b) => {
-          let valA = a[campo];
-          let valB = b[campo];
-          if (campo === "vencimento") {
-            return compareDate(valA, valB) * asc;
-          }
-          if (campo === "devedor" || campo === "produto" || campo === "status") {
-            valA = valA.toLowerCase();
-            valB = valB.toLowerCase();
-            return valA.localeCompare(valB) * asc;
-          }
-          return 0;
-        });
-      }
-
-      // Filtra
-      if (busca) {
-        vendasOrdenadas = vendasOrdenadas.filter(v => 
-          v.devedor.toLowerCase().includes(busca) || 
-          v.produto.toLowerCase().includes(busca)
-        );
-      }
-
-      // Limpa tabela
-      this.vendasTabela.innerHTML = "";
-
-      if (vendasOrdenadas.length === 0) {
-        this.vendasTabela.innerHTML = `<tr><td colspan="9" class="text-center p-4 text-gray-500 dark:text-gray-400">Nenhuma venda encontrada.</td></tr>`;
-        return;
-      }
-
-      vendasOrdenadas.forEach(v => {
-        const tr = document.createElement("tr");
-        tr.className = "hover:bg-blue-50 dark:hover:bg-blue-900 transition";
-
-        const statusColors = {
-          "Pendente": "text-yellow-600 dark:text-yellow-400",
-          "Recebido": "text-green-600 dark:text-green-400",
-          "Cancelado": "text-red-600 dark:text-red-400"
-        };
-
-        tr.innerHTML = `
-          <td class="p-2 border-b border-gray-300 dark:border-gray-600">${v.devedor}</td>
-          <td class="p-2 border-b border-gray-300 dark:border-gray-600">${v.produto}</td>
-          <td class="p-2 border-b border-gray-300 dark:border-gray-600 text-center">${v.quantidade}</td>
-          <td class="p-2 border-b border-gray-300 dark:border-gray-600">${formatBRL(v.valor)}</td>
-          <td class="p-2 border-b border-gray-300 dark:border-gray-600">${formatBRL(v.custo)}</td>
-          <td class="p-2 border-b border-gray-300 dark:border-gray-600">${formatBRL(v.lucro)}</td>
-          <td class="p-2 border-b border-gray-300 dark:border-gray-600">${formatDateBR(v.vencimento)}</td>
-          <td class="p-2 border-b border-gray-300 dark:border-gray-600 font-semibold ${statusColors[v.status] || ""}">${v.status}</td>
-          <td class="p-2 border-b border-gray-300 dark:border-gray-600 text-center space-x-1">
-            ${v.status === "Pendente" ? `<button title="Marcar como Recebido" aria-label="Marcar venda como Recebido" class="btnRecebido text-green-600 hover:text-green-800 focus:outline-none focus:ring-2 focus:ring-green-600 rounded" data-id="${v.id}">&#10004;</button>` : ""}
-            ${v.status !== "Cancelado" ? `<button title="Cancelar Venda" aria-label="Cancelar venda" class="btnCancelar text-red-600 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-600 rounded" data-id="${v.id}">&#10060;</button>` : ""}
-          </td>
-        `;
-
-        this.vendasTabela.appendChild(tr);
-      });
-
-      // Bind ações nas linhas
-      this.vendasTabela.querySelectorAll(".btnRecebido").forEach(btn => {
-        btn.onclick = () => {
-          const venda = this.vendas.find(v => v.id === btn.dataset.id);
-          if (venda && venda.status === "Pendente") {
-            venda.status = "Recebido";
-            this.salvar();
-            this.renderVendasTabela();
-            this.renderDashboard();
-            showNotification("Venda marcada como Recebido.");
-          }
-        };
-      });
-      this.vendasTabela.querySelectorAll(".btnCancelar").forEach(btn => {
-        btn.onclick = () => {
-          const venda = this.vendas.find(v => v.id === btn.dataset.id);
-          if (venda && venda.status !== "Cancelado") {
-            if (confirm("Cancelar esta venda? Esta ação não pode ser desfeita.")) {
-              venda.status = "Cancelado";
-              this.salvar();
-              this.renderVendasTabela();
-              this.renderDashboard();
-              showNotification("Venda cancelada.");
-            }
-          }
-        };
-      });
-
-      this.renderDashboard();
-    },
-
-    // Alterna ordenação
-    toggleSort(campo) {
-      if (this.ordenacao.campo === campo) {
-        this.ordenacao.asc = !this.ordenacao.asc;
-      } else {
-        this.ordenacao.campo = campo;
-        this.ordenacao.asc = true;
-      }
-      // Atualiza aria-pressed
-      this.vendasTabela.parentElement.querySelectorAll("th[data-sort]").forEach(th => {
-        th.setAttribute("aria-pressed", th.dataset.sort === campo ? "true" : "false");
-      });
-      this.renderVendasTabela();
-    },
-
-    // Render dashboard
-    renderDashboard() {
-      // Valores totais
-      const totalRecebido = this.vendas
-        .filter(v => v.status === "Recebido")
-        .reduce((acc, v) => acc + (v.valor * v.quantidade), 0);
-
-      const totalAReceber = this.vendas
-        .filter(v => v.status === "Pendente")
-        .reduce((acc, v) => acc + (v.valor * v.quantidade), 0);
-
-      const totalCusto = this.vendas
-        .filter(v => v.status !== "Cancelado")
-        .reduce((acc, v) => acc + v.custo, 0);
-
-      const lucroTotal = totalRecebido - totalCusto;
-
-      this.totalRecebidoEl.textContent = formatBRL(totalRecebido);
-      this.totalAReceberEl.textContent = formatBRL(totalAReceber);
-      this.totalCustoEl.textContent = formatBRL(totalCusto);
-      this.lucroTotalEl.textContent = formatBRL(lucroTotal);
-
-      // Dados para gráfico Produtos mais vendidos
-      const produtoCount = {};
-      this.vendas.forEach(v => {
-        if (v.status !== "Cancelado") {
-          produtoCount[v.produto] = (produtoCount[v.produto] || 0) + v.quantidade;
-        }
-      });
-      const produtos = Object.keys(produtoCount);
-      const quantidades = Object.values(produtoCount);
-
-      // Cria gráfico de barras
-      if (this.chartProdutos) this.chartProdutos.destroy();
-      this.chartProdutos = new Chart(document.getElementById("graficoProdutos").getContext("2d"), {
-        type: "bar",
-        data: {
-          labels: produtos,
-          datasets: [{
-            label: "Quantidade Vendida",
-            data: quantidades,
-            backgroundColor: "rgba(37, 99, 235, 0.7)",
-            borderRadius: 4,
-            borderSkipped: false,
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { display: false },
-            tooltip: { enabled: true },
-          },
-          scales: {
-            y: { beginAtZero: true, stepSize: 1 }
-          }
-        }
-      });
-
-      // Dados para gráfico Status vendas
-      const statusCount = {
-        Pendente: 0,
-        Recebido: 0,
-        Cancelado: 0,
-      };
-      this.vendas.forEach(v => {
-        statusCount[v.status] = (statusCount[v.status] || 0) + 1;
-      });
-
-      if (this.chartStatus) this.chartStatus.destroy();
-      this.chartStatus = new Chart(document.getElementById("graficoStatus").getContext("2d"), {
-        type: "doughnut",
-        data: {
-          labels: Object.keys(statusCount),
-          datasets: [{
-            label: "Status das Vendas",
-            data: Object.values(statusCount),
-            backgroundColor: [
-              "rgba(253, 224, 71, 0.8)",   // amarelo Pendente
-              "rgba(34, 197, 94, 0.8)",    // verde Recebido
-              "rgba(239, 68, 68, 0.8)",    // vermelho Cancelado
-            ],
-            borderColor: "rgba(255, 255, 255, 0.8)",
-            borderWidth: 2,
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              position: "bottom",
-              labels: {
-                color: document.body.classList.contains("dark") ? "#eee" : "#333",
-                font: { weight: "bold" }
-              }
-            }
-          }
-        }
-      });
-    },
-
-    // Export CSV completo com produtos e vendas
-    exportCSV() {
-      let csv = "Categoria;Nome;Quantidade;Valor Unitário (R$);Custo Unitário (R$);Total (R$);Status;Vencimento\n";
-
-      // Produtos (sem vendas)
-      for (const [nome, p] of Object.entries(this.produtos)) {
-        csv += `Produto;${nome};;;;${formatBRL(p.valor)};;\n`;
-      }
-
-      // Vendas
-      this.vendas.forEach(v => {
-        csv += `Venda;${v.produto};${v.quantidade};${v.valor.toFixed(2)};${(v.custo / v.quantidade).toFixed(2)};${(v.valor * v.quantidade).toFixed(2)};${v.status};${formatDateBR(v.vencimento)}\n`;
-      });
-
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `controle_vendas_${new Date().toISOString().slice(0,10)}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
-
-      showNotification("CSV exportado com sucesso!");
-    },
-
-    // Export PDF com jsPDF
-    async exportPDF() {
-      // Importa jsPDF da variável global
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-
-      doc.setFontSize(16);
-      doc.text("Relatório de Vendas & Produtos", 14, 22);
-
-      doc.setFontSize(12);
-      doc.text(`Gerado em: ${new Date().toLocaleString("pt-BR")}`, 14, 30);
-
-      // Produtos
-      doc.setFontSize(14);
-      doc.text("Produtos", 14, 40);
-      const prodData = [["Nome", "Valor (R$)", "Custo (R$)"]];
-      for (const [nome, p] of Object.entries(this.produtos)) {
-        prodData.push([nome, formatBRL(p.valor), formatBRL(p.custo)]);
-      }
-      doc.autoTable({
-        startY: 45,
-        head: [prodData[0]],
-        body: prodData.slice(1),
-        theme: "grid",
-        styles: { fontSize: 9 },
-        headStyles: { fillColor: [37, 99, 235] }
-      });
-
-      // Vendas
-      let y = doc.previousAutoTable.finalY + 10;
-      doc.setFontSize(14);
-      doc.text("Vendas", 14, y);
-      const vendasData = [["Devedor", "Produto", "Qtd", "Valor Unit. (R$)", "Custo Unit. (R$)", "Total (R$)", "Status", "Vencimento"]];
-      this.vendas.forEach(v => {
-        vendasData.push([
-          v.devedor,
-          v.produto,
-          v.quantidade.toString(),
-          v.valor.toFixed(2),
-          (v.custo / v.quantidade).toFixed(2),
-          (v.valor * v.quantidade).toFixed(2),
-          v.status,
-          formatDateBR(v.vencimento),
-        ]);
-      });
-      doc.autoTable({
-        startY: y + 5,
-        head: [vendasData[0]],
-        body: vendasData.slice(1),
-        theme: "grid",
-        styles: { fontSize: 9 },
-        headStyles: { fillColor: [37, 99, 235] }
-      });
-
-      doc.save(`relatorio_vendas_${new Date().toISOString().slice(0,10)}.pdf`);
-      showNotification("PDF exportado com sucesso!");
-    },
-
-    // Render geral
-    renderAll() {
-      this.renderProdutos();
-      this.renderVendasTabela();
-      this.renderDashboard();
-    },
-
-    // Troca aba ativa
-    setActiveTab(tabId) {
-      for (const key in this.tabs) {
-        const el = this.tabs[key];
-        const btn = [...this.tabButtons].find(b => b.dataset.tab === el.id);
-        if (el.id === tabId) {
-          el.classList.add("active");
-          el.removeAttribute("hidden");
-          btn.classList.add("active");
-          btn.setAttribute("aria-selected", "true");
-          btn.tabIndex = 0;
-          el.focus();
-        } else {
-          el.classList.remove("active");
-          el.setAttribute("hidden", "");
-          btn.classList.remove("active");
-          btn.setAttribute("aria-selected", "false");
-          btn.tabIndex = -1;
-        }
-      }
+  // Accessibility: foco no tab ao trocar
+  tabButtons.forEach(btn => btn.addEventListener('keydown', e => {
+    if (e.key === 'Tab' && !e.shiftKey) {
+      const tabId = btn.dataset.tab;
+      tabs[tabId.replace('tab','').toLowerCase()].focus();
     }
-  };
+  }));
 
-  // Inicializa app
-  app.init();
 })();
 </script>
 
-<!-- AutoTable do jsPDF para tabelas (min) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+<!-- Screen reader only -->
+<style>
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0,0,0,0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+.hidden {
+  display:none !important;
+}
+</style>
 
 </body>
 </html>
