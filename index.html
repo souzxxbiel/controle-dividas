@@ -1,384 +1,766 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="scroll-smooth">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Controle de Vendas & Dívidas — Premium</title>
-    <meta name="description" content="App completo para controle de produtos, vendas e dívidas, com dashboard, gráficos, exportação e dark mode.">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        /* Reset e base */
-        * {
-            box-sizing: border-box;
-        }
-        body {
-            margin: 0;
-            font-family: 'Roboto', sans-serif;
-            background: #f9fafb;
-            color: #111;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            transition: background 0.3s, color 0.3s;
-        }
-        header {
-            background: #2563eb;
-            color: white;
-            padding: 1rem;
-            text-align: center;
-        }
-        header h1 {
-            margin: 0;
-        }
-        button {
-            cursor: pointer;
-            border: none;
-            background: none;
-            color: white;
-            font-size: 1.2rem;
-        }
-        #darkToggle {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-        }
-        .tab {
-            padding: 1rem;
-            max-width: 700px;
-            margin: auto;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        h2 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-        input, select {
-            width: 100%;
-            padding: 0.5rem;
-            margin-bottom: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            transition: border-color 0.3s;
-        }
-        input:focus {
-            border-color: #2563eb;
-            outline: none;
-        }
-        .btn-primary {
-            background-color: #2563eb;
-            color: white;
-            padding: 0.7rem;
-            border-radius: 6px;
-            font-weight: bold;
-            transition: background-color 0.3s;
-        }
-        .btn-primary:hover {
-            background-color: #1d4ed8;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-        th, td {
-            padding: 0.5rem;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background: #f3f4f6;
-        }
-        .stat-card {
-            flex: 1;
-            background: #2563eb;
-            color: white;
-            margin: 0.5rem;
-            padding: 1rem;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 1.5rem;
-        }
-        #dashboardStats {
-            display: flex;
-            flex-wrap: wrap;
-            margin-bottom: 1rem;
-        }
-        #notification {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #2563eb;
-            color: white;
-            padding: 0.7rem 1.3rem;
-            border-radius: 9999px;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-        #notification.show {
-            opacity: 1;
-        }
-        /* Dark Mode */
-        body.dark {
-            background: #121212;
-            color: #eee;
-        }
-        body.dark header {
-            background: #1e1e1e;
-        }
-        body.dark input, body.dark select {
-            background: #222;
-            color: #eee;
-            border-color: #555;
-        }
-        body.dark th {
-            background: #222;
-            color: #eee;
-        }
-        body.dark .stat-card {
-            background: #1e1e1e;
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Controle Clientes e Produtos</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #121212; color: #ddd;
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  h1,h2 { color: #f0a500; margin-bottom: 12px; }
+  #app {
+    width: 100%; max-width: 960px;
+  }
+
+  /* Login */
+  #loginPage {
+    max-width: 360px;
+    background: #222;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px #f0a500aa;
+  }
+  #loginPage label {
+    display: block; margin: 12px 0 6px; font-weight: 600; color: #eee;
+  }
+  #loginPage input, #loginPage select {
+    width: 100%;
+    padding: 10px 8px;
+    border-radius: 6px;
+    border: none;
+    background: #333;
+    color: #eee;
+    font-size: 1rem;
+  }
+  #loginPage button {
+    margin-top: 20px;
+    background: #f0a500;
+    border: none;
+    padding: 12px;
+    width: 100%;
+    font-weight: 700;
+    color: #121212;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  #loginPage button:hover { background: #cf8600; }
+
+  /* Header (exibido após login) */
+  header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;
+  }
+  header h1 {
+    margin: 0; font-weight: 700; font-size: 2rem;
+  }
+  #logoutBtn {
+    background: #f03e3e;
+    border: none;
+    padding: 8px 18px;
+    font-weight: 600;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  #logoutBtn:hover { background: #c13131; }
+
+  /* Navegação */
+  nav {
+    display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;
+  }
+  nav button {
+    background: #222;
+    border: 2px solid #444;
+    color: #ccc;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+  nav button.active,
+  nav button:hover {
+    background: #f0a500;
+    color: #121212;
+    border-color: #f0a500;
+  }
+
+  /* Páginas */
+  section.page {
+    display: none;
+  }
+  section.page.active {
+    display: block;
+  }
+
+  /* Formulários gerais */
+  form {
+    background: #222;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 12px #f0a500aa;
+    max-width: 100%;
+  }
+  form label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #eee;
+  }
+  form input, form select {
+    width: 100%;
+    padding: 8px 10px;
+    margin-bottom: 16px;
+    border-radius: 6px;
+    border: none;
+    background: #333;
+    color: #eee;
+    font-size: 1rem;
+  }
+  form button {
+    background: #f0a500;
+    border: none;
+    padding: 12px;
+    width: 100%;
+    font-weight: 700;
+    color: #121212;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  form button:hover { background: #cf8600; }
+
+  /* Tabela */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    margin-top: 12px;
+  }
+  table thead tr {
+    background: #222;
+  }
+  table thead th {
+    padding: 10px;
+    color: #f0a500;
+    border-bottom: 2px solid #f0a500;
+    text-align: left;
+  }
+  table tbody tr {
+    background: #1c1c1c;
+    border-bottom: 1px solid #333;
+    transition: background-color 0.3s ease;
+  }
+  table tbody tr:hover {
+    background: #2a2a2a;
+  }
+  table tbody td {
+    padding: 8px 10px;
+    color: #ddd;
+  }
+  .btn-action {
+    cursor: pointer;
+    background: #f0a500;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    font-weight: 600;
+    color: #121212;
+    transition: background-color 0.3s ease;
+  }
+  .btn-action:hover { background: #cf8600; }
+
+  /* Notificação */
+  #notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #f0a500;
+    color: #121212;
+    padding: 14px 20px;
+    border-radius: 10px;
+    font-weight: 700;
+    box-shadow: 0 0 10px #f0a500aa;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+    z-index: 10000;
+  }
+  #notification.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Responsividade */
+  @media (max-width: 600px) {
+    nav { flex-direction: column; }
+    table thead { display: none; }
+    table, table tbody, table tr, table td {
+      display: block;
+      width: 100%;
+    }
+    table tr { margin-bottom: 15px; }
+    table td {
+      padding-left: 50%;
+      position: relative;
+    }
+    table td::before {
+      content: attr(data-label);
+      position: absolute;
+      left: 15px;
+      top: 8px;
+      font-weight: 700;
+      color: #f0a500;
+    }
+  }
+</style>
 </head>
 <body>
+
+<div id="app">
+
+  <!-- Página Login -->
+  <section id="loginPage">
+    <h1>Login</h1>
+    <form id="formLogin">
+      <label for="inputUsername">Usuário</label>
+      <input type="text" id="inputUsername" required autocomplete="username" />
+      
+      <label for="inputPassword">Senha</label>
+      <input type="password" id="inputPassword" required autocomplete="current-password" />
+
+      <label for="inputUserType">Tipo de Usuário</label>
+      <select id="inputUserType" required>
+        <option value="">Selecione</option>
+        <option value="cliente">Cliente</option>
+        <option value="admin">Admin</option>
+      </select>
+
+      <button type="submit">Entrar</button>
+    </form>
+  </section>
+
+  <!-- Área principal após login -->
+  <section id="mainApp" style="display:none;">
     <header>
-        <h1>Controle de Vendas & Dívidas</h1>
-        <button id="darkToggle" aria-label="Alternar modo claro/escuro" title="Alternar modo claro/escuro">
-            <i class="fas fa-moon" id="iconMoon"></i>
-            <i class="fas fa-sun hidden" id="iconSun"></i>
-        </button>
+      <h1>Controle Clientes & Produtos</h1>
+      <button id="logoutBtn">Logout</button>
     </header>
 
-    <main>
-        <nav id="bottomNav" role="tablist">
-            <button role="tab" aria-selected="true" data-tab="tabProdutos">Produtos</button>
-            <button role="tab" aria-selected="false" data-tab="tabVendas">Vendas</button>
-            <button role="tab" aria-selected="false" data-tab="tabDashboard">Dashboard</button>
-        </nav>
+    <nav aria-label="Navegação principal">
+      <!-- Admin vê cadastro de produtos e devedores -->
+      <!-- Cliente vê produtos e anota dívidas -->
+    </nav>
 
-        <section id="tabProdutos" class="tab" role="tabpanel" aria-label="Produtos">
-            <h2>Produtos</h2>
-            <form id="produtoForm">
-                <label for="nomeProduto">Nome do Produto</label>
-                <input id="nomeProduto" name="nomeProduto" type="text" placeholder="Ex: Camiseta" required />
-                <label for="valorProduto">Valor Unitário (R$)</label>
-                <input id="valorProduto" name="valorProduto" type="number" min="0" step="0.01" placeholder="0,00" required />
-                <label for="custoProduto">Custo Unitário (R$)</label>
-                <input id="custoProduto" name="custoProduto" type="number" min="0" step="0.01" placeholder="0,00" required />
-                <button class="btn-primary" type="submit">Adicionar Produto</button>
-            </form>
-            <table id="produtosTabela">
-                <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>Valor</th>
-                        <th>Custo</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </section>
+    <!-- Páginas / abas -->
+    <section id="clientesPage" class="page" aria-label="Área dos Clientes">
+      <h2>Produtos Disponíveis</h2>
+      <table id="produtosClienteTable" aria-label="Lista de produtos para cliente">
+        <thead>
+          <tr><th>Produto</th><th>Preço Unit.</th><th>Ação</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <h3>Minhas Dívidas</h3>
+      <table id="dividasClienteTable" aria-label="Minhas dívidas">
+        <thead>
+          <tr><th>Produto</th><th>Quantidade</th><th>Total</th><th>Pago</th><th>Pendente</th><th>Status</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
 
-        <section id="tabVendas" class="tab" role="tabpanel" aria-label="Vendas" hidden>
-            <h2>Vendas & Dívidas</h2>
-            <form id="vendaForm">
-                <label for="devedorVenda">Nome do Devedor</label>
-                <input id="devedorVenda" name="devedorVenda" type="text" placeholder="Ex: João" required />
-                <label for="produtoVenda">Produto</label>
-                <input id="produtoVenda" name="produtoVenda" type="text" placeholder="Selecione um produto" required />
-                <label for="quantidadeVenda">Quantidade</label>
-                <input id="quantidadeVenda" name="quantidadeVenda" type="number" min="1" value="1" required />
-                <label for="valorVenda">Valor Unitário (R$)</label>
-                <input id="valorVenda" name="valorVenda" type="number" min="0" step="0.01" placeholder="0,00" required />
-                <label for="vencimentoVenda">Data de Vencimento</label>
-                <input id="vencimentoVenda" name="vencimentoVenda" type="date" required />
-                <button class="btn-primary" type="submit">Registrar Venda</button>
-            </form>
-            <table id="vendasTabela">
-                <thead>
-                    <tr>
-                        <th>Devedor</th>
-                        <th>Produto</th>
-                        <th>Qtd</th>
-                        <th>Valor Unit.</th>
-                        <th>Total</th>
-                        <th>Status</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </section>
+    <section id="adminPage" class="page" aria-label="Painel do Admin">
+      <nav aria-label="Sub-navegação Admin" style="margin-bottom:20px;">
+        <button class="admin-tab-btn active" data-tab="produtosTab">Produtos</button>
+        <button class="admin-tab-btn" data-tab="devedoresTab">Devedores</button>
+      </nav>
 
-        <section id="tabDashboard" class="tab" role="tabpanel" aria-label="Dashboard" hidden>
-            <h2>Dashboard & Estatísticas</h2>
-            <div id="dashboardStats">
-                <div class="stat-card" id="totalRecebido">R$ 0,00</div>
-                <div class="stat-card" id="totalAReceber">R$ 0,00</div>
-                <div class="stat-card" id="totalCusto">R$ 0,00</div>
-                <div class="stat-card" id="lucroTotal">R$ 0,00</div>
-            </div>
-            <canvas id="graficoProdutos"></canvas>
-            <canvas id="graficoStatus" style="margin-top: 1rem;"></canvas>
-        </section>
-    </main>
+      <!-- Aba Produtos -->
+      <section id="produtosTab" class="admin-tab page active">
+        <h2>Cadastro de Produtos</h2>
+        <form id="formCadastroProduto">
+          <label for="produtoNome">Nome do Produto</label>
+          <input type="text" id="produtoNome" required />
 
-    <div id="notification" role="alert"></div>
+          <label for="produtoPreco">Preço Unitário (R$)</label>
+          <input type="number" id="produtoPreco" min="0.01" step="0.01" required />
 
-    <script>
-        (() => {
-            'use strict';
+          <button type="submit">Cadastrar Produto</button>
+        </form>
+        <table id="produtosAdminTable" aria-label="Tabela de produtos cadastrados" style="margin-top: 20px;">
+          <thead>
+            <tr><th>Produto</th><th>Preço Unit.</th><th>Ações</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
 
-            const formatBRL = n => n.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
-            const notificationEl = document.getElementById('notification');
+      <!-- Aba Devedores -->
+      <section id="devedoresTab" class="admin-tab page" style="margin-top: 20px;">
+        <h2>Controle de Devedores e Dívidas</h2>
+        <form id="formAnotarDivida">
+          <label for="devedorNome">Nome do Devedor</label>
+          <input type="text" id="devedorNome" required />
 
-            function showNotification(msg) {
-                notificationEl.textContent = msg;
-                notificationEl.classList.add('show');
-                setTimeout(() => notificationEl.classList.remove('show'), 3000);
-            }
+          <label for="devedorProduto">Produto</label>
+          <select id="devedorProduto" required>
+            <!-- Opções produtos dinamicamente -->
+          </select>
 
-            const darkToggle = document.getElementById('darkToggle');
-            darkToggle.addEventListener('click', () => {
-                document.body.classList.toggle('dark');
-                localStorage.setItem('darkMode', document.body.classList.contains('dark') ? '1' : '0');
-            });
+          <label for="devedorQuantidade">Quantidade</label>
+          <input type="number" id="devedorQuantidade" min="1" value="1" required />
 
-            // Inicializa modo dark baseado no localStorage
-            document.body.classList.toggle('dark', localStorage.getItem('darkMode') === '1');
+          <label for="devedorData">Data</label>
+          <input type="date" id="devedorData" required />
 
-            const produtoForm = document.getElementById('produtoForm');
-            const vendaForm = document.getElementById('vendaForm');
-            const produtosTabela = document.querySelector('#produtosTabela tbody');
-            const vendasTabela = document.querySelector('#vendasTabela tbody');
+          <button type="submit">Anotar Dívida</button>
+        </form>
 
-            let produtos = {};
-            let vendas = [];
+        <table id="dividasAdminTable" aria-label="Tabela de dívidas cadastradas" style="margin-top: 20px;">
+          <thead>
+            <tr>
+              <th>Devedor</th><th>Produto</th><th>Qtd.</th><th>Valor Unit.</th><th>Total</th><th>Pago</th><th>Pendente</th><th>Status</th><th>Ações</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+    </section>
+  </section>
 
-            function salvarDados() {
-                localStorage.setItem('controleProdutos', JSON.stringify(produtos));
-                localStorage.setItem('controleVendas', JSON.stringify(vendas));
-            }
+</div>
 
-            function carregarDados() {
-                const p = localStorage.getItem('controleProdutos');
-                if (p) produtos = JSON.parse(p);
-                const v = localStorage.getItem('controleVendas');
-                if (v) vendas = JSON.parse(v);
-            }
+<!-- Notificação -->
+<div id="notification" role="alert" aria-live="assertive"></div>
 
-            function renderProdutos() {
-                produtosTabela.innerHTML = '';
-                for (const [nome, info] of Object.entries(produtos)) {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${nome}</td>
-                        <td>${formatBRL(info.valor)}</td>
-                        <td>${formatBRL(info.custo)}</td>
-                        <td><button class="btnExcluirProduto" data-nome="${nome}">&#10060;</button></td>
-                    `;
-                    produtosTabela.appendChild(tr);
-                }
+<script>
+(() => {
+  // Storage Keys
+  const STORAGE_USER = 'controleUserLogged'; // {username, tipo}
+  const STORAGE_CLIENTES = 'controleClientes'; // Array clientes registrados
+  const STORAGE_PRODUTOS = 'controleProdutos'; // Array produtos
+  const STORAGE_DIVIDAS = 'controleDividas';   // Array dívidas
 
-                document.querySelectorAll('.btnExcluirProduto').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const nome = btn.dataset.nome;
-                        if (confirm(`Deseja excluir o produto "${nome}"?`)) {
-                            delete produtos[nome];
-                            salvarDados();
-                            renderProdutos();
-                            showNotification(`Produto "${nome}" excluído.`);
-                        }
-                    });
-                });
-            }
+  // DOM
+  const loginPage = document.getElementById('loginPage');
+  const mainApp = document.getElementById('mainApp');
+  const formLogin = document.getElementById('formLogin');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const nav = mainApp.querySelector('nav');
 
-            function renderVendasTabela() {
-                vendasTabela.innerHTML = '';
-                vendas.forEach(v => {
-                    const tr = document.createElement('tr');
-                    const total = v.valor * v.quantidade;
-                    tr.innerHTML = `
-                        <td>${v.devedor}</td>
-                        <td>${v.produto}</td>
-                        <td>${v.quantidade}</td>
-                        <td>${formatBRL(v.valor)}</td>
-                        <td>${formatBRL(total)}</td>
-                        <td>${v.status}</td>
-                        <td><button class="btnCancelar" data-id="${v.id}">&#10060;</button></td>
-                    `;
-                    vendasTabela.appendChild(tr);
-                });
+  // Clientes page
+  const clientesPage = document.getElementById('clientesPage');
+  const produtosClienteTableBody = document.querySelector('#produtosClienteTable tbody');
+  const dividasClienteTableBody = document.querySelector('#dividasClienteTable tbody');
 
-                document.querySelectorAll('.btnCancelar').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const id = btn.dataset.id;
-                        const venda = vendas.find(v => v.id === id);
-                        if (venda && confirm(`Deseja cancelar a venda de ${venda.devedor}?`)) {
-                            venda.status = 'Cancelado';
-                            salvarDados();
-                            renderVendasTabela();
-                            showNotification("Venda cancelada.");
-                        }
-                    });
-                });
-            }
+  // Admin page and tabs
+  const adminPage = document.getElementById('adminPage');
+  const adminTabBtns = adminPage.querySelectorAll('.admin-tab-btn');
+  const produtosTab = document.getElementById('produtosTab');
+  const devedoresTab = document.getElementById('devedoresTab');
 
-            produtoForm.addEventListener('submit', e => {
-                e.preventDefault();
-                const nome = document.getElementById('nomeProduto').value.trim();
-                const valor = parseFloat(document.getElementById('valorProduto').value);
-                const custo = parseFloat(document.getElementById('custoProduto').value);
-                if (!nome || isNaN(valor) || isNaN(custo)) {
-                    alert("Preencha corretamente todos os campos.");
-                    return;
-                }
-                produtos[nome] = { valor, custo };
-                salvarDados();
-                renderProdutos();
-                produtoForm.reset();
-                showNotification(`Produto "${nome}" adicionado.`);
-            });
+  // Form produtos (admin)
+  const formCadastroProduto = document.getElementById('formCadastroProduto');
+  const produtoNomeInput = document.getElementById('produtoNome');
+  const produtoPrecoInput = document.getElementById('produtoPreco');
+  const produtosAdminTableBody = document.querySelector('#produtosAdminTable tbody');
 
-            vendaForm.addEventListener('submit', e => {
-                e.preventDefault();
-                const devedor = document.getElementById('devedorVenda').value.trim();
-                const produto = document.getElementById('produtoVenda').value.trim();
-                const quantidade = parseInt(document.getElementById('quantidadeVenda').value);
-                const valor = parseFloat(document.getElementById('valorVenda').value);
-                const vencimento = document.getElementById('vencimentoVenda').value;
+  // Form dívidas (admin)
+  const formAnotarDivida = document.getElementById('formAnotarDivida');
+  const devedorNomeInput = document.getElementById('devedorNome');
+  const devedorProdutoSelect = document.getElementById('devedorProduto');
+  const devedorQuantidadeInput = document.getElementById('devedorQuantidade');
+  const devedorDataInput = document.getElementById('devedorData');
+  const dividasAdminTableBody = document.querySelector('#dividasAdminTable tbody');
 
-                if (!devedor || !produto || isNaN(quantidade) || isNaN(valor) || !vencimento) {
-                    alert('Preencha corretamente todos os campos da venda.');
-                    return;
-                }
+  // Notification
+  const notification = document.getElementById('notification');
 
-                const vendaNova = {
-                    id: Date.now().toString(),
-                    devedor,
-                    produto,
-                    quantidade,
-                    valor,
-                    vencimento,
-                    status: 'Pendente'
-                };
+  // Dados
+  let usuarios = JSON.parse(localStorage.getItem(STORAGE_CLIENTES) || '[]'); 
+  let produtos = JSON.parse(localStorage.getItem(STORAGE_PRODUTOS) || '[]');
+  let dividas = JSON.parse(localStorage.getItem(STORAGE_DIVIDAS) || '[]');
 
-                vendas.push(vendaNova);
-                salvarDados();
-                renderVendasTabela();
-                vendaForm.reset();
-                showNotification('Venda registrada com sucesso.');
-            });
+  // Usuário atual
+  let usuarioAtual = JSON.parse(localStorage.getItem(STORAGE_USER));
 
-            function init() {
-                carregarDados();
-                renderProdutos();
-                renderVendasTabela();
-            }
-            init();
-        })();
-    </script>
+  // Função notificação
+  function showNotification(msg, duration=3500) {
+    notification.textContent = msg;
+    notification.classList.add('show');
+    setTimeout(() => notification.classList.remove('show'), duration);
+  }
+
+  // Limpar tabela
+  function limparTabela(tbody) {
+    while(tbody.firstChild) tbody.removeChild(tbody.firstChild);
+  }
+
+  // Render produtos admin tabela
+  function renderProdutosAdmin() {
+    limparTabela(produtosAdminTableBody);
+    produtos.forEach((p, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td data-label="Produto">${p.nome}</td>
+        <td data-label="Preço Unit.">R$ ${p.preco.toFixed(2)}</td>
+        <td data-label="Ações">
+          <button class="btn-action btn-remove-produto" data-index="${i}">Remover</button>
+        </td>
+      `;
+      produtosAdminTableBody.appendChild(tr);
+    });
+    // Eventos remover produto
+    produtosAdminTableBody.querySelectorAll('.btn-remove-produto').forEach(btn => {
+      btn.onclick = () => {
+        const idx = Number(btn.dataset.index);
+        produtos.splice(idx,1);
+        salvarProdutos();
+        renderProdutosAdmin();
+        atualizarProdutosSelect();
+        if(usuarioAtual.tipo === 'cliente') renderProdutosCliente();
+        showNotification('Produto removido');
+      };
+    });
+  }
+
+  // Render produtos para cliente (lista)
+  function renderProdutosCliente() {
+    limparTabela(produtosClienteTableBody);
+    produtos.forEach((p, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td data-label="Produto">${p.nome}</td>
+        <td data-label="Preço Unit.">R$ ${p.preco.toFixed(2)}</td>
+        <td data-label="Ação">
+          <button class="btn-action btn-comprar" data-index="${i}">Anotar Dívida</button>
+        </td>
+      `;
+      produtosClienteTableBody.appendChild(tr);
+    });
+    produtosClienteTableBody.querySelectorAll('.btn-comprar').forEach(btn => {
+      btn.onclick = () => {
+        const idx = Number(btn.dataset.index);
+        abrirModalAnotarDividaCliente(produtos[idx]);
+      };
+    });
+  }
+
+  // Render dívidas cliente atual
+  function renderDividasCliente() {
+    limparTabela(dividasClienteTableBody);
+    if(!usuarioAtual) return;
+    const minhasDividas = dividas.filter(d => d.devedor.toLowerCase() === usuarioAtual.username.toLowerCase());
+    minhasDividas.forEach(d => {
+      const total = d.quantidade * d.valorUnitario;
+      const pago = d.pago || 0;
+      const pendente = total - pago;
+      let status = 'Pendente';
+      if(pago >= total) status = 'Pago';
+      else if(pago > 0 && pago < total) status = 'Parcial';
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td data-label="Produto">${d.produto}</td>
+        <td data-label="Quantidade">${d.quantidade}</td>
+        <td data-label="Total">R$ ${total.toFixed(2)}</td>
+        <td data-label="Pago">R$ ${pago.toFixed(2)}</td>
+        <td data-label="Pendente">R$ ${pendente.toFixed(2)}</td>
+        <td data-label="Status">${status}</td>
+      `;
+      dividasClienteTableBody.appendChild(tr);
+    });
+  }
+
+  // Render dívidas admin
+  function renderDividasAdmin() {
+    limparTabela(dividasAdminTableBody);
+    dividas.forEach((d,i) => {
+      const total = d.quantidade * d.valorUnitario;
+      const pago = d.pago || 0;
+      const pendente = total - pago;
+      let status = 'Pendente';
+      if(pago >= total) status = 'Pago';
+      else if(pago > 0 && pago < total) status = 'Parcial';
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td data-label="Devedor">${d.devedor}</td>
+        <td data-label="Produto">${d.produto}</td>
+        <td data-label="Qtd.">${d.quantidade}</td>
+        <td data-label="Valor Unit.">R$ ${d.valorUnitario.toFixed(2)}</td>
+        <td data-label="Total">R$ ${total.toFixed(2)}</td>
+        <td data-label="Pago">R$ ${pago.toFixed(2)}</td>
+        <td data-label="Pendente">R$ ${pendente.toFixed(2)}</td>
+        <td data-label="Status">${status}</td>
+        <td data-label="Ações">
+          <button class="btn-action btn-pagar" data-index="${i}">Registrar Pagamento</button>
+          <button class="btn-action btn-remover" data-index="${i}">Remover</button>
+        </td>
+      `;
+      dividasAdminTableBody.appendChild(tr);
+    });
+    // Eventos botões
+    dividasAdminTableBody.querySelectorAll('.btn-pagar').forEach(btn => {
+      btn.onclick = () => abrirModalPagamento(Number(btn.dataset.index));
+    });
+    dividasAdminTableBody.querySelectorAll('.btn-remover').forEach(btn => {
+      btn.onclick = () => {
+        const idx = Number(btn.dataset.index);
+        if(confirm('Remover essa dívida?')) {
+          dividas.splice(idx,1);
+          salvarDividas();
+          renderDividasAdmin();
+          showNotification('Dívida removida');
+        }
+      };
+    });
+  }
+
+  // Atualiza select produtos na aba dívidas admin
+  function atualizarProdutosSelect() {
+    devedorProdutoSelect.innerHTML = '';
+    produtos.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.nome;
+      opt.textContent = p.nome;
+      devedorProdutoSelect.appendChild(opt);
+    });
+  }
+
+  // Salvar dados no localStorage
+  function salvarProdutos() {
+    localStorage.setItem(STORAGE_PRODUTOS, JSON.stringify(produtos));
+  }
+  function salvarDividas() {
+    localStorage.setItem(STORAGE_DIVIDAS, JSON.stringify(dividas));
+  }
+  function salvarUsuarioLogado(user) {
+    localStorage.setItem(STORAGE_USER, JSON.stringify(user));
+  }
+
+  // Login
+  formLogin.addEventListener('submit', e => {
+    e.preventDefault();
+    const username = formLogin.inputUsername.value.trim();
+    const password = formLogin.inputPassword.value;
+    const tipo = formLogin.inputUserType.value;
+
+    // Login simplificado (no real security)
+    // Admin fixo: username=admin password=admin123
+    // Clientes registrados ficam no localStorage (para simplificar, aceitar qualquer cliente cadastrado sem senha)
+    if(tipo === 'admin') {
+      if(username === 'admin' && password === 'admin123') {
+        usuarioAtual = { username, tipo };
+        salvarUsuarioLogado(usuarioAtual);
+        showNotification('Login Admin realizado');
+        mostrarAreaAdmin();
+      } else {
+        alert('Usuário ou senha admin incorretos');
+      }
+    } else if(tipo === 'cliente') {
+      // Clientes não tem senha no momento (pode ser melhorado)
+      // Verificar se cliente existe no cadastro, se não existe, cadastrar automaticamente
+      if(!username) return alert('Informe seu nome de usuário');
+      let clienteExistente = usuarios.find(u => u.username.toLowerCase() === username.toLowerCase());
+      if(!clienteExistente) {
+        // Cadastrar novo cliente
+        usuarios.push({ username });
+        localStorage.setItem(STORAGE_CLIENTES, JSON.stringify(usuarios));
+        showNotification('Novo cliente cadastrado');
+      }
+      usuarioAtual = { username, tipo };
+      salvarUsuarioLogado(usuarioAtual);
+      showNotification('Login Cliente realizado');
+      mostrarAreaCliente();
+    } else {
+      alert('Selecione um tipo de usuário');
+    }
+    formLogin.reset();
+  });
+
+  // Logout
+  logoutBtn.onclick = () => {
+    usuarioAtual = null;
+    localStorage.removeItem(STORAGE_USER);
+    showLogin();
+    showNotification('Logout realizado');
+  };
+
+  // Mostrar login
+  function showLogin() {
+    mainApp.style.display = 'none';
+    loginPage.style.display = 'block';
+    nav.innerHTML = '';
+    clientesPage.classList.remove('active');
+    adminPage.classList.remove('active');
+  }
+
+  // Mostrar área admin
+  function mostrarAreaAdmin() {
+    loginPage.style.display = 'none';
+    mainApp.style.display = 'block';
+    nav.innerHTML = '';
+    clientesPage.classList.remove('active');
+    adminPage.classList.add('active');
+    montarNavAdmin();
+    atualizarProdutosSelect();
+    renderProdutosAdmin();
+    renderDividasAdmin();
+  }
+
+  // Mostrar área cliente
+  function mostrarAreaCliente() {
+    loginPage.style.display = 'none';
+    mainApp.style.display = 'block';
+    nav.innerHTML = '';
+    clientesPage.classList.add('active');
+    adminPage.classList.remove('active');
+    montarNavCliente();
+    renderProdutosCliente();
+    renderDividasCliente();
+  }
+
+  // Montar navegação admin
+  function montarNavAdmin() {
+    nav.innerHTML = '';
+    ['Produtos','Devedores'].forEach((tabName,i) => {
+      const btn = document.createElement('button');
+      btn.textContent = tabName;
+      btn.className = 'nav-btn' + (i === 0 ? ' active' : '');
+      btn.dataset.tab = tabName.toLowerCase();
+      btn.onclick = () => {
+        // Trocar aba
+        nav.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if(tabName === 'Produtos') {
+          produtosTab.classList.add('active');
+          devedoresTab.classList.remove('active');
+        } else {
+          produtosTab.classList.remove('active');
+          devedoresTab.classList.add('active');
+        }
+      };
+      nav.appendChild(btn);
+    });
+  }
+
+  // Montar navegação cliente (simples)
+  function montarNavCliente() {
+    nav.innerHTML = '';
+    const btn = document.createElement('button');
+    btn.textContent = 'Produtos & Dívidas';
+    btn.className = 'nav-btn active';
+    btn.onclick = () => {
+      // Apenas uma aba, manter ativa
+      clientesPage.classList.add('active');
+    };
+    nav.appendChild(btn);
+  }
+
+  // Form produtos admin submit
+  formCadastroProduto.addEventListener('submit', e => {
+    e.preventDefault();
+    const nome = produtoNomeInput.value.trim();
+    const preco = parseFloat(produtoPrecoInput.value);
+    if(!nome || isNaN(preco) || preco <= 0) return alert('Informe nome e preço válidos');
+    produtos.push({ nome, preco });
+    salvarProdutos();
+    produtoNomeInput.value = '';
+    produtoPrecoInput.value = '';
+    renderProdutosAdmin();
+    atualizarProdutosSelect();
+    showNotification('Produto cadastrado');
+  });
+
+  // Form dívidas admin submit
+  formAnotarDivida.addEventListener('submit', e => {
+    e.preventDefault();
+    const devedor = devedorNomeInput.value.trim();
+    const produto = devedorProdutoSelect.value;
+    const quantidade = parseInt(devedorQuantidadeInput.value);
+    const data = devedorDataInput.value;
+
+    if(!devedor || !produto || isNaN(quantidade) || quantidade < 1 || !data) return alert('Preencha todos os campos');
+
+    // Pega preço do produto
+    const p = produtos.find(prod => prod.nome === produto);
+    if(!p) return alert('Produto inválido');
+
+    dividas.push({
+      devedor,
+      produto,
+      quantidade,
+      valorUnitario: p.preco,
+      data,
+      pago: 0,
+    });
+    salvarDividas();
+    formAnotarDivida.reset();
+    renderDividasAdmin();
+    showNotification('Dívida registrada');
+  });
+
+  // Modal anotar dívida para cliente
+  function abrirModalAnotarDividaCliente(produto) {
+    const qtd = prompt(`Digite a quantidade do produto "${produto.nome}" para anotar dívida:`, '1');
+    const quantidade = parseInt(qtd);
+    if(isNaN(quantidade) || quantidade < 1) return showNotification('Quantidade inválida');
+    const data = new Date().toISOString().slice(0,10);
+
+    dividas.push({
+      devedor: usuarioAtual.username,
+      produto: produto.nome,
+      quantidade,
+      valorUnitario: produto.preco,
+      data,
+      pago: 0,
+    });
+    salvarDividas();
+    renderDividasCliente();
+    showNotification('Dívida anotada');
+  }
+
+  // Modal pagamento admin (simples prompt)
+  function abrirModalPagamento(index) {
+    const divida = dividas[index];
+    if(!divida) return;
+    const total = divida.quantidade * divida.valorUnitario;
+    const pendente = total - (divida.pago || 0);
+    if(pendente <= 0) return showNotification('Dívida já totalmente paga');
+
+    let valor = prompt(`Dívida pendente R$ ${pendente.toFixed(2)}. Informe valor do pagamento:`, pendente.toFixed(2));
+    if(valor === null) return;
+    valor = parseFloat(valor);
+    if(isNaN(valor) || valor <= 0 || valor > pendente) return alert('Valor inválido');
+
+    divida.pago = (divida.pago || 0) + valor;
+    salvarDividas();
+    renderDividasAdmin();
+    showNotification('Pagamento registrado');
+  }
+
+  // Inicialização
+  function init() {
+    if(usuarioAtual) {
+      if(usuarioAtual.tipo === 'admin') mostrarAreaAdmin();
+      else if(usuarioAtual.tipo === 'cliente') mostrarAreaCliente();
+    } else {
+      showLogin();
+    }
+  }
+  init();
+
+})();
+</script>
 </body>
 </html>
