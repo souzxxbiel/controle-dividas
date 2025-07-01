@@ -1,341 +1,384 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-  <title>💼 Controle de Vendas & Dívidas — Master Edition</title>
-  <style>
-    /* Reset e base */
-    *, *::before, *::after {
-      box-sizing: border-box;
-    }
-    body {
-      margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-      background: #f9fafb;
-      color: #222;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      transition: background-color 0.3s ease, color 0.3s ease;
-    }
-    h1, h2, h3 {
-      font-weight: 700;
-      margin: 0 0 1rem 0;
-      color: #2563eb;
-    }
-    /* Dark Mode */
-    html.dark, html.dark body {
-      background: #121212;
-      color: #ddd;
-    }
-    html.dark a, html.dark button {
-      color: #93c5fd;
-    }
-    /* Container */
-    #app {
-      max-width: 960px;
-      margin: 1rem auto 3rem;
-      width: 95%;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 12px 24px rgb(0 0 0 / 0.12);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      transition: background-color 0.3s ease;
-    }
-    html.dark #app {
-      background: #1e1e1e;
-      box-shadow: 0 12px 24px rgb(255 255 255 / 0.1);
-    }
-    header {
-      padding: 1rem 1.5rem;
-      background: #2563eb;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    header h1 {
-      font-size: 1.5rem;
-    }
-    /* Dark mode toggle */
-    #darkToggle {
-      background: none;
-      border: none;
-      cursor: pointer;
-      width: 36px;
-      height: 36px;
-      position: relative;
-      color: white;
-      transition: transform 0.3s ease;
-    }
-    #darkToggle:hover {
-      transform: rotate(30deg);
-    }
-    #darkToggle svg {
-      width: 100%;
-      height: 100%;
-      fill: currentColor;
-    }
-    /* Navigation tabs bottom fixed */
-    nav#bottomNav {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      background: #f3f4f6;
-      border-top: 1px solid #ccc;
-      display: flex;
-      justify-content: space-around;
-      padding: 0.4rem 0;
-      z-index: 1000;
-      transition: background-color 0.3s ease;
-    }
-    html.dark nav#bottomNav {
-      background: #212121;
-      border-color: #444;
-    }
-    nav#bottomNav button {
-      background: none;
-      border: none;
-      color: #6b7280;
-      font-weight: 600;
-      font-size: 0.75rem;
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 0.3rem 0;
-      cursor: pointer;
-      transition: color 0.3s ease;
-    }
-    nav#bottomNav button.active,
-    nav#bottomNav button:hover,
-    nav#bottomNav button:focus {
-      color: #2563eb;
-      outline: none;
-    }
-    nav#bottomNav svg {
-      width: 22px;
-      height: 22px;
-      margin-bottom: 2px;
-    }
-    main > section {
-      padding: 1rem 1.5rem 4rem;
-      display: none;
-      animation: fadeIn 0.4s ease forwards;
-    }
-    main > section.active {
-      display: block;
-    }
-    @keyframes fadeIn {
-      from {opacity: 0;}
-      to {opacity: 1;}
-    }
-    /* Forms */
-    form {
-      display: grid;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-    label {
-      font-weight: 600;
-      margin-bottom: 0.3rem;
-      display: block;
-    }
-    input[type=text], input[type=number], input[type=date], input[list] {
-      width: 100%;
-      padding: 0.6rem 0.8rem;
-      border-radius: 6px;
-      border: 1.8px solid #d1d5db;
-      font-size: 1rem;
-      transition: border-color 0.3s ease;
-    }
-    input[type=text]:focus, input[type=number]:focus, input[type=date]:focus, input[list]:focus {
-      border-color: #2563eb;
-      outline: none;
-      box-shadow: 0 0 6px #2563eba0;
-    }
-    button.btn-primary {
-      background: #2563eb;
-      border: none;
-      color: white;
-      font-weight: 700;
-      font-size: 1rem;
-      padding: 0.75rem;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    button.btn-primary:hover,
-    button.btn-primary:focus {
-      background: #1e40af;
-      outline: none;
-    }
-    button.btn-secondary {
-      background: #6b7280;
-      border: none;
-      color: white;
-      font-weight: 700;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    button.btn-secondary:hover,
-    button.btn-secondary:focus {
-      background: #4b5563;
-      outline: none;
-    }
-    /* Tables */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.9rem;
-    }
-    thead {
-      background: #e0e7ff;
-    }
-    html.dark thead {
-      background: #374151;
-    }
-    th, td {
-      padding: 0.6rem 0.9rem;
-      border: 1px solid #cbd5e1;
-    }
-    html.dark th, html.dark td {
-      border-color: #4b5563;
-    }
-    th {
-      cursor: pointer;
-      user-select: none;
-      position: relative;
-    }
-    th .sort-arrow {
-      position: absolute;
-      right: 0.5rem;
-      font-size: 0.8rem;
-      opacity: 0.5;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
-    th.sorted-asc .sort-arrow {
-      opacity: 1;
-      transform: rotate(180deg);
-    }
-    th.sorted-desc .sort-arrow {
-      opacity: 1;
-    }
-    tbody tr:hover {
-      background: #e0e7ffaa;
-    }
-    html.dark tbody tr:hover {
-      background: #2563eba5;
-    }
-    /* Status badges */
-    .status-pendente {
-      color: #d97706;
-      font-weight: 700;
-    }
-    .status-recebido {
-      color: #16a34a;
-      font-weight: 700;
-    }
-    .status-cancelado {
-      color: #dc2626;
-      font-weight: 700;
-      text-decoration: line-through;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Controle de Vendas & Dívidas — Premium</title>
+    <meta name="description" content="App completo para controle de produtos, vendas e dívidas, com dashboard, gráficos, exportação e dark mode.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Reset e base */
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background: #f9fafb;
+            color: #111;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
+        }
+        header {
+            background: #2563eb;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0;
+        }
+        button {
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: white;
+            font-size: 1.2rem;
+        }
+        #darkToggle {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+        }
+        .tab {
+            padding: 1rem;
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        input, select {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            border-color: #2563eb;
+            outline: none;
+        }
+        .btn-primary {
+            background-color: #2563eb;
+            color: white;
+            padding: 0.7rem;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            padding: 0.5rem;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #f3f4f6;
+        }
+        .stat-card {
+            flex: 1;
+            background: #2563eb;
+            color: white;
+            margin: 0.5rem;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+        #dashboardStats {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        #notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2563eb;
+            color: white;
+            padding: 0.7rem 1.3rem;
+            border-radius: 9999px;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        #notification.show {
+            opacity: 1;
+        }
+        /* Dark Mode */
+        body.dark {
+            background: #121212;
+            color: #eee;
+        }
+        body.dark header {
+            background: #1e1e1e;
+        }
+        body.dark input, body.dark select {
+            background: #222;
+            color: #eee;
+            border-color: #555;
+        }
+        body.dark th {
+            background: #222;
+            color: #eee;
+        }
+        body.dark .stat-card {
+            background: #1e1e1e;
+        }
+    </style>
 </head>
-
 <body>
-  <div id="app">
     <header>
-      <h1>Controle de Vendas & Dívidas</h1>
-      <button id="darkToggle" aria-label="Alternar para modo escuro">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 8.8c0 3.46 2.42 6.42 5.65 7.52 0.64-1.23 1.88-2.18 3.35-2.66 0.7-0.24 1.35-0.64 1.85-1.13-0.1-0.2-0.23-0.42-0.23-0.67C14 6.88 14.75 2 12 2zM5 8.8c0-2.11 1.46-4.01 3.5-4.55-0.19 0.34-0.34 0.7-0.44 1.07-0.52-0.01-1.03-0.01-1.55 0.01-0.67 0.03-1.32 0.12-1.95 0.25 0.05-0.6 0.19-1.18 0.38-1.74C4.18 5.85 5 7.5 5 8.8z" /></svg>
-      </button>
+        <h1>Controle de Vendas & Dívidas</h1>
+        <button id="darkToggle" aria-label="Alternar modo claro/escuro" title="Alternar modo claro/escuro">
+            <i class="fas fa-moon" id="iconMoon"></i>
+            <i class="fas fa-sun hidden" id="iconSun"></i>
+        </button>
     </header>
 
     <main>
-      <section id="tabProdutos" class="active">
-        <h2>Gerenciar Produtos</h2>
-        <form id="formProduto">
-          <label for="nomeProduto">Nome do Produto</label>
-          <input type="text" id="nomeProduto" required placeholder="Nome do Produto" />
-          <label for="valorProduto">Valor</label>
-          <input type="number" id="valorProduto" required placeholder="Valor do Produto" />
-          <label for="custoProduto">Custo</label>
-          <input type="number" id="custoProduto" required placeholder="Custo do Produto" />
-          <button type="submit" class="btn-primary">Adicionar Produto</button>
-        </form>
-        <table>
-          <thead>
-            <tr>
-              <th>Produto</th>
-              <th>Valor (R$)</th>
-              <th>Custo (R$)</th>
-              <th>Lucro (R$)</th>
-            </tr>
-          </thead>
-          <tbody id="tabelaProdutos"></tbody>
-        </table>
-      </section>
+        <nav id="bottomNav" role="tablist">
+            <button role="tab" aria-selected="true" data-tab="tabProdutos">Produtos</button>
+            <button role="tab" aria-selected="false" data-tab="tabVendas">Vendas</button>
+            <button role="tab" aria-selected="false" data-tab="tabDashboard">Dashboard</button>
+        </nav>
 
-      <section id="tabVendas">
-        <h2>Registrar Venda</h2>
-        <form id="formVenda">
-          <div>
-            <label for="devedorVenda">Devedor</label>
-            <input id="devedorVenda" list="listaDevedores" placeholder="Devedor" />
-          </div>
-          <div>
-            <label for="produtoVenda">Produto</label>
-            <input id="produtoVenda" list="listaProdutos" placeholder="Produto" />
-          </div>
-          <div>
-            <label for="quantidadeVenda">Quantidade</label>
-            <input id="quantidadeVenda" type="number" min="1" step="1" value="1" />
-          </div>
-          <div>
-            <label for="valorVenda">Valor de Venda (R$)</label>
-            <input id="valorVenda" type="number" step="0.01" />
-          </div>
-          <div>
-            <label for="vencimentoVenda">Vencimento</label>
-            <input id="vencimentoVenda" type="date" />
-          </div>
-          <button type="submit" class="btn-primary">Registrar Venda</button>
-        </form>
-        <table id="vendasTabela">
-          <thead>
-            <tr>
-              <th>Devedor</th>
-              <th>Produto</th>
-              <th>Quantidade</th>
-              <th>Venda (R$)</th>
-              <th>Custo (R$)</th>
-              <th>Lucro (R$)</th>
-              <th>Status</th>
-              <th>Vencimento</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </section>
+        <section id="tabProdutos" class="tab" role="tabpanel" aria-label="Produtos">
+            <h2>Produtos</h2>
+            <form id="produtoForm">
+                <label for="nomeProduto">Nome do Produto</label>
+                <input id="nomeProduto" name="nomeProduto" type="text" placeholder="Ex: Camiseta" required />
+                <label for="valorProduto">Valor Unitário (R$)</label>
+                <input id="valorProduto" name="valorProduto" type="number" min="0" step="0.01" placeholder="0,00" required />
+                <label for="custoProduto">Custo Unitário (R$)</label>
+                <input id="custoProduto" name="custoProduto" type="number" min="0" step="0.01" placeholder="0,00" required />
+                <button class="btn-primary" type="submit">Adicionar Produto</button>
+            </form>
+            <table id="produtosTabela">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Valor</th>
+                        <th>Custo</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+
+        <section id="tabVendas" class="tab" role="tabpanel" aria-label="Vendas" hidden>
+            <h2>Vendas & Dívidas</h2>
+            <form id="vendaForm">
+                <label for="devedorVenda">Nome do Devedor</label>
+                <input id="devedorVenda" name="devedorVenda" type="text" placeholder="Ex: João" required />
+                <label for="produtoVenda">Produto</label>
+                <input id="produtoVenda" name="produtoVenda" type="text" placeholder="Selecione um produto" required />
+                <label for="quantidadeVenda">Quantidade</label>
+                <input id="quantidadeVenda" name="quantidadeVenda" type="number" min="1" value="1" required />
+                <label for="valorVenda">Valor Unitário (R$)</label>
+                <input id="valorVenda" name="valorVenda" type="number" min="0" step="0.01" placeholder="0,00" required />
+                <label for="vencimentoVenda">Data de Vencimento</label>
+                <input id="vencimentoVenda" name="vencimentoVenda" type="date" required />
+                <button class="btn-primary" type="submit">Registrar Venda</button>
+            </form>
+            <table id="vendasTabela">
+                <thead>
+                    <tr>
+                        <th>Devedor</th>
+                        <th>Produto</th>
+                        <th>Qtd</th>
+                        <th>Valor Unit.</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+
+        <section id="tabDashboard" class="tab" role="tabpanel" aria-label="Dashboard" hidden>
+            <h2>Dashboard & Estatísticas</h2>
+            <div id="dashboardStats">
+                <div class="stat-card" id="totalRecebido">R$ 0,00</div>
+                <div class="stat-card" id="totalAReceber">R$ 0,00</div>
+                <div class="stat-card" id="totalCusto">R$ 0,00</div>
+                <div class="stat-card" id="lucroTotal">R$ 0,00</div>
+            </div>
+            <canvas id="graficoProdutos"></canvas>
+            <canvas id="graficoStatus" style="margin-top: 1rem;"></canvas>
+        </section>
     </main>
 
-    <!-- Bottom Navigation -->
-    <nav id="bottomNav">
-      <button data-tab="tabProdutos" class="active">Produtos</button>
-      <button data-tab="tabVendas">Vendas</button>
-    </nav>
-  </div>
+    <div id="notification" role="alert"></div>
 
-  <script>
-    // JavaScript to handle dark mode, form submissions, and tabs logic
-  </script>
+    <script>
+        (() => {
+            'use strict';
+
+            const formatBRL = n => n.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+            const notificationEl = document.getElementById('notification');
+
+            function showNotification(msg) {
+                notificationEl.textContent = msg;
+                notificationEl.classList.add('show');
+                setTimeout(() => notificationEl.classList.remove('show'), 3000);
+            }
+
+            const darkToggle = document.getElementById('darkToggle');
+            darkToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark');
+                localStorage.setItem('darkMode', document.body.classList.contains('dark') ? '1' : '0');
+            });
+
+            // Inicializa modo dark baseado no localStorage
+            document.body.classList.toggle('dark', localStorage.getItem('darkMode') === '1');
+
+            const produtoForm = document.getElementById('produtoForm');
+            const vendaForm = document.getElementById('vendaForm');
+            const produtosTabela = document.querySelector('#produtosTabela tbody');
+            const vendasTabela = document.querySelector('#vendasTabela tbody');
+
+            let produtos = {};
+            let vendas = [];
+
+            function salvarDados() {
+                localStorage.setItem('controleProdutos', JSON.stringify(produtos));
+                localStorage.setItem('controleVendas', JSON.stringify(vendas));
+            }
+
+            function carregarDados() {
+                const p = localStorage.getItem('controleProdutos');
+                if (p) produtos = JSON.parse(p);
+                const v = localStorage.getItem('controleVendas');
+                if (v) vendas = JSON.parse(v);
+            }
+
+            function renderProdutos() {
+                produtosTabela.innerHTML = '';
+                for (const [nome, info] of Object.entries(produtos)) {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${nome}</td>
+                        <td>${formatBRL(info.valor)}</td>
+                        <td>${formatBRL(info.custo)}</td>
+                        <td><button class="btnExcluirProduto" data-nome="${nome}">&#10060;</button></td>
+                    `;
+                    produtosTabela.appendChild(tr);
+                }
+
+                document.querySelectorAll('.btnExcluirProduto').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const nome = btn.dataset.nome;
+                        if (confirm(`Deseja excluir o produto "${nome}"?`)) {
+                            delete produtos[nome];
+                            salvarDados();
+                            renderProdutos();
+                            showNotification(`Produto "${nome}" excluído.`);
+                        }
+                    });
+                });
+            }
+
+            function renderVendasTabela() {
+                vendasTabela.innerHTML = '';
+                vendas.forEach(v => {
+                    const tr = document.createElement('tr');
+                    const total = v.valor * v.quantidade;
+                    tr.innerHTML = `
+                        <td>${v.devedor}</td>
+                        <td>${v.produto}</td>
+                        <td>${v.quantidade}</td>
+                        <td>${formatBRL(v.valor)}</td>
+                        <td>${formatBRL(total)}</td>
+                        <td>${v.status}</td>
+                        <td><button class="btnCancelar" data-id="${v.id}">&#10060;</button></td>
+                    `;
+                    vendasTabela.appendChild(tr);
+                });
+
+                document.querySelectorAll('.btnCancelar').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const id = btn.dataset.id;
+                        const venda = vendas.find(v => v.id === id);
+                        if (venda && confirm(`Deseja cancelar a venda de ${venda.devedor}?`)) {
+                            venda.status = 'Cancelado';
+                            salvarDados();
+                            renderVendasTabela();
+                            showNotification("Venda cancelada.");
+                        }
+                    });
+                });
+            }
+
+            produtoForm.addEventListener('submit', e => {
+                e.preventDefault();
+                const nome = document.getElementById('nomeProduto').value.trim();
+                const valor = parseFloat(document.getElementById('valorProduto').value);
+                const custo = parseFloat(document.getElementById('custoProduto').value);
+                if (!nome || isNaN(valor) || isNaN(custo)) {
+                    alert("Preencha corretamente todos os campos.");
+                    return;
+                }
+                produtos[nome] = { valor, custo };
+                salvarDados();
+                renderProdutos();
+                produtoForm.reset();
+                showNotification(`Produto "${nome}" adicionado.`);
+            });
+
+            vendaForm.addEventListener('submit', e => {
+                e.preventDefault();
+                const devedor = document.getElementById('devedorVenda').value.trim();
+                const produto = document.getElementById('produtoVenda').value.trim();
+                const quantidade = parseInt(document.getElementById('quantidadeVenda').value);
+                const valor = parseFloat(document.getElementById('valorVenda').value);
+                const vencimento = document.getElementById('vencimentoVenda').value;
+
+                if (!devedor || !produto || isNaN(quantidade) || isNaN(valor) || !vencimento) {
+                    alert('Preencha corretamente todos os campos da venda.');
+                    return;
+                }
+
+                const vendaNova = {
+                    id: Date.now().toString(),
+                    devedor,
+                    produto,
+                    quantidade,
+                    valor,
+                    vencimento,
+                    status: 'Pendente'
+                };
+
+                vendas.push(vendaNova);
+                salvarDados();
+                renderVendasTabela();
+                vendaForm.reset();
+                showNotification('Venda registrada com sucesso.');
+            });
+
+            function init() {
+                carregarDados();
+                renderProdutos();
+                renderVendasTabela();
+            }
+            init();
+        })();
+    </script>
 </body>
 </html>
