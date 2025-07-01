@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="scroll-smooth">
+<html lang="pt-BR" class="scroll-smooth" >
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-<title>Controle Vendas & Dívidas - Mobile Friendly</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Controle Avançado de Vendas & Dívidas</title>
 
-<!-- Tailwind CDN -->
+<!-- Tailwind CDN + configuração -->
 <script src="https://cdn.tailwindcss.com"></script>
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -13,143 +13,221 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
 <style>
-  /* Scrollbar para desktop */
+  /* Scrollbar custom */
   ::-webkit-scrollbar {
-    width: 8px; height: 8px;
+    width: 10px; height: 10px;
   }
   ::-webkit-scrollbar-thumb {
-    background-color: rgba(59, 130, 246, 0.5);
-    border-radius: 8px;
+    background-color: rgba(59,130,246,0.4);
+    border-radius: 10px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(59, 130, 246, 0.8);
+    background-color: rgba(59,130,246,0.75);
   }
-  /* Animação fade para troca de abas */
+  /* Fade transitions for tabs */
   .tab-content {
-    display: none;
-    animation: fadeIn 0.4s ease forwards;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    transition: opacity 0.4s ease;
   }
   .tab-content.active {
-    display: block;
+    opacity: 1;
+    pointer-events: all;
+    position: relative;
   }
-  @keyframes fadeIn {
-    from {opacity: 0;}
-    to {opacity: 1;}
-  }
-  /* Nav bottom fixed */
+  /* Bottom nav styles */
   nav#bottomNav {
-    box-shadow: 0 -2px 10px rgb(0 0 0 / 0.15);
-    z-index: 9999;
+    box-shadow: 0 -3px 12px rgb(0 0 0 / 0.15);
+    z-index: 99999;
+    backdrop-filter: saturate(180%) blur(15px);
+    background-color: rgba(255 255 255 / 0.95);
   }
-  /* Botão ativo nav */
+  body.dark nav#bottomNav {
+    background-color: rgba(17 24 39 / 0.85);
+  }
   nav#bottomNav button.active svg path,
   nav#bottomNav button.active svg circle {
     stroke: #2563eb; /* blue-600 */
     fill: #2563eb;
   }
-  /* Smooth scroll body */
-  body {
-    scroll-behavior: smooth;
+  /* Accessible focus */
+  button:focus-visible, input:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+  }
+  /* Notifications */
+  #notification {
+    position: fixed;
+    top: 1rem; right: 1rem;
+    background: #2563eb;
+    color: white;
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 600;
+    box-shadow: 0 3px 8px rgb(37 99 235 / 0.7);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 100000;
+    user-select: none;
+  }
+  #notification.show {
+    opacity: 1;
+    pointer-events: all;
+  }
+  /* Loader spinner */
+  #loader {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #2563eb;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    animation: spin 1s linear infinite;
+    margin-left: 0.75rem;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
   }
 </style>
 </head>
-<body class="bg-gradient-to-br from-gray-100 to-white dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-gray-200 min-h-screen flex flex-col">
+<body class="bg-gradient-to-br from-gray-100 to-white dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-gray-200 min-h-screen flex flex-col relative font-sans">
+
+<!-- Notification -->
+<div id="notification" role="alert" aria-live="assertive"></div>
 
 <header class="bg-blue-700 dark:bg-blue-900 text-white p-5 flex justify-between items-center shadow-lg sticky top-0 z-50 select-none">
-  <h1 class="text-xl sm:text-2xl font-extrabold">Controle Vendas & Dívidas</h1>
+  <h1 class="text-xl sm:text-2xl font-extrabold" id="mainTitle" tabindex="0">Controle Avançado de Vendas & Dívidas</h1>
   <button id="darkToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro"
-    class="w-10 h-10 rounded-full bg-blue-300 dark:bg-yellow-400 flex items-center justify-center hover:ring-4 ring-yellow-400 transition">
-    <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    class="w-10 h-10 rounded-full bg-blue-300 dark:bg-yellow-400 flex items-center justify-center hover:ring-4 ring-yellow-400 transition focus-visible:outline-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2">
+    <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
       <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m8.66-12.34l-.7.7M4.04 19.96l-.7-.7M21 12h-1M4 12H3m16.66 6.66l-.7-.7M4.04 4.04l-.7.7" />
     </svg>
-    <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
       <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
     </svg>
   </button>
 </header>
 
-<main class="flex-grow max-w-4xl mx-auto p-4 pb-20 space-y-8">
+<main class="flex-grow max-w-5xl mx-auto p-4 pb-24 relative min-h-[600px]">
 
-  <!-- SEÇÕES (PÁGINAS) -->
-
-  <!-- 1. Produtos -->
-  <section id="tabProdutos" class="tab-content">
-    <h2 class="text-2xl font-bold mb-4 text-blue-700 dark:text-blue-400">Produtos</h2>
-    <form id="produtoForm" class="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-6">
-      <input type="text" id="nomeProduto" placeholder="Nome do Produto" required
-        class="p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
-      <input type="number" id="valorProduto" min="0" step="0.01" placeholder="Valor de Venda (R$)" required
-        class="p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
-      <input type="number" id="custoProduto" min="0" step="0.01" placeholder="Custo (R$)" required
-        class="p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
-      <button type="submit"
-        class="bg-green-600 hover:bg-green-700 text-white font-bold rounded p-2 transition duration-200">Adicionar</button>
+  <!-- Seções SPA -->
+  <section id="tabProdutos" class="tab-content active" aria-labelledby="produtosTitle" role="tabpanel" tabindex="0">
+    <h2 id="produtosTitle" class="text-2xl font-bold mb-5 text-blue-700 dark:text-blue-400">Produtos</h2>
+    <form id="produtoForm" class="grid grid-cols-1 sm:grid-cols-5 gap-3 mb-6" novalidate>
+      <input
+        type="text" id="nomeProduto" name="nomeProduto" aria-label="Nome do Produto" placeholder="Nome do Produto"
+        pattern=".{3,50}" title="Nome deve ter entre 3 e 50 caracteres"
+        required
+        class="p-3 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
+        autocomplete="off"
+      />
+      <input
+        type="number" id="valorProduto" name="valorProduto" aria-label="Valor de Venda (R$)" min="0" step="0.01" placeholder="Valor de Venda (R$)"
+        required
+        class="p-3 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
+      />
+      <input
+        type="number" id="custoProduto" name="custoProduto" aria-label="Custo (R$)" min="0" step="0.01" placeholder="Custo (R$)"
+        required
+        class="p-3 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
+      />
+      <button
+        type="submit"
+        class="bg-green-600 hover:bg-green-700 text-white font-bold rounded p-3 transition duration-200 disabled:opacity-60"
+        aria-disabled="false"
+      >Adicionar Produto</button>
+      <button
+        type="reset"
+        class="bg-gray-400 hover:bg-gray-500 text-white font-bold rounded p-3 transition duration-200"
+      >Limpar</button>
     </form>
-    <div class="overflow-x-auto max-h-64 border border-gray-300 dark:border-gray-600 rounded shadow">
-      <table class="w-full text-sm border-collapse">
-        <thead class="bg-blue-100 dark:bg-blue-800 sticky top-0">
+
+    <div class="overflow-x-auto max-h-[320px] border border-gray-300 dark:border-gray-600 rounded shadow">
+      <table class="w-full text-sm border-collapse" aria-describedby="produtosTitle">
+        <thead class="bg-blue-100 dark:bg-blue-800 sticky top-0 z-10">
           <tr>
             <th class="p-2 border-b border-gray-300 dark:border-gray-600">Produto</th>
             <th class="p-2 border-b border-gray-300 dark:border-gray-600">Valor (R$)</th>
             <th class="p-2 border-b border-gray-300 dark:border-gray-600">Custo (R$)</th>
-            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Excluir</th>
+            <th class="p-2 border-b border-gray-300 dark:border-gray-600" aria-label="Excluir Produto"></th>
           </tr>
         </thead>
-        <tbody id="produtosTabela"></tbody>
+        <tbody id="produtosTabela" tabindex="0" aria-live="polite" aria-relevant="all"></tbody>
       </table>
     </div>
   </section>
 
-  <!-- 2. Vendas -->
-  <section id="tabVendas" class="tab-content">
-    <h2 class="text-2xl font-bold mb-4 text-blue-700 dark:text-blue-400">Registrar Venda</h2>
-    <form id="vendaForm" class="grid grid-cols-1 sm:grid-cols-6 gap-3 mb-6">
-      <input list="devedores" id="devedorVenda" placeholder="Nome do Devedor" required
-        class="p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
+  <section id="tabVendas" class="tab-content" aria-labelledby="vendasTitle" role="tabpanel" tabindex="0" hidden>
+    <h2 id="vendasTitle" class="text-2xl font-bold mb-5 text-blue-700 dark:text-blue-400">Registrar Venda</h2>
+    <form id="vendaForm" class="grid grid-cols-1 sm:grid-cols-7 gap-3 mb-6" novalidate>
+      <input
+        list="devedores" id="devedorVenda" name="devedorVenda" aria-label="Nome do Devedor" placeholder="Nome do Devedor"
+        required autocomplete="off"
+        class="p-3 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
+      />
       <datalist id="devedores"></datalist>
 
-      <input list="produtosDatalist" id="produtoVenda" placeholder="Produto" required
-        class="p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
+      <input
+        list="produtosDatalist" id="produtoVenda" name="produtoVenda" aria-label="Produto" placeholder="Produto"
+        required autocomplete="off"
+        class="p-3 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
+      />
       <datalist id="produtosDatalist"></datalist>
 
-      <input type="number" id="quantidadeVenda" min="1" value="1" required
-        class="p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
-      <input type="number" id="valorVenda" min="0" step="0.01" placeholder="Valor Unitário (R$)" required
-        class="p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
-      <input type="date" id="vencimentoVenda" required
-        class="p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
-      <button type="submit"
-        class="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded p-2 transition duration-200">Registrar</button>
+      <input
+        type="number" id="quantidadeVenda" name="quantidadeVenda" min="1" value="1" aria-label="Quantidade"
+        required
+        class="p-3 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
+      />
+      <input
+        type="number" id="valorVenda" name="valorVenda" min="0" step="0.01" placeholder="Valor Unitário (R$)" aria-label="Valor Unitário (R$)"
+        required
+        class="p-3 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
+      />
+      <input
+        type="date" id="vencimentoVenda" name="vencimentoVenda" aria-label="Data de Vencimento" required
+        class="p-3 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
+      />
+      <button
+        type="submit"
+        class="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded p-3 transition duration-200 disabled:opacity-60"
+        aria-disabled="false"
+      >Registrar Venda</button>
     </form>
 
-    <input id="buscaVendas" type="search" placeholder="Buscar por devedor ou produto..."
-      class="w-full p-2 rounded border border-gray-300 dark:border-gray-600 mb-3 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
+    <input
+      id="buscaVendas" type="search" aria-label="Buscar vendas" placeholder="Buscar por devedor ou produto..."
+      class="w-full p-3 rounded border border-gray-300 dark:border-gray-600 mb-3 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
+      autocomplete="off"
+    />
 
-    <div class="overflow-x-auto max-h-64 border border-gray-300 dark:border-gray-600 rounded shadow">
-      <table class="w-full text-sm border-collapse">
-        <thead class="bg-blue-100 dark:bg-blue-800 sticky top-0">
+    <div class="overflow-x-auto max-h-[320px] border border-gray-300 dark:border-gray-600 rounded shadow">
+      <table class="w-full text-sm border-collapse" aria-describedby="vendasTitle">
+        <thead class="bg-blue-100 dark:bg-blue-800 sticky top-0 z-10">
           <tr>
-            <th class="p-2 border-b border-gray-300 dark:border-gray-600 cursor-pointer" data-sort="devedor">Devedor ▲▼</th>
-            <th class="p-2 border-b border-gray-300 dark:border-gray-600 cursor-pointer" data-sort="produto">Produto ▲▼</th>
-            <th class="p-2 border-b border-gray-300 dark:border-gray-600 cursor-default">Qtd</th>
-            <th class="p-2 border-b border-gray-300 dark:border-gray-600 cursor-default">Valor (R$)</th>
-            <th class="p-2 border-b border-gray-300 dark:border-gray-600 cursor-default">Custo (R$)</th>
-            <th class="p-2 border-b border-gray-300 dark:border-gray-600 cursor-default">Lucro (R$)</th>
-            <th class="p-2 border-b border-gray-300 dark:border-gray-600 cursor-default">Vencimento</th>
-            <th class="p-2 border-b border-gray-300 dark:border-gray-600 cursor-pointer" data-sort="status">Status ▲▼</th>
-            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Ações</th>
+            <th scope="col" tabindex="0" role="button" aria-pressed="false" class="p-2 border-b border-gray-300 dark:border-gray-600 cursor-pointer" data-sort="devedor" title="Ordenar por Devedor">Devedor ▲▼</th>
+            <th scope="col" tabindex="0" role="button" aria-pressed="false" class="p-2 border-b border-gray-300 dark:border-gray-600 cursor-pointer" data-sort="produto" title="Ordenar por Produto">Produto ▲▼</th>
+            <th scope="col" class="p-2 border-b border-gray-300 dark:border-gray-600">Qtd</th>
+            <th scope="col" class="p-2 border-b border-gray-300 dark:border-gray-600">Valor (R$)</th>
+            <th scope="col" class="p-2 border-b border-gray-300 dark:border-gray-600">Custo (R$)</th>
+            <th scope="col" class="p-2 border-b border-gray-300 dark:border-gray-600">Lucro (R$)</th>
+            <th scope="col" tabindex="0" role="button" aria-pressed="false" class="p-2 border-b border-gray-300 dark:border-gray-600 cursor-pointer" data-sort="vencimento" title="Ordenar por Vencimento">Vencimento ▲▼</th>
+            <th scope="col" tabindex="0" role="button" aria-pressed="false" class="p-2 border-b border-gray-300 dark:border-gray-600 cursor-pointer" data-sort="status" title="Ordenar por Status">Status ▲▼</th>
+            <th scope="col" class="p-2 border-b border-gray-300 dark:border-gray-600">Ações</th>
           </tr>
         </thead>
-        <tbody id="vendasTabela"></tbody>
+        <tbody id="vendasTabela" tabindex="0" aria-live="polite" aria-relevant="all"></tbody>
       </table>
     </div>
   </section>
 
-  <!-- 3. Dashboard -->
-  <section id="tabDashboard" class="tab-content">
-    <h2 class="text-2xl font-bold mb-4 text-blue-700 dark:text-blue-400">Dashboard & Relatórios</h2>
+  <section id="tabDashboard" class="tab-content" aria-labelledby="dashboardTitle" role="tabpanel" tabindex="0" hidden>
+    <h2 id="dashboardTitle" class="text-2xl font-bold mb-6 text-blue-700 dark:text-blue-400">Dashboard & Relatórios</h2>
 
-    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6 text-center">
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-8 text-center">
       <div class="bg-blue-50 dark:bg-blue-900 rounded p-4 shadow">
         <h3 class="text-lg font-semibold mb-2">Total Recebido</h3>
         <p class="text-xl font-bold text-green-600 dark:text-green-400" id="totalRecebido">R$ 0,00</p>
@@ -168,99 +246,18 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
       <div>
-        <h3 class="text-xl font-semibold mb-2 text-center text-blue-700 dark:text-blue-400">Produtos mais vendidos</h3>
-        <canvas id="graficoProdutos" class="rounded shadow"></canvas>
+        <h3 class="text-xl font-semibold mb-4 text-center text-blue-700 dark:text-blue-400">Produtos mais vendidos</h3>
+        <canvas id="graficoProdutos" class="rounded shadow" aria-label="Gráfico de barras dos produtos mais vendidos" role="img"></canvas>
       </div>
       <div>
-        <h3 class="text-xl font-semibold mb-2 text-center text-blue-700 dark:text-blue-400">Status das Vendas</h3>
-        <canvas id="graficoStatus" class="rounded shadow"></canvas>
+        <h3 class="text-xl font-semibold mb-4 text-center text-blue-700 dark:text-blue-400">Status das Vendas</h3>
+        <canvas id="graficoStatus" class="rounded shadow" aria-label="Gráfico de pizza do status das vendas" role="img"></canvas>
       </div>
     </div>
 
-    <div class="mt-6 flex justify-center gap-4 flex-wrap">
+    <div class="mt-8 flex justify-center gap-4 flex-wrap">
       <button id="exportCSV"
-        class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded transition">Exportar CSV</button>
-      <button id="exportPDF"
-        class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded transition">Exportar PDF</button>
-      <button id="limparDados"
-        class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded transition">Limpar Tudo</button>
-    </div>
-  </section>
-
-</main>
-
-<!-- Navegação bottom fixed -->
-<nav id="bottomNav" class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-300 dark:border-gray-700 flex justify-around py-2 sm:py-3">
-  <button aria-label="Produtos" class="tabBtn flex flex-col items-center gap-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 active" data-tab="tabProdutos" type="button">
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>
-    <span class="text-xs">Produtos</span>
-  </button>
-  <button aria-label="Vendas" class="tabBtn flex flex-col items-center gap-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" data-tab="tabVendas" type="button">
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3z"></path><path d="M7 7h10v10H7z" stroke="#2563eb"></path></svg>
-    <span class="text-xs">Vendas</span>
-  </button>
-  <button aria-label="Dashboard" class="tabBtn flex flex-col items-center gap-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" data-tab="tabDashboard" type="button">
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M8 12l2 2 4-4"></path></svg>
-    <span class="text-xs">Dashboard</span>
-  </button>
-</nav>
-
-<script>
-(() => {
-  'use strict';
-
-  // Estado
-  let produtos = JSON.parse(localStorage.getItem('produtos')) || {};
-  let vendas = JSON.parse(localStorage.getItem('vendas')) || [];
-  let darkMode = localStorage.getItem('darkMode') === 'true';
-
-  // Elementos DOM
-  const tabs = {
-    produtos: document.getElementById('tabProdutos'),
-    vendas: document.getElementById('tabVendas'),
-    dashboard: document.getElementById('tabDashboard')
-  };
-  const tabButtons = document.querySelectorAll('.tabBtn');
-
-  // Dark mode toggle
-  const darkToggleBtn = document.getElementById('darkToggle');
-  const iconSun = document.getElementById('iconSun');
-  const iconMoon = document.getElementById('iconMoon');
-
-  function aplicarDarkMode() {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-      iconSun.classList.remove('hidden');
-      iconMoon.classList.add('hidden');
-    } else {
-      document.documentElement.classList.remove('dark');
-      iconSun.classList.add('hidden');
-      iconMoon.classList.remove('hidden');
-    }
-  }
-  darkToggleBtn.onclick = () => {
-    darkMode = !darkMode;
-    aplicarDarkMode();
-    salvarLocal();
-  };
-  aplicarDarkMode();
-
-  // Salvar localStorage
-  function salvarLocal() {
-    localStorage.setItem('produtos', JSON.stringify(produtos));
-    localStorage.setItem('vendas', JSON.stringify(vendas));
-    localStorage.setItem('darkMode', darkMode);
-  }
-
-  // Função para renderizar produtos
-  const produtosTabela = document.getElementById('produtosTabela');
-  const produtosDatalist = document.getElementById('produtosDatalist');
-
-  function renderProdutos() {
-    produtosTabela.innerHTML = '';
-    produtosDatalist.innerHTML = '';
-
-    Object.entries(produtos).forEach(([nome, prod]) => {
-      // Linha
+        class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded transition focus-visible:outline-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2"
+      >
