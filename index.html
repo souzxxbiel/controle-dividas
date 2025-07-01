@@ -1,72 +1,297 @@
-Crie um site totalmente automatizado para me ajudar a gerenciar minhas vendas e dívidas pessoais. O sistema deve funcionar inteiramente no navegador (sem backend), utilizando `localStorage` para manter os dados salvos automaticamente. O foco é **facilitar minha vida** ao máximo: tudo deve ser intuitivo, rápido de preencher, com o mínimo de digitação.
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Controle de Vendas & Dívidas — Ultimate</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  /* Scrollbar custom */
+  ::-webkit-scrollbar {
+    width: 8px; height: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(59, 130, 246, 0.5);
+    border-radius: 8px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(59, 130, 246, 0.8);
+  }
+  /* Dark mode toggle animation */
+  #darkToggle {
+    transition: background-color 0.3s ease;
+  }
+</style>
+</head>
+<body class="bg-gradient-to-br from-gray-100 to-white dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-gray-200 min-h-screen flex flex-col">
 
-### Objetivo:
-Controlar o que vendi, para quem, por quanto, quanto custou, quanto estou ganhando, quanto foi pago, e o que ainda falta receber.
+<header class="bg-blue-700 dark:bg-blue-900 text-white p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between shadow-lg sticky top-0 z-50">
+  <h1 class="text-3xl font-extrabold mb-3 sm:mb-0 select-none">Controle de Vendas & Dívidas</h1>
+  <button id="darkToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro"
+    class="w-12 h-12 rounded-full bg-blue-300 dark:bg-yellow-400 flex items-center justify-center hover:ring-4 ring-yellow-400 transition">
+    <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m8.66-12.34l-.7.7M4.04 19.96l-.7-.7M21 12h-1M4 12H3m16.66 6.66l-.7-.7M4.04 4.04l-.7.7" />
+    </svg>
+    <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
+    </svg>
+  </button>
+</header>
 
----
+<main class="flex-grow max-w-7xl mx-auto p-6 space-y-8">
 
-### Funcionalidades principais (automatizadas):
+  <!-- PRODUTOS -->
+  <section aria-labelledby="produtosTitle" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+    <h2 id="produtosTitle" class="text-2xl font-bold mb-4 text-blue-700 dark:text-blue-400">Cadastro de Produtos</h2>
+    <form id="produtoForm" class="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
+      <div>
+        <label for="nomeProduto" class="block font-semibold mb-1">Nome do Produto</label>
+        <input type="text" id="nomeProduto" required placeholder="Ex: Camisa Polo"
+          class="w-full p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
+      </div>
+      <div>
+        <label for="valorProduto" class="block font-semibold mb-1">Valor de Venda (R$)</label>
+        <input type="number" step="0.01" min="0" id="valorProduto" required placeholder="0.00"
+          class="w-full p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
+      </div>
+      <div>
+        <label for="custoProduto" class="block font-semibold mb-1">Custo (R$)</label>
+        <input type="number" step="0.01" min="0" id="custoProduto" required placeholder="0.00"
+          class="w-full p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
+      </div>
+      <button type="submit"
+        class="bg-green-600 hover:bg-green-700 text-white font-bold rounded py-2 transition duration-200">
+        Adicionar Produto
+      </button>
+    </form>
 
-#### 🧾 Registro de vendas/dívidas
-- Nome do devedor (com autocompletar)
-- Produto (com autocompletar, valor de venda e custo preenchidos automaticamente)
-- Quantidade
-- Total calculado automaticamente (quantidade × valor de venda)
-- Custo total também calculado (quantidade × custo)
-- Data da venda (auto preenchida com data atual)
-- Data de vencimento (selecionável)
-- Status ("A receber" ou "Recebido") com botão para alternar
-- Botão “Salvar”
+    <div class="mt-6 overflow-x-auto max-h-64 border border-gray-300 dark:border-gray-600 rounded">
+      <table class="w-full text-left text-sm border-collapse">
+        <thead class="bg-blue-100 dark:bg-blue-800 sticky top-0">
+          <tr>
+            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Produto</th>
+            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Valor (R$)</th>
+            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Custo (R$)</th>
+            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Ações</th>
+          </tr>
+        </thead>
+        <tbody id="produtosTabela"></tbody>
+      </table>
+    </div>
+  </section>
 
-#### 📦 Cadastro inteligente de produtos
-- Cadastro de produtos com:
-  - Nome
-  - Valor de venda
-  - Valor de custo
-- Quando eu escolho um produto, o valor de venda e custo aparecem automaticamente.
-- Se o produto já existir, ele preenche tudo.
-- Se for novo, posso cadastrá-lo direto no formulário.
+  <!-- VENDAS -->
+  <section aria-labelledby="vendasTitle" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+    <h2 id="vendasTitle" class="text-2xl font-bold mb-4 text-blue-700 dark:text-blue-400">Registrar Venda</h2>
+    <form id="vendaForm" class="grid grid-cols-1 sm:grid-cols-6 gap-4 items-end">
+      <div>
+        <label for="devedorVenda" class="block font-semibold mb-1">Nome do Devedor</label>
+        <input list="devedores" id="devedorVenda" placeholder="Nome do Devedor" required
+          class="w-full p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
+        <datalist id="devedores"></datalist>
+      </div>
+      <div>
+        <label for="produtoVenda" class="block font-semibold mb-1">Produto</label>
+        <input list="produtosDatalist" id="produtoVenda" placeholder="Produto" required
+          class="w-full p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
+        <datalist id="produtosDatalist"></datalist>
+      </div>
+      <div>
+        <label for="quantidadeVenda" class="block font-semibold mb-1">Quantidade</label>
+        <input type="number" min="1" value="1" id="quantidadeVenda" required
+          class="w-full p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
+      </div>
+      <div>
+        <label for="valorVenda" class="block font-semibold mb-1">Valor Unitário (R$)</label>
+        <input type="number" min="0" step="0.01" id="valorVenda" required
+          class="w-full p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
+      </div>
+      <div>
+        <label for="vencimentoVenda" class="block font-semibold mb-1">Data de Vencimento</label>
+        <input type="date" id="vencimentoVenda" required
+          class="w-full p-2 rounded border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700" />
+      </div>
+      <button type="submit"
+        class="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded py-2 transition duration-200">
+        Registrar Venda
+      </button>
+    </form>
 
-#### 📊 Painel financeiro automatizado
-- Total a receber
-- Total já recebido
-- Total de vendas
-- Total de custos
-- Lucro total (vendas - custos)
-- Tudo atualizado automaticamente conforme registro
+    <div class="mt-6 overflow-x-auto max-h-64 border border-gray-300 dark:border-gray-600 rounded">
+      <table class="w-full text-left text-sm border-collapse">
+        <thead class="bg-blue-100 dark:bg-blue-800 sticky top-0">
+          <tr>
+            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Devedor</th>
+            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Produto</th>
+            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Qtd</th>
+            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Valor (R$)</th>
+            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Custo (R$)</th>
+            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Lucro (R$)</th>
+            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Vencimento</th>
+            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Status</th>
+            <th class="p-2 border-b border-gray-300 dark:border-gray-600">Ações</th>
+          </tr>
+        </thead>
+        <tbody id="vendasTabela"></tbody>
+      </table>
+    </div>
+  </section>
 
-#### 👤 Resumo por cliente
-- Lista de devedores com:
-  - Quanto cada um já pagou
-  - Quanto ainda deve
-  - Lucro gerado por cliente
+  <!-- DASHBOARD -->
+  <section aria-labelledby="dashboardTitle" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+    <h2 id="dashboardTitle" class="text-2xl font-bold mb-6 text-blue-700 dark:text-blue-400">Resumo Financeiro & Gráficos</h2>
 
-#### 📁 Exportação e filtros
-- Filtro por nome do devedor
-- Filtro por data
-- Filtro por produto
-- Botão para exportar todos os dados para CSV
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 text-center">
+      <div class="bg-blue-50 dark:bg-blue-900 rounded p-4 shadow">
+        <h3 class="text-lg font-semibold mb-2">Total Recebido</h3>
+        <p class="text-xl font-bold text-green-600 dark:text-green-400" id="totalRecebido">R$ 0,00</p>
+      </div>
+      <div class="bg-blue-50 dark:bg-blue-900 rounded p-4 shadow">
+        <h3 class="text-lg font-semibold mb-2">Total a Receber</h3>
+        <p class="text-xl font-bold text-yellow-600 dark:text-yellow-400" id="totalAReceber">R$ 0,00</p>
+      </div>
+      <div class="bg-blue-50 dark:bg-blue-900 rounded p-4 shadow">
+        <h3 class="text-lg font-semibold mb-2">Total de Custos</h3>
+        <p class="text-xl font-bold text-red-600 dark:text-red-400" id="totalCusto">R$ 0,00</p>
+      </div>
+      <div class="bg-blue-50 dark:bg-blue-900 rounded p-4 shadow">
+        <h3 class="text-lg font-semibold mb-2">Lucro Total</h3>
+        <p class="text-xl font-bold text-indigo-600 dark:text-indigo-400" id="lucroTotal">R$ 0,00</p>
+      </div>
+    </div>
 
----
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div>
+        <h3 class="text-xl font-semibold mb-4 text-center text-blue-700 dark:text-blue-400">Produtos mais vendidos</h3>
+        <canvas id="graficoProdutos"></canvas>
+      </div>
+      <div>
+        <h3 class="text-xl font-semibold mb-4 text-center text-blue-700 dark:text-blue-400">Status das vendas</h3>
+        <canvas id="graficoStatus"></canvas>
+      </div>
+    </div>
 
-### Recursos extras:
-- Visual limpo e bonito com Tailwind CSS
-- Totalmente responsivo (funciona bem no celular, como um app)
-- Salva tudo automaticamente com `localStorage`
-- Campo de busca rápida
-- Animações leves (opcional) para melhorar a experiência
+    <div class="mt-8 flex justify-center gap-4">
+      <button id="exportCSV" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded transition">Exportar CSV</button>
+      <button id="exportPDF" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded transition">Exportar PDF</button>
+    </div>
+  </section>
 
----
+</main>
 
-### Tecnologias:
-- HTML5
-- Tailwind CSS (ou CSS puro)
-- JavaScript puro (sem frameworks)
-- Sem backend, banco de dados ou login
-- Compatível com navegador de celular (iPhone, Android, Safari, Chrome)
+<footer class="bg-blue-700 dark:bg-blue-900 text-white p-4 text-center select-none">
+  <small>© 2025 Controle Vendas & Dívidas - Criado com ❤️ por você e ChatGPT</small>
+</footer>
 
----
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script>
+(() => {
+  // Estado app
+  let produtos = JSON.parse(localStorage.getItem('produtos')) || {};
+  let vendas = JSON.parse(localStorage.getItem('vendas')) || [];
+  let darkMode = localStorage.getItem('darkMode') === 'true';
 
-### Objetivo final:
-Um painel leve, bonito e rápido, onde eu não precise digitar tudo toda vez. Os campos se preenchem com base nos dados anteriores (autocompletar). Os cálculos de totais, custos e lucros são todos automáticos. Ideal para uso diário como vendedor informal ou para cobrar clientes de forma simples.
+  // Referências DOM
+  const nomeProduto = document.getElementById('nomeProduto');
+  const valorProduto = document.getElementById('valorProduto');
+  const custoProduto = document.getElementById('custoProduto');
+  const produtoForm = document.getElementById('produtoForm');
+  const produtosTabela = document.getElementById('produtosTabela');
 
+  const devedorVenda = document.getElementById('devedorVenda');
+  const produtoVenda = document.getElementById('produtoVenda');
+  const quantidadeVenda = document.getElementById('quantidadeVenda');
+  const valorVenda = document.getElementById('valorVenda');
+  const vencimentoVenda = document.getElementById('vencimentoVenda');
+  const vendaForm = document.getElementById('vendaForm');
+  const vendasTabela = document.getElementById('vendasTabela');
+
+  const devedoresDatalist = document.getElementById('devedores');
+  const produtosDatalist = document.getElementById('produtosDatalist');
+
+  const totalRecebidoEl = document.getElementById('totalRecebido');
+  const totalAReceberEl = document.getElementById('totalAReceber');
+  const totalCustoEl = document.getElementById('totalCusto');
+  const lucroTotalEl = document.getElementById('lucroTotal');
+
+  const exportCSVBtn = document.getElementById('exportCSV');
+  const exportPDFBtn = document.getElementById('exportPDF');
+
+  const darkToggleBtn = document.getElementById('darkToggle');
+  const iconSun = document.getElementById('iconSun');
+  const iconMoon = document.getElementById('iconMoon');
+
+  // Chart instances
+  let graficoProdutosChart = null;
+  let graficoStatusChart = null;
+
+  // Util
+  function salvarLocal() {
+    localStorage.setItem('produtos', JSON.stringify(produtos));
+    localStorage.setItem('vendas', JSON.stringify(vendas));
+    localStorage.setItem('darkMode', darkMode);
+  }
+  function formatarReal(num) {
+    return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+
+  // Dark mode init
+  function aplicarDarkMode() {
+    if(darkMode) {
+      document.documentElement.classList.add('dark');
+      iconSun.classList.remove('hidden');
+      iconMoon.classList.add('hidden');
+    } else {
+      document.documentElement.classList.remove('dark');
+      iconSun.classList.add('hidden');
+      iconMoon.classList.remove('hidden');
+    }
+  }
+  darkToggleBtn.onclick = () => {
+    darkMode = !darkMode;
+    aplicarDarkMode();
+    salvarLocal();
+  };
+  aplicarDarkMode();
+
+  // Atualizar produtos na tabela e datalist
+  function atualizarProdutos() {
+    produtosTabela.innerHTML = '';
+    Object.entries(produtos).forEach(([nome, prod]) => {
+      const tr = document.createElement('tr');
+      tr.className = 'border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition';
+
+      tr.innerHTML = `
+        <td class="p-2">${nome}</td>
+        <td class="p-2">${formatarReal(prod.valor)}</td>
+        <td class="p-2">${formatarReal(prod.custo)}</td>
+        <td class="p-2 text-center">
+          <button aria-label="Excluir produto ${nome}" class="text-red-600 hover:text-red-800 font-semibold" data-nome="${nome}">Excluir</button>
+        </td>`;
+      produtosTabela.appendChild(tr);
+    });
+
+    // Datalist produtos
+    produtosDatalist.innerHTML = Object.keys(produtos).map(p => `<option value="${p}">`).join('');
+  }
+
+  produtosTabela.addEventListener('click', e => {
+    if(e.target.tagName === 'BUTTON') {
+      const nome = e.target.dataset.nome;
+      if(confirm(`Deseja realmente excluir o produto "${nome}"? Isso também removerá as vendas relacionadas.`)) {
+        delete produtos[nome];
+        // Remove vendas associadas
+        vendas = vendas.filter(v => v.produto !== nome);
+        atualizarProdutos();
+        atualizarVendas();
+        atualizarDevedores();
+        atualizarResumo();
+        salvarLocal();
+      }
+    }
+  });
+
+  produtoForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const nome =
