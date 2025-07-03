@@ -3,23 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VENDAS OLIVEIRA | Controle de Devedores</title>
+    <title>VENDAS OLIVEIRA | Sistema Ultra Moderno</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #2c3e50;
-            --primary-light: #34495e;
-            --secondary: #16a085;
-            --accent: #3498db;
-            --success: #27ae60;
-            --danger: #e74c3c;
-            --warning: #f39c12;
-            --dark: #2c3e50;
-            --light: #ecf0f1;
-            --gray: #95a5a6;
-            --card-bg: #ffffff;
-            --card-shadow: rgba(0, 0, 0, 0.08);
+            --primary: #1a1c2c;
+            --primary-light: #2d3047;
+            --secondary: #5d4e6d;
+            --accent: #9a8f97;
+            --success: #87c5a4;
+            --danger: #ff6b6b;
+            --warning: #ffd166;
+            --dark: #1a1c2c;
+            --light: #f9f7f7;
+            --gray: #8e9aaf;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --card-shadow: rgba(0, 0, 0, 0.25);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         
         * {
@@ -29,30 +31,33 @@
         }
         
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            color: var(--dark);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: var(--light);
             min-height: 100vh;
             padding: 0;
             overflow-x: hidden;
             line-height: 1.6;
+            backdrop-filter: blur(10px);
         }
         
         .container {
             max-width: 100%;
             margin: 0 auto;
-            padding-bottom: 80px;
+            padding: 20px;
+            padding-bottom: 100px;
         }
         
         /* Header */
         header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
             color: white;
-            padding: 20px 15px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px var(--card-shadow);
             text-align: center;
         }
         
@@ -60,60 +65,90 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            font-size: 1.6rem;
+            gap: 15px;
+            font-size: 1.8rem;
             font-weight: 700;
         }
         
         .logo i {
-            color: var(--secondary);
+            color: var(--success);
+            font-size: 2.2rem;
         }
         
         .logo-text {
-            background: linear-gradient(to right, var(--secondary), var(--accent));
+            background: linear-gradient(to right, var(--success), var(--accent));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
         /* Tabs Navigation */
         .tabs-container {
             display: flex;
-            background: white;
-            position: sticky;
-            top: 80px;
-            z-index: 90;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 20px var(--card-shadow);
         }
         
         .tab {
             flex: 1;
             text-align: center;
-            padding: 15px 0;
+            padding: 18px 0;
             font-weight: 500;
-            color: var(--gray);
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s;
+            color: var(--light);
+            background: transparent;
             cursor: pointer;
-            background: white;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tab::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: var(--success);
+            transform: translateX(-50%);
+            transition: var(--transition);
         }
         
         .tab.active {
-            color: var(--primary);
-            border-bottom: 3px solid var(--secondary);
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .tab.active::before {
+            width: 100%;
+        }
+        
+        .tab:hover {
+            background: rgba(0, 0, 0, 0.1);
         }
         
         .tab i {
             display: block;
-            font-size: 1.3rem;
-            margin-bottom: 5px;
+            font-size: 1.6rem;
+            margin-bottom: 8px;
+            transition: var(--transition);
+        }
+        
+        .tab.active i {
+            transform: scale(1.1);
+            color: var(--success);
         }
         
         /* Tab Content */
         .tab-content {
             display: none;
-            padding: 20px 15px;
-            animation: fadeIn 0.4s ease;
+            animation: fadeIn 0.5s ease;
         }
         
         .tab-content.active {
@@ -121,158 +156,150 @@
         }
         
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
         
         /* Cards */
         .card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            box-shadow: 0 4px 15px var(--card-shadow);
-            padding: 20px;
-            margin-bottom: 20px;
-            transition: transform 0.3s;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px var(--card-shadow);
+            transition: var(--transition);
         }
         
         .card:hover {
-            transform: translateY(-3px);
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
         }
         
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--glass-border);
         }
         
         .card-title {
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             font-weight: 600;
-            color: var(--primary);
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-title i {
+            font-size: 1.6rem;
         }
         
         /* Stats */
         .stats-container {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
         }
         
         .stat-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 15px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            box-shadow: 0 4px 8px var(--card-shadow);
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 20px var(--card-shadow);
+            transition: var(--transition);
             text-align: center;
         }
         
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
         .stat-title {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: var(--gray);
         }
         
         .stat-value {
-            font-size: 1.4rem;
+            font-size: 1.8rem;
             font-weight: 700;
-            color: var(--dark);
+            color: var(--light);
         }
         
         .stat-icon {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 10px;
-            font-size: 1.2rem;
-        }
-        
-        .icon-primary {
-            background: rgba(44, 62, 80, 0.15);
-            color: var(--primary);
-        }
-        
-        .icon-success {
-            background: rgba(39, 174, 96, 0.15);
+            font-size: 1.5rem;
+            background: rgba(135, 197, 164, 0.15);
             color: var(--success);
-        }
-        
-        .icon-warning {
-            background: rgba(243, 156, 18, 0.15);
-            color: var(--warning);
-        }
-        
-        .icon-danger {
-            background: rgba(231, 76, 60, 0.15);
-            color: var(--danger);
         }
         
         /* Form */
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         
         .form-group label {
             display: block;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             font-weight: 500;
-            color: var(--dark);
-            font-size: 0.9rem;
+            color: var(--light);
+            font-size: 1rem;
         }
         
         .form-control {
             width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            transition: border-color 0.3s;
-            background: #f8fafc;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.15);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            font-size: 1rem;
+            color: var(--light);
+            transition: var(--transition);
         }
         
         .form-control:focus {
             outline: none;
-            border-color: var(--accent);
+            border-color: var(--success);
+            background: rgba(0, 0, 0, 0.25);
+            box-shadow: 0 0 0 3px rgba(135, 197, 164, 0.2);
         }
         
         .btn {
-            padding: 12px 20px;
+            padding: 15px 25px;
             border: none;
-            border-radius: 10px;
-            font-size: 1rem;
+            border-radius: 12px;
+            font-size: 1.05rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: var(--transition);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
+            background: linear-gradient(135deg, var(--success), #6ab190);
+            color: var(--dark);
+            box-shadow: 0 4px 15px rgba(135, 197, 164, 0.3);
         }
         
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: var(--primary-light);
-        }
-        
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
-        
-        .btn-success:hover {
-            background: #219653;
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(135, 197, 164, 0.4);
         }
         
         .btn-block {
@@ -282,216 +309,292 @@
         /* Table */
         .table-container {
             overflow-x: auto;
-            max-height: 400px;
-            overflow-y: auto;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            box-shadow: 0 8px 32px var(--card-shadow);
         }
         
         .table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 500px;
+            min-width: 600px;
         }
         
         .table th {
-            background: #f1f5f9;
-            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 16px;
             text-align: left;
             font-weight: 600;
-            color: var(--dark);
-            border-bottom: 2px solid #e2e8f0;
-            font-size: 0.9rem;
+            color: var(--success);
+            font-size: 1rem;
             position: sticky;
             top: 0;
         }
         
         .table td {
-            padding: 12px;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 0.9rem;
+            padding: 16px;
+            border-bottom: 1px solid var(--glass-border);
+            font-size: 0.95rem;
+            color: var(--light);
         }
         
-        .debtor-row:hover, .sale-row:hover {
-            background: #f8fafc;
+        .table tr:last-child td {
+            border-bottom: none;
         }
         
+        .table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        /* Status */
         .status {
-            padding: 5px 10px;
+            padding: 8px 15px;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             font-weight: 500;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
         
         .status.pending {
-            background: rgba(243, 156, 18, 0.15);
-            color: #d97706;
+            background: rgba(255, 209, 102, 0.15);
+            color: var(--warning);
         }
         
         .status.paid {
-            background: rgba(39, 174, 96, 0.15);
-            color: #059669;
-        }
-        
-        .status.overdue {
-            background: rgba(231, 76, 60, 0.15);
-            color: #b91c1c;
-        }
-        
-        .action-btn {
-            padding: 6px 10px;
-            border: none;
-            border-radius: 8px;
-            background: none;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: background 0.3s;
-        }
-        
-        .action-btn:hover {
-            background: #f1f5f9;
-        }
-        
-        .btn-edit {
-            color: var(--primary);
-        }
-        
-        .btn-delete {
-            color: var(--danger);
-        }
-        
-        .btn-paid {
+            background: rgba(135, 197, 164, 0.15);
             color: var(--success);
         }
         
-        /* Summary */
-        .summary-card {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 8px 20px rgba(44, 62, 80, 0.25);
+        .status.overdue {
+            background: rgba(255, 107, 107, 0.15);
+            color: var(--danger);
         }
         
-        .summary-title {
-            font-size: 1.1rem;
-            font-weight: 600;
+        /* Action buttons */
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+            color: var(--light);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .action-btn:hover {
+            background: var(--success);
+            color: var(--dark);
+            transform: translateY(-2px);
+        }
+        
+        /* Selection styles */
+        .selection-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .selection-group {
+            flex: 1;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 15px;
+        }
+        
+        .selection-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--success);
+        }
+        
+        .selection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 15px;
+        }
+        
+        .selection-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--light);
+        }
+        
+        .add-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--success);
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+        }
+        
+        .add-btn:hover {
+            transform: rotate(90deg) scale(1.1);
+        }
+        
+        /* Quantity */
+        .quantity-control {
             display: flex;
             align-items: center;
             gap: 10px;
         }
         
-        .summary-item {
+        .quantity-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--light);
             display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 0.95rem;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: var(--transition);
         }
         
-        .summary-total {
-            font-size: 1.5rem;
-            font-weight: 700;
+        .quantity-btn:hover {
+            background: var(--success);
+            color: var(--dark);
+        }
+        
+        .quantity-input {
+            width: 60px;
             text-align: center;
-            margin: 15px 0;
-        }
-        
-        /* Profit indicator */
-        .profit-indicator {
-            display: inline-block;
-            padding: 3px 8px;
+            background: transparent;
+            border: 1px solid var(--glass-border);
             border-radius: 10px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-left: 5px;
-        }
-        
-        .profit-positive {
-            background: rgba(39, 174, 96, 0.2);
-            color: #059669;
-        }
-        
-        .profit-negative {
-            background: rgba(231, 76, 60, 0.2);
-            color: #b91c1c;
-        }
-        
-        /* Empty state */
-        .empty-state {
-            text-align: center;
-            padding: 30px 20px;
-            color: var(--gray);
-        }
-        
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            color: #cbd5e1;
+            padding: 10px;
+            color: var(--light);
+            font-size: 1.1rem;
         }
         
         /* Floating action button */
         .fab {
             position: fixed;
-            bottom: 80px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            background: var(--secondary);
+            bottom: 30px;
+            right: 30px;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--success), #6ab190);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-            box-shadow: 0 6px 15px rgba(22, 160, 133, 0.4);
+            color: var(--dark);
+            font-size: 1.8rem;
+            box-shadow: 0 6px 20px rgba(135, 197, 164, 0.4);
             z-index: 80;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: var(--transition);
+            border: none;
         }
         
         .fab:hover {
-            transform: scale(1.1);
-            background: #14967b;
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 8px 25px rgba(135, 197, 164, 0.6);
         }
         
-        /* Product selection */
-        .product-selection {
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .empty-state p {
+            margin-bottom: 10px;
+        }
+        
+        /* Summary card */
+        .summary-card {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            margin-bottom: 25px;
+        }
+        
+        .summary-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
+            color: var(--success);
         }
         
-        .product-select {
-            flex: 1;
-        }
-        
-        .add-product-btn {
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            width: 36px;
-            height: 36px;
+        .summary-item {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 1.05rem;
+        }
+        
+        .summary-total {
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 20px 0;
+            color: var(--light);
         }
         
         /* Responsive */
-        @media (min-width: 768px) {
-            .container {
-                max-width: 700px;
-                margin: 0 auto;
-                padding-bottom: 20px;
+        @media (max-width: 768px) {
+            .selection-container {
+                flex-direction: column;
+            }
+            
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
             }
             
             .tabs-container {
-                top: 70px;
+                flex-wrap: wrap;
             }
             
-            .fab {
-                bottom: 30px;
+            .tab {
+                min-width: 50%;
+            padding: 12px 0;
+            font-size: 0.9rem;
+            flex: none;
+            width: 50%;
+            box-sizing: border-box;
+            display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .tab i {
+                margin-bottom: 5px;
+                font-size: 1.4rem;
             }
         }
     </style>
@@ -501,7 +604,7 @@
         <!-- Header -->
         <header>
             <div class="logo">
-                <i class="fas fa-cash-register"></i>
+                <i class="fas fa-store"></i>
                 <h1 class="logo-text">VENDAS OLIVEIRA</h1>
             </div>
         </header>
@@ -516,9 +619,13 @@
                 <i class="fas fa-shopping-cart"></i>
                 <span>Vendas</span>
             </div>
-            <div class="tab" data-tab="debtors">
+            <div class="tab" data-tab="clients">
                 <i class="fas fa-users"></i>
-                <span>Devedores</span>
+                <span>Clientes</span>
+            </div>
+            <div class="tab" data-tab="products">
+                <i class="fas fa-box"></i>
+                <span>Produtos</span>
             </div>
         </div>
         
@@ -527,28 +634,28 @@
             <!-- Stats -->
             <div class="stats-container">
                 <div class="stat-card">
-                    <div class="stat-icon icon-primary">
+                    <div class="stat-icon">
                         <i class="fas fa-money-bill-wave"></i>
                     </div>
                     <span class="stat-title">Total Devido</span>
                     <span class="stat-value" id="total-due">R$ 0,00</span>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon icon-warning">
+                    <div class="stat-icon">
                         <i class="fas fa-user-clock"></i>
                     </div>
-                    <span class="stat-title">Devedores Ativos</span>
-                    <span class="stat-value" id="active-debtors">0</span>
+                    <span class="stat-title">Clientes Ativos</span>
+                    <span class="stat-value" id="active-clients">0</span>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon icon-danger">
+                    <div class="stat-icon">
                         <i class="fas fa-exclamation-triangle"></i>
                     </div>
                     <span class="stat-title">Vencimentos Hoje</span>
                     <span class="stat-value" id="due-today">0</span>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon icon-success">
+                    <div class="stat-icon">
                         <i class="fas fa-chart-line"></i>
                     </div>
                     <span class="stat-title">Lucro Total</span>
@@ -575,22 +682,23 @@
                     <span id="paid-total">R$ 0,00</span>
                 </div>
                 
-                <div class="summary-total" id="all-total">
-                    R$ 0,00
+                <div class="summary-total">
+                    <span id="all-total">R$ 0,00</span>
                 </div>
             </div>
             
-            <!-- Recent Debtors -->
+            <!-- Recent Sales -->
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title">Últimas Vendas</h2>
-                    <i class="fas fa-history"></i>
+                    <h2 class="card-title">
+                        <i class="fas fa-history"></i> Últimas Vendas
+                    </h2>
                 </div>
                 <div class="table-container">
-                    <table class="table" id="recent-sales-table">
+                    <table class="table" id="recent-sales">
                         <thead>
                             <tr>
-                                <th>Devedor</th>
+                                <th>Cliente</th>
                                 <th>Produto</th>
                                 <th>Valor</th>
                                 <th>Status</th>
@@ -601,106 +709,95 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="empty-state" id="no-recent-sales">
+                <div class="empty-state" id="no-sales">
                     <i class="fas fa-shopping-cart"></i>
                     <p>Nenhuma venda registrada</p>
                     <p>Adicione vendas na aba "Vendas"</p>
-                </div>
-            </div>
-            
-            <!-- Top Products -->
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Produtos Mais Vendidos</h2>
-                    <i class="fas fa-star"></i>
-                </div>
-                <div class="table-container">
-                    <table class="table" id="top-products-table">
-                        <thead>
-                            <tr>
-                                <th>Produto</th>
-                                <th>Vendas</th>
-                                <th>Lucro</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Dinamicamente preenchido -->
-                        </tbody>
-                    </table>
-                </div>
-                <div class="empty-state" id="no-top-products">
-                    <i class="fas fa-box-open"></i>
-                    <p>Nenhum produto cadastrado</p>
-                    <p>Adicione produtos ao registrar vendas</p>
                 </div>
             </div>
         </div>
         
         <!-- Sales Tab -->
         <div id="sales" class="tab-content">
-            <!-- Add Sale Form -->
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title">Registrar Venda</h2>
-                    <i class="fas fa-file-invoice-dollar"></i>
+                    <h2 class="card-title">
+                        <i class="fas fa-file-invoice-dollar"></i> Registrar Nova Venda
+                    </h2>
                 </div>
-                <form id="add-sale-form">
-                    <div class="form-group">
-                        <label for="debtor-name">Nome do Devedor *</label>
-                        <input type="text" id="debtor-name" class="form-control" placeholder="Nome completo" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="debtor-phone">Telefone (opcional)</label>
-                        <input type="tel" id="debtor-phone" class="form-control" placeholder="(00) 00000-0000">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="product-selection">Produto Vendido *</label>
-                        <div class="product-selection">
-                            <select id="product-select" class="form-control product-select" required>
-                                <option value="">Selecione um produto</option>
-                                <!-- Dinamicamente preenchido -->
-                            </select>
-                            <button type="button" class="add-product-btn" id="add-product-btn">
+                
+                <!-- Selection Containers -->
+                <div class="selection-container">
+                    <div class="selection-group">
+                        <div class="selection-header">
+                            <h3>Selecionar Cliente</h3>
+                            <button class="add-btn" id="add-client-btn">
                                 <i class="fas fa-plus"></i>
                             </button>
                         </div>
+                        <select class="form-control" id="client-select">
+                            <option value="">Selecione um cliente</option>
+                            <!-- Dinamicamente preenchido -->
+                        </select>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="sale-amount">Valor da Venda (R$) *</label>
-                        <input type="number" id="sale-amount" class="form-control" placeholder="0.00" min="0" step="0.01" required>
+                    <div class="selection-group">
+                        <div class="selection-header">
+                            <h3>Selecionar Produto</h3>
+                            <button class="add-btn" id="add-product-btn">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <select class="form-control" id="product-select">
+                            <option value="">Selecione um produto</option>
+                            <!-- Dinamicamente preenchido -->
+                        </select>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="cost-amount">Custo do Produto (R$) *</label>
-                        <input type="number" id="cost-amount" class="form-control" placeholder="0.00" min="0" step="0.01" required>
+                </div>
+                
+                <!-- Quantity Control -->
+                <div class="form-group">
+                    <label>Quantidade</label>
+                    <div class="quantity-control">
+                        <button class="quantity-btn" id="minus-btn">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <input type="number" class="quantity-input" id="quantity-input" value="1" min="1">
+                        <button class="quantity-btn" id="plus-btn">
+                            <i class="fas fa-plus"></i>
+                        </button>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="due-date">Data de Vencimento *</label>
-                        <input type="date" id="due-date" class="form-control" required>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary btn-block">
-                        <i class="fas fa-save"></i> Registrar Venda
-                    </button>
-                </form>
+                </div>
+                
+                <!-- Sale Details -->
+                <div class="form-group">
+                    <label for="sale-amount">Valor Total (R$)</label>
+                    <input type="text" id="sale-amount" class="form-control" value="0,00" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label for="due-date">Data de Vencimento</label>
+                    <input type="date" id="due-date" class="form-control">
+                </div>
+                
+                <button class="btn btn-block" id="register-sale-btn">
+                    <i class="fas fa-save"></i> Registrar Venda
+                </button>
             </div>
             
             <!-- Sales List -->
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title">Histórico de Vendas</h2>
-                    <i class="fas fa-list"></i>
+                    <h2 class="card-title">
+                        <i class="fas fa-list"></i> Histórico de Vendas
+                    </h2>
                 </div>
                 <div class="table-container">
                     <table class="table" id="sales-table">
                         <thead>
                             <tr>
                                 <th>Data</th>
-                                <th>Devedor</th>
+                                <th>Cliente</th>
                                 <th>Produto</th>
                                 <th>Valor</th>
                                 <th>Status</th>
@@ -712,24 +809,51 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="empty-state" id="no-sales">
+                <div class="empty-state" id="empty-sales">
                     <i class="fas fa-file-invoice"></i>
                     <p>Nenhuma venda registrada</p>
-                    <p>Registre sua primeira venda usando o formulário acima</p>
+                    <p>Registre sua primeira venda</p>
                 </div>
             </div>
         </div>
         
-        <!-- Debtors Tab -->
-        <div id="debtors" class="tab-content">
-            <!-- Debtors List -->
+        <!-- Clients Tab -->
+        <div id="clients" class="tab-content">
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title">Lista de Devedores</h2>
-                    <i class="fas fa-users"></i>
+                    <h2 class="card-title">
+                        <i class="fas fa-user-plus"></i> Adicionar Novo Cliente
+                    </h2>
+                </div>
+                <div class="form-group">
+                    <label for="client-name">Nome Completo *</label>
+                    <input type="text" id="client-name" class="form-control" placeholder="Digite o nome completo" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="client-phone">Telefone *</label>
+                    <input type="tel" id="client-phone" class="form-control" placeholder="(00) 00000-0000" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="client-email">E-mail (opcional)</label>
+                    <input type="email" id="client-email" class="form-control" placeholder="email@exemplo.com">
+                </div>
+                
+                <button class="btn btn-block" id="save-client-btn">
+                    <i class="fas fa-save"></i> Salvar Cliente
+                </button>
+            </div>
+            
+            <!-- Clients List -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-users"></i> Lista de Clientes
+                    </h2>
                 </div>
                 <div class="table-container">
-                    <table class="table" id="debtors-table">
+                    <table class="table" id="clients-table">
                         <thead>
                             <tr>
                                 <th>Nome</th>
@@ -744,405 +868,427 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="empty-state" id="no-debtors">
+                <div class="empty-state" id="empty-clients">
                     <i class="fas fa-user-friends"></i>
-                    <p>Nenhum devedor cadastrado</p>
-                    <p>Os devedores serão cadastrados automaticamente ao registrar vendas</p>
+                    <p>Nenhum cliente cadastrado</p>
+                    <p>Adicione seu primeiro cliente</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Products Tab -->
+        <div id="products" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-box"></i> Adicionar Novo Produto
+                    </h2>
+                </div>
+                <div class="form-group">
+                    <label for="product-name">Nome do Produto *</label>
+                    <input type="text" id="product-name" class="form-control" placeholder="Digite o nome do produto" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="product-price">Preço de Venda (R$) *</label>
+                    <input type="number" id="product-price" class="form-control" placeholder="0.00" min="0" step="0.01" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="product-cost">Custo (R$) *</label>
+                    <input type="number" id="product-cost" class="form-control" placeholder="0.00" min="0" step="0.01" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="product-description">Descrição (opcional)</label>
+                    <textarea id="product-description" class="form-control" rows="2" placeholder="Detalhes do produto..."></textarea>
+                </div>
+                
+                <button class="btn btn-block" id="save-product-btn">
+                    <i class="fas fa-save"></i> Salvar Produto
+                </button>
+            </div>
+            
+            <!-- Products List -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-boxes"></i> Lista de Produtos
+                    </h2>
+                </div>
+                <div class="table-container">
+                    <table class="table" id="products-table">
+                        <thead>
+                            <tr>
+                                <th>Produto</th>
+                                <th>Custo</th>
+                                <th>Venda</th>
+                                <th>Lucro</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dinamicamente preenchido -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="empty-state" id="empty-products">
+                    <i class="fas fa-box-open"></i>
+                    <p>Nenhum produto cadastrado</p>
+                    <p>Adicione seu primeiro produto</p>
                 </div>
             </div>
         </div>
         
         <!-- Floating Action Button -->
-        <div class="fab" id="fab-button">
+        <div class="fab" id="fab">
             <i class="fas fa-plus"></i>
         </div>
     </div>
     
     <script>
-        // Sistema de armazenamento
-        const STORAGE_KEY_SALES = 'vendasOliveira_sales';
-        const STORAGE_KEY_DEBTORS = 'vendasOliveira_debtors';
-        const STORAGE_KEY_PRODUCTS = 'vendasOliveira_products';
-        
-        // Estado da aplicação
-        let sales = [];
-        let debtors = [];
+        // Armazenamento de dados
+        let clients = [];
         let products = [];
+        let sales = [];
+        
+        // Referências do DOM
+        const clientSelect = document.getElementById('client-select');
+        const productSelect = document.getElementById('product-select');
+        const quantityInput = document.getElementById('quantity-input');
+        const saleAmount = document.getElementById('sale-amount');
+        const dueDate = document.getElementById('due-date');
+        const registerSaleBtn = document.getElementById('register-sale-btn');
+        
+        // Elementos de lista
+        const recentSalesTable = document.getElementById('recent-sales').querySelector('tbody');
+        const salesTable = document.getElementById('sales-table').querySelector('tbody');
+        const clientsTable = document.getElementById('clients-table').querySelector('tbody');
+        const productsTable = document.getElementById('products-table').querySelector('tbody');
+        
+        // Elementos de estado vazio
+        const noSales = document.getElementById('no-sales');
+        const emptySales = document.getElementById('empty-sales');
+        const emptyClients = document.getElementById('empty-clients');
+        const emptyProducts = document.getElementById('empty-products');
         
         // Inicialização
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', () => {
             // Carregar dados do localStorage
             loadData();
             
-            // Atualizar dashboard
-            updateDashboard();
+            // Configurar a data de vencimento padrão
+            const today = new Date();
+            dueDate.value = today.toISOString().split('T')[0];
             
             // Configurar navegação por abas
             setupTabs();
             
-            // Configurar formulários
-            setupForms();
-            
-            // Configurar botão flutuante
-            setupFloatingButton();
+            // Atualizar selects
+            updateClientSelect();
+            updateProductSelect();
             
             // Atualizar listas
+            updateRecentSales();
             updateSalesList();
-            updateDebtorsList();
-            updateProductSelect();
+            updateClientsList();
+            updateProductsList();
+            
+            // Atualizar dashboard
+            updateDashboard();
+            
+            // Configurar eventos
+            setupEventListeners();
         });
         
         // Carregar dados do localStorage
         function loadData() {
-            // Carregar vendas
-            const savedSales = localStorage.getItem(STORAGE_KEY_SALES);
-            if (savedSales) {
-                sales = JSON.parse(savedSales);
-            }
+            const savedClients = localStorage.getItem('vendasOliveira_clients');
+            const savedProducts = localStorage.getItem('vendasOliveira_products');
+            const savedSales = localStorage.getItem('vendasOliveira_sales');
             
-            // Carregar devedores
-            const savedDebtors = localStorage.getItem(STORAGE_KEY_DEBTORS);
-            if (savedDebtors) {
-                debtors = JSON.parse(savedDebtors);
-            }
-            
-            // Carregar produtos
-            const savedProducts = localStorage.getItem(STORAGE_KEY_PRODUCTS);
-            if (savedProducts) {
-                products = JSON.parse(savedProducts);
-            } else {
-                // Produtos iniciais
-                products = [
-                    { id: 1, name: "Camiseta Básica", cost: 15.00, price: 35.00 },
-                    { id: 2, name: "Calça Jeans", cost: 45.00, price: 99.90 },
-                    { id: 3, name: "Tênis Esportivo", cost: 80.00, price: 179.90 },
-                    { id: 4, name: "Vestido Floral", cost: 35.00, price: 79.90 }
-                ];
-                localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(products));
-            }
+            if (savedClients) clients = JSON.parse(savedClients);
+            if (savedProducts) products = JSON.parse(savedProducts);
+            if (savedSales) sales = JSON.parse(savedSales);
         }
         
         // Salvar dados no localStorage
         function saveData() {
-            localStorage.setItem(STORAGE_KEY_SALES, JSON.stringify(sales));
-            localStorage.setItem(STORAGE_KEY_DEBTORS, JSON.stringify(debtors));
-            localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(products));
+            localStorage.setItem('vendasOliveira_clients', JSON.stringify(clients));
+            localStorage.setItem('vendasOliveira_products', JSON.stringify(products));
+            localStorage.setItem('vendasOliveira_sales', JSON.stringify(sales));
         }
         
         // Configurar navegação por abas
         function setupTabs() {
             const tabs = document.querySelectorAll('.tab');
-            const tabContents = document.querySelectorAll('.tab-content');
-            
             tabs.forEach(tab => {
                 tab.addEventListener('click', () => {
-                    // Remover classe ativa de todas as abas e conteúdos
+                    // Remover classe ativa de todas as abas
                     tabs.forEach(t => t.classList.remove('active'));
-                    tabContents.forEach(c => c.classList.remove('active'));
                     
                     // Adicionar classe ativa à aba clicada
                     tab.classList.add('active');
                     
-                    // Mostrar o conteúdo correspondente
+                    // Esconder todos os conteúdos de abas
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    // Mostrar o conteúdo da aba selecionada
                     const tabId = tab.getAttribute('data-tab');
                     document.getElementById(tabId).classList.add('active');
-                    
-                    // Atualizar botão flutuante
-                    updateFloatingButton(tabId);
                 });
             });
         }
         
-        // Atualizar botão flutuante
-        function updateFloatingButton(activeTab) {
-            const fab = document.getElementById('fab-button');
-            
-            if (activeTab === 'sales') {
-                fab.innerHTML = '<i class="fas fa-cart-plus"></i>';
-                fab.onclick = () => {
-                    document.getElementById('debtor-name').focus();
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                };
-            } else if (activeTab === 'debtors') {
-                fab.innerHTML = '<i class="fas fa-user-plus"></i>';
-                fab.onclick = () => {
-                    // Não há formulário para devedores, então vamos para vendas
-                    document.querySelector('.tab[data-tab="sales"]').click();
-                };
-            } else {
-                fab.innerHTML = '<i class="fas fa-plus"></i>';
-                fab.onclick = () => {
-                    // Alternar para a aba de vendas
-                    document.querySelector('.tab[data-tab="sales"]').click();
-                };
-            }
+        // Atualizar select de clientes
+        function updateClientSelect() {
+            clientSelect.innerHTML = '<option value="">Selecione um cliente</option>';
+            clients.forEach(client => {
+                const option = document.createElement('option');
+                option.value = client.id;
+                option.textContent = client.name;
+                clientSelect.appendChild(option);
+            });
         }
         
-        // Configurar botão flutuante
-        function setupFloatingButton() {
-            const activeTab = document.querySelector('.tab.active').getAttribute('data-tab');
-            updateFloatingButton(activeTab);
-        }
-        
-        // Atualizar seleção de produtos
+        // Atualizar select de produtos
         function updateProductSelect() {
-            const select = document.getElementById('product-select');
-            select.innerHTML = '<option value="">Selecione um produto</option>';
-            
+            productSelect.innerHTML = '<option value="">Selecione um produto</option>';
             products.forEach(product => {
                 const option = document.createElement('option');
                 option.value = product.id;
-                option.textContent = product.name;
-                select.appendChild(option);
-            });
-            
-            // Adicionar evento para preencher valores ao selecionar produto
-            select.addEventListener('change', function() {
-                const productId = parseInt(this.value);
-                if (productId) {
-                    const product = products.find(p => p.id === productId);
-                    if (product) {
-                        document.getElementById('sale-amount').value = product.price.toFixed(2);
-                        document.getElementById('cost-amount').value = product.cost.toFixed(2);
-                    }
-                }
-            });
-            
-            // Botão para adicionar novo produto
-            document.getElementById('add-product-btn').addEventListener('click', function() {
-                const productName = prompt("Digite o nome do novo produto:");
-                if (productName && productName.trim() !== "") {
-                    const newProduct = {
-                        id: Date.now(),
-                        name: productName.trim(),
-                        cost: 0,
-                        price: 0
-                    };
-                    
-                    products.push(newProduct);
-                    saveData();
-                    updateProductSelect();
-                    
-                    // Selecionar o novo produto
-                    document.getElementById('product-select').value = newProduct.id;
-                    
-                    // Solicitar valores
-                    setTimeout(() => {
-                        const cost = parseFloat(prompt("Digite o custo do produto:"));
-                        const price = parseFloat(prompt("Digite o preço de venda:"));
-                        
-                        if (!isNaN(cost) && !isNaN(price)) {
-                            newProduct.cost = cost;
-                            newProduct.price = price;
-                            saveData();
-                            
-                            // Atualizar campos
-                            document.getElementById('sale-amount').value = price.toFixed(2);
-                            document.getElementById('cost-amount').value = cost.toFixed(2);
-                        }
-                    }, 100);
-                }
+                option.textContent = `${product.name} - R$ ${product.price.toFixed(2)}`;
+                productSelect.appendChild(option);
             });
         }
         
-        // Configurar formulários
-        function setupForms() {
-            // Formulário de vendas
-            document.getElementById('add-sale-form').addEventListener('submit', function(e) {
-                e.preventDefault();
+        // Atualizar lista de vendas recentes
+        function updateRecentSales() {
+            recentSalesTable.innerHTML = '';
+            
+            if (sales.length === 0) {
+                noSales.style.display = 'block';
+                return;
+            }
+            
+            noSales.style.display = 'none';
+            
+            // Pegar as últimas 5 vendas
+            const recentSales = [...sales].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+            
+            recentSales.forEach(sale => {
+                const client = clients.find(c => c.id === sale.clientId);
+                const product = products.find(p => p.id === sale.productId);
                 
-                // Obter valores do formulário
-                const debtorName = document.getElementById('debtor-name').value.trim();
-                const debtorPhone = document.getElementById('debtor-phone').value.trim();
-                const productId = parseInt(document.getElementById('product-select').value);
-                const saleAmount = parseFloat(document.getElementById('sale-amount').value);
-                const costAmount = parseFloat(document.getElementById('cost-amount').value);
-                const dueDate = document.getElementById('due-date').value;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${client ? client.name : 'Cliente não encontrado'}</td>
+                    <td>${product ? product.name : 'Produto não encontrado'}</td>
+                    <td>R$ ${sale.total.toFixed(2)}</td>
+                    <td><span class="status ${sale.status}">${getStatusText(sale.status)}</span></td>
+                `;
                 
-                // Validar dados
-                if (!debtorName || isNaN(productId) || isNaN(saleAmount) || isNaN(costAmount) || !dueDate) {
-                    alert('Por favor, preencha todos os campos obrigatórios corretamente.');
-                    return;
-                }
-                
-                // Encontrar ou criar devedor
-                let debtor = debtors.find(d => d.name.toLowerCase() === debtorName.toLowerCase());
-                if (!debtor) {
-                    debtor = {
-                        id: Date.now(),
-                        name: debtorName,
-                        phone: debtorPhone,
-                        totalDebt: 0,
-                        sales: []
-                    };
-                    debtors.push(debtor);
-                }
-                
-                // Calcular lucro
-                const profit = saleAmount - costAmount;
-                
-                // Criar nova venda
-                const product = products.find(p => p.id === productId);
-                const newSale = {
-                    id: Date.now(),
-                    debtorId: debtor.id,
-                    productId: productId,
-                    productName: product ? product.name : "Produto Desconhecido",
-                    amount: saleAmount,
-                    cost: costAmount,
-                    profit: profit,
-                    dueDate: dueDate,
-                    status: 'pending',
-                    createdAt: new Date().toISOString()
-                };
-                
-                // Adicionar à lista de vendas
-                sales.push(newSale);
-                
-                // Atualizar devedor
-                debtor.totalDebt += saleAmount;
-                debtor.sales.push(newSale.id);
-                
-                // Salvar dados
-                saveData();
-                
-                // Atualizar listas e dashboard
-                updateSalesList();
-                updateDebtorsList();
-                updateDashboard();
-                
-                // Limpar formulário
-                this.reset();
-                document.getElementById('product-select').value = "";
-                
-                // Mostrar mensagem de sucesso
-                alert('Venda registrada com sucesso!');
+                recentSalesTable.appendChild(row);
             });
         }
         
         // Atualizar lista de vendas
         function updateSalesList() {
-            const tableBody = document.querySelector('#sales-table tbody');
-            const emptyState = document.getElementById('no-sales');
-            
-            // Limpar tabela
-            tableBody.innerHTML = '';
+            salesTable.innerHTML = '';
             
             if (sales.length === 0) {
-                emptyState.style.display = 'block';
+                emptySales.style.display = 'block';
                 return;
             }
             
-            emptyState.style.display = 'none';
+            emptySales.style.display = 'none';
             
-            // Adicionar vendas à tabela (ordenadas por data)
-            const sortedSales = [...sales].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-            
-            sortedSales.forEach(sale => {
-                const saleDate = new Date(sale.createdAt);
-                const formattedDate = saleDate.toLocaleDateString('pt-BR');
-                
-                // Encontrar devedor
-                const debtor = debtors.find(d => d.id === sale.debtorId);
-                
-                // Determinar status
-                let statusClass = 'pending';
-                let statusText = 'Pendente';
-                const dueDate = new Date(sale.dueDate);
-                
-                if (sale.status === 'paid') {
-                    statusClass = 'paid';
-                    statusText = 'Pago';
-                } else if (sale.status === 'overdue' || new Date() > dueDate) {
-                    statusClass = 'overdue';
-                    statusText = 'Atrasado';
-                }
+            sales.forEach(sale => {
+                const client = clients.find(c => c.id === sale.clientId);
+                const product = products.find(p => p.id === sale.productId);
+                const saleDate = new Date(sale.date);
+                const formattedDate = `${saleDate.getDate()}/${saleDate.getMonth() + 1}/${saleDate.getFullYear()}`;
                 
                 const row = document.createElement('tr');
-                row.className = 'sale-row';
                 row.innerHTML = `
                     <td>${formattedDate}</td>
-                    <td>${debtor ? debtor.name : 'Desconhecido'}</td>
-                    <td>${sale.productName}</td>
-                    <td>R$ ${sale.amount.toFixed(2)}</td>
-                    <td><span class="status ${statusClass}">${statusText}</span></td>
+                    <td>${client ? client.name : 'Cliente não encontrado'}</td>
+                    <td>${product ? product.name : 'Produto não encontrado'}</td>
+                    <td>R$ ${sale.total.toFixed(2)}</td>
+                    <td><span class="status ${sale.status}">${getStatusText(sale.status)}</span></td>
                     <td>
-                        <button class="action-btn btn-paid" title="Marcar como pago" data-id="${sale.id}">
-                            <i class="fas fa-check-circle"></i>
+                        <button class="action-btn" title="Marcar como pago" data-id="${sale.id}">
+                            <i class="fas fa-check"></i>
                         </button>
-                        <button class="action-btn btn-delete" title="Excluir" data-id="${sale.id}">
+                        <button class="action-btn" title="Excluir" data-id="${sale.id}">
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </td>
                 `;
                 
-                tableBody.appendChild(row);
+                salesTable.appendChild(row);
             });
             
-            // Adicionar event listeners para botões de ação
-            document.querySelectorAll('.btn-paid').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const saleId = parseInt(this.getAttribute('data-id'));
-                    markSaleAsPaid(saleId);
-                });
-            });
-            
-            document.querySelectorAll('.btn-delete').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const saleId = parseInt(this.getAttribute('data-id'));
-                    deleteSale(saleId);
+            // Adicionar eventos aos botões de ação
+            document.querySelectorAll('#sales-table .action-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const saleId = btn.getAttribute('data-id');
+                    const saleIndex = sales.findIndex(s => s.id === saleId);
+                    
+                    if (saleIndex !== -1) {
+                        if (btn.querySelector('.fa-check')) {
+                            // Marcar como pago
+                            sales[saleIndex].status = 'paid';
+                            saveData();
+                            updateSalesList();
+                            updateRecentSales();
+                            updateDashboard();
+                            alert('Venda marcada como paga!');
+                        } else if (btn.querySelector('.fa-trash-alt')) {
+                            // Excluir venda
+                            if (confirm('Tem certeza que deseja excluir esta venda?')) {
+                                sales.splice(saleIndex, 1);
+                                saveData();
+                                updateSalesList();
+                                updateRecentSales();
+                                updateDashboard();
+                                alert('Venda excluída com sucesso!');
+                            }
+                        }
+                    }
                 });
             });
         }
         
-        // Atualizar lista de devedores
-        function updateDebtorsList() {
-            const tableBody = document.querySelector('#debtors-table tbody');
-            const emptyState = document.getElementById('no-debtors');
+        // Atualizar lista de clientes
+        function updateClientsList() {
+            clientsTable.innerHTML = '';
             
-            // Limpar tabela
-            tableBody.innerHTML = '';
-            
-            if (debtors.length === 0) {
-                emptyState.style.display = 'block';
+            if (clients.length === 0) {
+                emptyClients.style.display = 'block';
                 return;
             }
             
-            emptyState.style.display = 'none';
+            emptyClients.style.display = 'none';
             
-            // Adicionar devedores à tabela
-            debtors.forEach(debtor => {
-                // Verificar se há vendas pendentes
-                const hasPendingSales = sales.some(s => 
-                    s.debtorId === debtor.id && 
-                    (s.status === 'pending' || s.status === 'overdue')
-                );
-                
-                const statusClass = hasPendingSales ? 'pending' : 'paid';
-                const statusText = hasPendingSales ? 'Pendente' : 'Quitado';
+            clients.forEach(client => {
+                // Calcular total devido pelo cliente
+                const clientSales = sales.filter(s => s.clientId === client.id && s.status !== 'paid');
+                const totalDue = clientSales.reduce((sum, sale) => sum + sale.total, 0);
                 
                 const row = document.createElement('tr');
-                row.className = 'debtor-row';
                 row.innerHTML = `
-                    <td>${debtor.name}</td>
-                    <td>${debtor.phone || '---'}</td>
-                    <td>R$ ${debtor.totalDebt.toFixed(2)}</td>
-                    <td><span class="status ${statusClass}">${statusText}</span></td>
+                    <td>${client.name}</td>
+                    <td>${client.phone}</td>
+                    <td>R$ ${totalDue.toFixed(2)}</td>
+                    <td><span class="status ${totalDue > 0 ? 'pending' : 'paid'}">${totalDue > 0 ? 'Pendente' : 'Quitado'}</span></td>
                     <td>
-                        <button class="action-btn btn-delete" title="Excluir" data-id="${debtor.id}">
+                        <button class="action-btn" title="Editar" data-id="${client.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn" title="Excluir" data-id="${client.id}">
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </td>
                 `;
                 
-                tableBody.appendChild(row);
+                clientsTable.appendChild(row);
             });
             
-            // Adicionar event listeners para botões de ação
-            document.querySelectorAll('.btn-delete').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const debtorId = parseInt(this.getAttribute('data-id'));
-                    deleteDebtor(debtorId);
+            // Adicionar eventos aos botões de ação
+            document.querySelectorAll('#clients-table .action-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const clientId = btn.getAttribute('data-id');
+                    const clientIndex = clients.findIndex(c => c.id === clientId);
+                    
+                    if (clientIndex !== -1) {
+                        if (btn.querySelector('.fa-edit')) {
+                            // Editar cliente (simplificado)
+                            const client = clients[clientIndex];
+                            document.getElementById('client-name').value = client.name;
+                            document.getElementById('client-phone').value = client.phone;
+                            document.getElementById('client-email').value = client.email || '';
+                            
+                            // Rolar para o topo do formulário
+                            document.getElementById('clients').scrollTo(0, 0);
+                        } else if (btn.querySelector('.fa-trash-alt')) {
+                            // Excluir cliente
+                            if (confirm('Tem certeza que deseja excluir este cliente?')) {
+                                clients.splice(clientIndex, 1);
+                                saveData();
+                                updateClientsList();
+                                updateClientSelect();
+                                alert('Cliente excluído com sucesso!');
+                            }
+                        }
+                    }
+                });
+            });
+        }
+        
+        // Atualizar lista de produtos
+        function updateProductsList() {
+            productsTable.innerHTML = '';
+            
+            if (products.length === 0) {
+                emptyProducts.style.display = 'block';
+                return;
+            }
+            
+            emptyProducts.style.display = 'none';
+            
+            products.forEach(product => {
+                const profit = product.price - product.cost;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${product.name}</td>
+                    <td>R$ ${product.cost.toFixed(2)}</td>
+                    <td>R$ ${product.price.toFixed(2)}</td>
+                    <td>R$ ${profit.toFixed(2)}</td>
+                    <td>
+                        <button class="action-btn" title="Editar" data-id="${product.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn" title="Excluir" data-id="${product.id}">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                `;
+                
+                productsTable.appendChild(row);
+            });
+            
+            // Adicionar eventos aos botões de ação
+            document.querySelectorAll('#products-table .action-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const productId = btn.getAttribute('data-id');
+                    const productIndex = products.findIndex(p => p.id === productId);
+                    
+                    if (productIndex !== -1) {
+                        if (btn.querySelector('.fa-edit')) {
+                            // Editar produto (simplificado)
+                            const product = products[productIndex];
+                            document.getElementById('product-name').value = product.name;
+                            document.getElementById('product-price').value = product.price;
+                            document.getElementById('product-cost').value = product.cost;
+                            document.getElementById('product-description').value = product.description || '';
+                            
+                            // Rolar para o topo do formulário
+                            document.getElementById('products').scrollTo(0, 0);
+                        } else if (btn.querySelector('.fa-trash-alt')) {
+                            // Excluir produto
+                            if (confirm('Tem certeza que deseja excluir este produto?')) {
+                                products.splice(productIndex, 1);
+                                saveData();
+                                updateProductsList();
+                                updateProductSelect();
+                                alert('Produto excluído com sucesso!');
+                            }
+                        }
+                    }
                 });
             });
         }
@@ -1151,34 +1297,31 @@
         function updateDashboard() {
             // Calcular estatísticas
             const pendingSales = sales.filter(s => s.status === 'pending');
+            const overdueSales = sales.filter(s => s.status === 'overdue');
             const paidSales = sales.filter(s => s.status === 'paid');
-            const overdueSales = sales.filter(s => s.status === 'overdue' || (s.status === 'pending' && new Date() > new Date(s.dueDate)));
             
-            const totalDue = sales
-                .filter(s => s.status !== 'paid')
-                .reduce((sum, sale) => sum + sale.amount, 0);
-                
-            const pendingTotal = pendingSales.reduce((sum, sale) => sum + sale.amount, 0);
-            const paidTotal = paidSales.reduce((sum, sale) => sum + sale.amount, 0);
-            const overdueTotal = overdueSales.reduce((sum, sale) => sum + sale.amount, 0);
+            const totalDue = sales.filter(s => s.status !== 'paid').reduce((sum, sale) => sum + sale.total, 0);
+            const pendingTotal = pendingSales.reduce((sum, sale) => sum + sale.total, 0);
+            const overdueTotal = overdueSales.reduce((sum, sale) => sum + sale.total, 0);
+            const paidTotal = paidSales.reduce((sum, sale) => sum + sale.total, 0);
             
-            const totalProfit = sales
-                .filter(s => s.status === 'paid')
-                .reduce((sum, sale) => sum + sale.profit, 0);
+            // Atualizar valores na dashboard
+            document.getElementById('total-due').textContent = `R$ ${totalDue.toFixed(2)}`;
+            document.getElementById('active-clients').textContent = clients.filter(c => 
+                sales.some(s => s.clientId === c.id && s.status !== 'paid')
+            ).length;
             
             // Contar vencimentos para hoje
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const dueToday = sales.filter(s => {
-                const dueDate = new Date(s.dueDate);
-                dueDate.setHours(0, 0, 0, 0);
-                return s.status === 'pending' && dueDate.getTime() === today.getTime();
-            }).length;
-            
-            // Atualizar estatísticas
-            document.getElementById('total-due').textContent = `R$ ${totalDue.toFixed(2)}`;
-            document.getElementById('active-debtors').textContent = debtors.filter(d => d.totalDebt > 0).length;
+            const today = new Date().toISOString().split('T')[0];
+            const dueToday = sales.filter(s => s.dueDate === today && s.status === 'pending').length;
             document.getElementById('due-today').textContent = dueToday;
+            
+            // Calcular lucro total (simplificado)
+            const totalProfit = paidSales.reduce((sum, sale) => {
+                const product = products.find(p => p.id === sale.productId);
+                return sum + (sale.total - (product ? product.cost * sale.quantity : 0));
+            }, 0);
+            
             document.getElementById('total-profit').textContent = `R$ ${totalProfit.toFixed(2)}`;
             
             // Atualizar resumo financeiro
@@ -1187,178 +1330,204 @@
             document.getElementById('paid-total').textContent = `R$ ${paidTotal.toFixed(2)}`;
             document.getElementById('all-total').textContent = `R$ ${totalDue.toFixed(2)}`;
             
-            // Atualizar lista de últimas vendas
+            // Atualizar listas
             updateRecentSales();
-            
-            // Atualizar lista de produtos mais vendidos
-            updateTopProducts();
         }
         
-        // Atualizar lista de últimas vendas
-        function updateRecentSales() {
-            const tableBody = document.querySelector('#recent-sales-table tbody');
-            const emptyState = document.getElementById('no-recent-sales');
+        // Configurar eventos
+        function setupEventListeners() {
+            // Controle de quantidade
+            document.getElementById('minus-btn').addEventListener('click', () => {
+                const quantity = parseInt(quantityInput.value);
+                if (quantity > 1) {
+                    quantityInput.value = quantity - 1;
+                    updateSaleAmount();
+                }
+            });
             
-            // Limpar tabela
-            tableBody.innerHTML = '';
+            document.getElementById('plus-btn').addEventListener('click', () => {
+                const quantity = parseInt(quantityInput.value);
+                quantityInput.value = quantity + 1;
+                updateSaleAmount();
+            });
             
-            if (sales.length === 0) {
-                emptyState.style.display = 'block';
+            quantityInput.addEventListener('change', updateSaleAmount);
+            
+            // Atualizar valor total quando produto é selecionado
+            productSelect.addEventListener('change', updateSaleAmount);
+            
+            // Registrar venda
+            registerSaleBtn.addEventListener('click', registerSale);
+            
+            // Salvar cliente
+            document.getElementById('save-client-btn').addEventListener('click', saveClient);
+            
+            // Salvar produto
+            document.getElementById('save-product-btn').addEventListener('click', saveProduct);
+            
+            // Botão flutuante
+            document.getElementById('fab').addEventListener('click', () => {
+                // Alternar para a aba de vendas
+                document.querySelector('.tab[data-tab="sales"]').click();
+            });
+            
+            // Adicionar cliente
+            document.getElementById('add-client-btn').addEventListener('click', () => {
+                // Alternar para a aba de clientes
+                document.querySelector('.tab[data-tab="clients"]').click();
+            });
+            
+            // Adicionar produto
+            document.getElementById('add-product-btn').addEventListener('click', () => {
+                // Alternar para a aba de produtos
+                document.querySelector('.tab[data-tab="products"]').click();
+            });
+        }
+        
+        // Atualizar valor total da venda
+        function updateSaleAmount() {
+            const productId = productSelect.value;
+            const quantity = parseInt(quantityInput.value);
+            
+            if (productId) {
+                const product = products.find(p => p.id === productId);
+                if (product) {
+                    const total = product.price * quantity;
+                    saleAmount.value = `R$ ${total.toFixed(2)}`;
+                    return;
+                }
+            }
+            
+            saleAmount.value = 'R$ 0,00';
+        }
+        
+        // Registrar nova venda
+        function registerSale() {
+            const clientId = clientSelect.value;
+            const productId = productSelect.value;
+            const quantity = parseInt(quantityInput.value);
+            const dueDateValue = dueDate.value;
+            
+            if (!clientId || !productId || !quantity || !dueDateValue) {
+                alert('Por favor, preencha todos os campos obrigatórios!');
                 return;
             }
             
-            emptyState.style.display = 'none';
-            
-            // Ordenar vendas por data (mais recentes primeiro)
-            const recentSales = [...sales]
-                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                .slice(0, 5); // Limitar a 5 itens
-            
-            // Adicionar vendas à tabela
-            recentSales.forEach(sale => {
-                // Encontrar devedor
-                const debtor = debtors.find(d => d.id === sale.debtorId);
-                
-                // Determinar status
-                let statusClass = 'pending';
-                let statusText = 'Pendente';
-                const dueDate = new Date(sale.dueDate);
-                
-                if (sale.status === 'paid') {
-                    statusClass = 'paid';
-                    statusText = 'Pago';
-                } else if (sale.status === 'overdue' || new Date() > dueDate) {
-                    statusClass = 'overdue';
-                    statusText = 'Atrasado';
-                }
-                
-                const row = document.createElement('tr');
-                row.className = 'sale-row';
-                row.innerHTML = `
-                    <td>${debtor ? debtor.name : 'Desconhecido'}</td>
-                    <td>${sale.productName}</td>
-                    <td>R$ ${sale.amount.toFixed(2)}</td>
-                    <td><span class="status ${statusClass}">${statusText}</span></td>
-                `;
-                
-                tableBody.appendChild(row);
-            });
-        }
-        
-        // Atualizar lista de produtos mais vendidos
-        function updateTopProducts() {
-            const tableBody = document.querySelector('#top-products-table tbody');
-            const emptyState = document.getElementById('no-top-products');
-            
-            // Limpar tabela
-            tableBody.innerHTML = '';
-            
-            if (sales.length === 0) {
-                emptyState.style.display = 'block';
+            const product = products.find(p => p.id === productId);
+            if (!product) {
+                alert('Produto não encontrado!');
                 return;
             }
             
-            emptyState.style.display = 'none';
+            const total = product.price * quantity;
             
-            // Agrupar vendas por produto
-            const productSales = {};
+            // Criar nova venda
+            const newSale = {
+                id: Date.now().toString(),
+                clientId: clientId,
+                productId: productId,
+                quantity: quantity,
+                total: total,
+                dueDate: dueDateValue,
+                status: 'pending',
+                date: new Date().toISOString()
+            };
             
-            sales.forEach(sale => {
-                if (!productSales[sale.productId]) {
-                    productSales[sale.productId] = {
-                        name: sale.productName,
-                        count: 0,
-                        profit: 0
-                    };
-                }
-                
-                productSales[sale.productId].count++;
-                if (sale.status === 'paid') {
-                    productSales[sale.productId].profit += sale.profit;
-                }
-            });
+            sales.push(newSale);
+            saveData();
             
-            // Converter para array e ordenar por quantidade vendida
-            const topProducts = Object.values(productSales)
-                .sort((a, b) => b.count - a.count)
-                .slice(0, 5); // Limitar a 5 itens
+            // Atualizar interfaces
+            updateSalesList();
+            updateRecentSales();
+            updateDashboard();
             
-            // Adicionar produtos à tabela
-            topProducts.forEach(product => {
-                const row = document.createElement('tr');
-                row.className = 'product-row';
-                row.innerHTML = `
-                    <td>${product.name}</td>
-                    <td>${product.count}</td>
-                    <td>R$ ${product.profit.toFixed(2)}</td>
-                `;
-                
-                tableBody.appendChild(row);
-            });
+            // Limpar formulário
+            clientSelect.value = '';
+            productSelect.value = '';
+            quantityInput.value = 1;
+            saleAmount.value = 'R$ 0,00';
+            
+            alert('Venda registrada com sucesso!');
         }
         
-        // Marcar venda como paga
-        function markSaleAsPaid(id) {
-            const sale = sales.find(s => s.id === id);
-            if (sale) {
-                sale.status = 'paid';
-                
-                // Atualizar devedor
-                const debtor = debtors.find(d => d.id === sale.debtorId);
-                if (debtor) {
-                    debtor.totalDebt -= sale.amount;
-                }
-                
-                saveData();
-                updateSalesList();
-                updateDebtorsList();
-                updateDashboard();
-                alert('Venda marcada como paga!');
+        // Salvar cliente
+        function saveClient() {
+            const name = document.getElementById('client-name').value.trim();
+            const phone = document.getElementById('client-phone').value.trim();
+            const email = document.getElementById('client-email').value.trim();
+            
+            if (!name || !phone) {
+                alert('Por favor, preencha os campos obrigatórios!');
+                return;
             }
+            
+            // Criar novo cliente
+            const newClient = {
+                id: Date.now().toString(),
+                name: name,
+                phone: phone,
+                email: email
+            };
+            
+            clients.push(newClient);
+            saveData();
+            
+            // Atualizar interfaces
+            updateClientsList();
+            updateClientSelect();
+            
+            // Limpar formulário
+            document.getElementById('client-name').value = '';
+            document.getElementById('client-phone').value = '';
+            document.getElementById('client-email').value = '';
+            
+            alert('Cliente salvo com sucesso!');
         }
         
-        // Excluir venda
-        function deleteSale(id) {
-            if (confirm('Tem certeza que deseja excluir esta venda?')) {
-                const sale = sales.find(s => s.id === id);
-                if (sale) {
-                    // Atualizar devedor
-                    const debtor = debtors.find(d => d.id === sale.debtorId);
-                    if (debtor) {
-                        debtor.totalDebt -= sale.amount;
-                        debtor.sales = debtor.sales.filter(saleId => saleId !== id);
-                        
-                        // Remover devedor se não tiver mais dívidas
-                        if (debtor.totalDebt <= 0) {
-                            debtors = debtors.filter(d => d.id !== debtor.id);
-                        }
-                    }
-                    
-                    // Remover venda
-                    sales = sales.filter(s => s.id !== id);
-                    saveData();
-                    updateSalesList();
-                    updateDebtorsList();
-                    updateDashboard();
-                    alert('Venda excluída com sucesso!');
-                }
+        // Salvar produto
+        function saveProduct() {
+            const name = document.getElementById('product-name').value.trim();
+            const price = parseFloat(document.getElementById('product-price').value);
+            const cost = parseFloat(document.getElementById('product-cost').value);
+            const description = document.getElementById('product-description').value.trim();
+            
+            if (!name || isNaN(price) || isNaN(cost) || price <= 0 || cost <= 0) {
+                alert('Por favor, preencha os campos obrigatórios com valores válidos!');
+                return;
             }
+            
+            // Criar novo produto
+            const newProduct = {
+                id: Date.now().toString(),
+                name: name,
+                price: price,
+                cost: cost,
+                description: description
+            };
+            
+            products.push(newProduct);
+            saveData();
+            
+            // Atualizar interfaces
+            updateProductsList();
+            updateProductSelect();
+            
+            // Limpar formulário
+            document.getElementById('product-name').value = '';
+            document.getElementById('product-price').value = '';
+            document.getElementById('product-cost').value = '';
+            document.getElementById('product-description').value = '';
+            
+            alert('Produto salvo com sucesso!');
         }
         
-        // Excluir devedor
-        function deleteDebtor(id) {
-            if (confirm('Tem certeza que deseja excluir este devedor e todas as suas vendas?')) {
-                // Remover vendas do devedor
-                sales = sales.filter(s => s.debtorId !== id);
-                
-                // Remover devedor
-                debtors = debtors.filter(d => d.id !== id);
-                
-                saveData();
-                updateSalesList();
-                updateDebtorsList();
-                updateDashboard();
-                alert('Devedor excluído com sucesso!');
+        // Obter texto do status
+        function getStatusText(status) {
+            switch (status) {
+                case 'pending': return 'Pendente';
+                case 'paid': return 'Pago';
+                case 'overdue': return 'Atrasado';
+                default: return status;
             }
         }
     </script>
