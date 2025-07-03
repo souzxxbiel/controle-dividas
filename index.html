@@ -1,1726 +1,1365 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VENDA DO OLIVEIRA</title>
+    <title>VENDAS OLIVEIRA | Controle de Devedores</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #0a0a2a;
-            --secondary: #1a1a4a;
-            --accent: #00f7ff;
-            --accent2: #ff0055;
-            --text: #f0f0ff;
-            --card-bg: rgba(20, 15, 50, 0.85);
-            --success: #00ff9d;
-            --warning: #ffcc00;
-            --danger: #ff0066;
-            --notification: #ff0055;
+            --primary: #2c3e50;
+            --primary-light: #34495e;
+            --secondary: #16a085;
+            --accent: #3498db;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --gray: #95a5a6;
+            --card-bg: #ffffff;
+            --card-shadow: rgba(0, 0, 0, 0.08);
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Exo 2', sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: var(--text);
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            color: var(--dark);
             min-height: 100vh;
+            padding: 0;
             overflow-x: hidden;
-            position: relative;
-        }
-        
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 10% 20%, rgba(255, 0, 85, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(0, 247, 255, 0.1) 0%, transparent 20%);
-            z-index: -1;
-        }
-        
-        .glow {
-            text-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent);
+            line-height: 1.6;
         }
         
         .container {
             max-width: 100%;
-            padding: 20px;
             margin: 0 auto;
+            padding-bottom: 80px;
         }
         
-        /* Tela de Login */
-        .login-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            padding: 20px 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
             text-align: center;
         }
         
         .logo {
-            margin-bottom: 40px;
-            animation: float 3s ease-in-out infinite;
-        }
-        
-        .logo h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2.8rem;
-            font-weight: 900;
-            background: linear-gradient(90deg, var(--accent), var(--accent2));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 15px rgba(0, 247, 255, 0.5);
-            margin-bottom: 10px;
-            letter-spacing: 1px;
-        }
-        
-        .logo p {
-            color: var(--accent);
-            font-size: 1.3rem;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-        }
-        
-        .login-form {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 30px;
-            width: 100%;
-            max-width: 400px;
-            border: 1px solid rgba(0, 247, 255, 0.5);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            margin-bottom: 20px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .login-form::before {
-            content: "";
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(0, 247, 255, 0.1), transparent);
-            transform: rotate(45deg);
-            z-index: -1;
-        }
-        
-        .login-form h2 {
-            font-size: 1.7rem;
-            margin-bottom: 25px;
-            color: var(--accent);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            font-weight: 700;
-        }
-        
-        .form-group {
-            margin-bottom: 22px;
-            text-align: left;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 10px;
-            color: var(--accent);
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-        
-        .form-group input {
-            width: 100%;
-            padding: 16px;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 247, 255, 0.5);
-            background: rgba(10, 10, 30, 0.7);
-            color: var(--text);
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-        }
-        
-        .form-group input:focus {
-            border-color: var(--accent2);
-            box-shadow: 0 0 15px rgba(255, 0, 85, 0.5);
-            outline: none;
-        }
-        
-        .btn {
-            background: linear-gradient(90deg, var(--accent), var(--accent2));
-            color: var(--primary);
-            border: none;
-            padding: 16px 28px;
-            border-radius: 50px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1.1rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            width: 100%;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn::before {
-            content: "";
-            position: absolute;
-            top: -100%;
-            left: -100%;
-            width: 300%;
-            height: 300%;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transform: rotate(45deg);
-            transition: all 0.5s ease;
-        }
-        
-        .btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 247, 255, 0.5);
-        }
-        
-        .btn:hover::before {
-            top: 0;
-            left: 0;
-        }
-        
-        .login-options {
-            display: flex;
-            gap: 20px;
-            width: 100%;
-            max-width: 400px;
-        }
-        
-        .login-option-btn {
-            flex: 1;
-            background: rgba(20, 15, 50, 0.5);
-            border: 1px solid rgba(0, 247, 255, 0.3);
-            border-radius: 15px;
-            padding: 18px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.4s ease;
-        }
-        
-        .login-option-btn.active {
-            background: rgba(0, 247, 255, 0.2);
-            border-color: var(--accent);
-            box-shadow: 0 0 20px rgba(0, 247, 255, 0.4);
-            transform: translateY(-5px);
-        }
-        
-        .login-option-btn i {
-            font-size: 1.8rem;
-            color: var(--accent);
-        }
-        
-        .login-option-btn p {
-            font-size: 1rem;
-            margin-top: 8px;
-            font-weight: 600;
-        }
-        
-        .error-message {
-            color: var(--danger);
-            margin-top: 18px;
-            font-size: 1rem;
-            display: none;
-            text-align: center;
-            font-weight: 600;
-        }
-        
-        /* Painéis */
-        .admin-panel, .client-panel {
-            display: none;
-            min-height: 100vh;
-        }
-        
-        .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            background: var(--card-bg);
-            border-bottom: 1px solid rgba(0, 247, 255, 0.3);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
-        }
-        
-        .panel-header h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2rem;
-            font-weight: 700;
-            background: linear-gradient(90deg, var(--accent), var(--accent2));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: 1px;
-        }
-        
-        .logout-btn {
-            background: rgba(255, 0, 102, 0.2);
-            border: 1px solid var(--danger);
-            color: var(--text);
-            padding: 12px 24px;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
             gap: 10px;
-            font-weight: 600;
+            font-size: 1.6rem;
+            font-weight: 700;
         }
         
-        .logout-btn:hover {
-            background: rgba(255, 0, 102, 0.4);
-            box-shadow: 0 0 15px rgba(255, 0, 102, 0.4);
+        .logo i {
+            color: var(--secondary);
         }
         
-        .tabs {
+        .logo-text {
+            background: linear-gradient(to right, var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+        
+        /* Tabs Navigation */
+        .tabs-container {
             display: flex;
-            overflow-x: auto;
-            padding: 16px 20px;
-            gap: 12px;
-            background: rgba(10, 10, 30, 0.9);
-            border-bottom: 1px solid rgba(0, 247, 255, 0.3);
+            background: white;
+            position: sticky;
+            top: 80px;
+            z-index: 90;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
         
         .tab {
-            padding: 12px 24px;
-            background: rgba(20, 15, 50, 0.5);
-            border-radius: 50px;
+            flex: 1;
+            text-align: center;
+            padding: 15px 0;
+            font-weight: 500;
+            color: var(--gray);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
             cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.3s ease;
-            border: 1px solid transparent;
-            font-weight: 600;
+            background: white;
         }
         
         .tab.active {
-            background: rgba(0, 247, 255, 0.2);
-            border-color: var(--accent);
-            box-shadow: 0 0 15px rgba(0, 247, 255, 0.4);
+            color: var(--primary);
+            border-bottom: 3px solid var(--secondary);
         }
         
+        .tab i {
+            display: block;
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+        
+        /* Tab Content */
         .tab-content {
             display: none;
-            padding: 25px;
+            padding: 20px 15px;
+            animation: fadeIn 0.4s ease;
         }
         
         .tab-content.active {
             display: block;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        .card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 28px;
-            margin-bottom: 28px;
-            border: 1px solid rgba(0, 247, 255, 0.3);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .card::before {
-            content: "";
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255, 0, 85, 0.1), transparent);
-            transform: rotate(45deg);
-            z-index: -1;
-        }
-        
-        .card h2 {
-            color: var(--accent);
-            margin-bottom: 25px;
-            font-size: 1.7rem;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            font-weight: 700;
-        }
-        
-        .card h2 i {
-            font-size: 2rem;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 25px;
-            margin-top: 25px;
-        }
-        
-        .stat-card {
-            background: rgba(10, 10, 30, 0.7);
-            border-radius: 18px;
-            padding: 25px;
-            border: 1px solid rgba(0, 247, 255, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .stat-card::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 6px;
-            height: 100%;
-            background: linear-gradient(to bottom, var(--accent), var(--accent2));
-        }
-        
-        .stat-card h3 {
-            color: var(--accent);
-            margin-bottom: 18px;
-            font-size: 1.3rem;
-        }
-        
-        .stat-value {
-            font-size: 2.8rem;
-            font-weight: 800;
-            background: linear-gradient(90deg, var(--accent), var(--accent2));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 12px 0;
-        }
-        
-        .chart-container {
-            height: 320px;
-            margin-top: 25px;
-        }
-        
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-            margin-top: 25px;
-        }
-        
-        .product-card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            overflow: hidden;
-            border: 1px solid rgba(0, 247, 255, 0.3);
-            transition: all 0.4s ease;
-            position: relative;
-        }
-        
-        .product-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 35px rgba(0, 247, 255, 0.4);
-        }
-        
-        .product-image {
-            height: 200px;
-            background: linear-gradient(45deg, var(--secondary), var(--primary));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4.5rem;
-            color: var(--accent);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .product-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .product-image .placeholder {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.3);
-        }
-        
-        .product-info {
-            padding: 22px;
-        }
-        
-        .product-info h3 {
-            color: var(--accent);
-            margin-bottom: 12px;
-            font-size: 1.5rem;
-        }
-        
-        .product-price {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: var(--success);
-            margin: 15px 0;
-            text-shadow: 0 0 8px rgba(0, 255, 157, 0.5);
-        }
-        
-        .request-btn {
-            width: 100%;
-            margin-top: 18px;
-        }
-        
-        .table-container {
-            overflow-x: auto;
-            border-radius: 18px;
-            border: 1px solid rgba(0, 247, 255, 0.3);
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: rgba(10, 10, 30, 0.7);
-        }
-        
-        th, td {
-            padding: 16px;
-            text-align: left;
-            border-bottom: 1px solid rgba(0, 247, 255, 0.3);
-        }
-        
-        th {
-            background: rgba(20, 15, 50, 0.9);
-            color: var(--accent);
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-        
-        tr:hover {
-            background: rgba(0, 247, 255, 0.08);
-        }
-        
-        /* Notificação */
-        .notification-badge {
-            position: absolute;
-            top: -10px;
-            right: -10px;
-            background: var(--notification);
-            color: white;
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-            font-weight: bold;
-            box-shadow: 0 0 12px rgba(255, 0, 85, 0.6);
-            animation: pulse 2s infinite;
-            z-index: 10;
-        }
-        
-        .ai-suggestion {
-            background: rgba(0, 247, 255, 0.15);
-            border-left: 4px solid var(--accent);
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            font-style: italic;
-        }
-        
-        /* Animações */
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0px); }
         }
         
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(25px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
         
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 12px rgba(255, 0, 85, 0.6); }
-            50% { transform: scale(1.15); box-shadow: 0 0 20px rgba(255, 0, 85, 0.8); }
-            100% { transform: scale(1); box-shadow: 0 0 12px rgba(255, 0, 85, 0.6); }
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 4px 15px var(--card-shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: transform 0.3s;
         }
         
-        /* Responsividade */
-        @media (max-width: 768px) {
-            .logo h1 {
-                font-size: 2.2rem;
+        .card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        /* Stats */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: 0 4px 8px var(--card-shadow);
+            text-align: center;
+        }
+        
+        .stat-title {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+        
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-size: 1.2rem;
+        }
+        
+        .icon-primary {
+            background: rgba(44, 62, 80, 0.15);
+            color: var(--primary);
+        }
+        
+        .icon-success {
+            background: rgba(39, 174, 96, 0.15);
+            color: var(--success);
+        }
+        
+        .icon-warning {
+            background: rgba(243, 156, 18, 0.15);
+            color: var(--warning);
+        }
+        
+        .icon-danger {
+            background: rgba(231, 76, 60, 0.15);
+            color: var(--danger);
+        }
+        
+        /* Form */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 0.9rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: border-color 0.3s;
+            background: #f8fafc;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-light);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #219653;
+        }
+        
+        .btn-block {
+            width: 100%;
+        }
+        
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 500px;
+        }
+        
+        .table th {
+            background: #f1f5f9;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 2px solid #e2e8f0;
+            font-size: 0.9rem;
+            position: sticky;
+            top: 0;
+        }
+        
+        .table td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.9rem;
+        }
+        
+        .debtor-row:hover, .sale-row:hover {
+            background: #f8fafc;
+        }
+        
+        .status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        .status.pending {
+            background: rgba(243, 156, 18, 0.15);
+            color: #d97706;
+        }
+        
+        .status.paid {
+            background: rgba(39, 174, 96, 0.15);
+            color: #059669;
+        }
+        
+        .status.overdue {
+            background: rgba(231, 76, 60, 0.15);
+            color: #b91c1c;
+        }
+        
+        .action-btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 8px;
+            background: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+        
+        .action-btn:hover {
+            background: #f1f5f9;
+        }
+        
+        .btn-edit {
+            color: var(--primary);
+        }
+        
+        .btn-delete {
+            color: var(--danger);
+        }
+        
+        .btn-paid {
+            color: var(--success);
+        }
+        
+        /* Summary */
+        .summary-card {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(44, 62, 80, 0.25);
+        }
+        
+        .summary-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.95rem;
+        }
+        
+        .summary-total {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        /* Profit indicator */
+        .profit-indicator {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+        
+        .profit-positive {
+            background: rgba(39, 174, 96, 0.2);
+            color: #059669;
+        }
+        
+        .profit-negative {
+            background: rgba(231, 76, 60, 0.2);
+            color: #b91c1c;
+        }
+        
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--gray);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #cbd5e1;
+        }
+        
+        /* Floating action button */
+        .fab {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 6px 15px rgba(22, 160, 133, 0.4);
+            z-index: 80;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .fab:hover {
+            transform: scale(1.1);
+            background: #14967b;
+        }
+        
+        /* Product selection */
+        .product-selection {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .product-select {
+            flex: 1;
+        }
+        
+        .add-product-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        /* Responsive */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 700px;
+                margin: 0 auto;
+                padding-bottom: 20px;
             }
             
-            .panel-header h1 {
-                font-size: 1.6rem;
+            .tabs-container {
+                top: 70px;
             }
             
-            .stat-value {
-                font-size: 2.3rem;
-            }
-            
-            .login-options {
-                flex-direction: column;
-            }
-            
-            .products-grid {
-                grid-template-columns: 1fr;
+            .fab {
+                bottom: 30px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Tela de Login -->
-    <div class="login-screen" id="loginScreen">
-        <div class="logo">
-            <h1 class="glow">VENDA DO OLIVEIRA</h1>
-            <p>O MELHOR SISTEMA DE VENDAS DO UNIVERSO</p>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <i class="fas fa-cash-register"></i>
+                <h1 class="logo-text">VENDAS OLIVEIRA</h1>
+            </div>
+        </header>
+        
+        <!-- Tabs Navigation -->
+        <div class="tabs-container">
+            <div class="tab active" data-tab="dashboard">
+                <i class="fas fa-chart-pie"></i>
+                <span>Dashboard</span>
+            </div>
+            <div class="tab" data-tab="sales">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Vendas</span>
+            </div>
+            <div class="tab" data-tab="debtors">
+                <i class="fas fa-users"></i>
+                <span>Devedores</span>
+            </div>
         </div>
         
-        <div class="login-options">
-            <div class="login-option-btn" id="adminOption" onclick="setLoginType('admin')">
-                <i class="fas fa-user-shield"></i>
-                <p>Administrador</p>
-            </div>
-            
-            <div class="login-option-btn active" id="clientOption" onclick="setLoginType('client')">
-                <i class="fas fa-user"></i>
-                <p>Cliente</p>
-            </div>
-        </div>
-        
-        <div class="login-form" id="loginForm">
-            <h2><i class="fas fa-sign-in-alt"></i> Login Cliente</h2>
-            
-            <div class="form-group">
-                <label for="username">Usuário</label>
-                <input type="text" id="username" placeholder="Digite seu usuário">
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Senha</label>
-                <input type="password" id="password" placeholder="Digite sua senha">
-            </div>
-            
-            <button class="btn" onclick="login()"><i class="fas fa-unlock-alt"></i> Entrar</button>
-            
-            <div class="error-message" id="errorMessage">
-                Usuário ou senha incorretos. Tente novamente.
-            </div>
-        </div>
-    </div>
-    
-    <!-- Painel Administrativo -->
-    <div class="admin-panel" id="adminPanel">
-        <div class="panel-header">
-            <h1><i class="fas fa-user-shield"></i> PAINEL ADMINISTRATIVO</h1>
-            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
-        </div>
-        
-        <div class="tabs">
-            <div class="tab active" data-tab="dashboard">Dashboard</div>
-            <div class="tab" data-tab="products">Cadastrar Produtos</div>
-            <div class="tab" data-tab="clients">Cadastrar Clientes</div>
-            <div class="tab" data-tab="requests">Solicitações <span id="requestsBadge" class="notification-badge" style="display: none;"></span></div>
-            <div class="tab" data-tab="stats">Estatísticas</div>
-        </div>
-        
-        <div class="container">
-            <!-- Dashboard -->
-            <div class="tab-content active" id="dashboard">
-                <div class="card">
-                    <h2><i class="fas fa-tachometer-alt"></i> Visão Geral</h2>
-                    
-                    <div class="ai-suggestion">
-                        <i class="fas fa-robot"></i> Recomendação: Os produtos com maior margem de lucro estão com estoque baixo. Considere repor.
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <!-- Stats -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-icon icon-primary">
+                        <i class="fas fa-money-bill-wave"></i>
                     </div>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <h3>LUCRO TOTAL</h3>
-                            <div class="stat-value" id="totalProfit">R$ 0,00</div>
-                            <p id="profitTrend"><i class="fas fa-arrow-up" style="color: var(--success);"></i> 0% em relação ao mês anterior</p>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <h3>VENDAS DO MÊS</h3>
-                            <div class="stat-value" id="monthlySales">0</div>
-                            <p id="salesTrend"><i class="fas fa-arrow-up" style="color: var(--success);"></i> 0% em relação ao mês anterior</p>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <h3>CLIENTES ATIVOS</h3>
-                            <div class="stat-value" id="activeClients">0</div>
-                            <p id="clientsTrend"><i class="fas fa-arrow-up" style="color: var(--success);"></i> 0% em relação ao mês anterior</p>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <h3>SOLICITAÇÕES PENDENTES</h3>
-                            <div class="stat-value" id="pendingRequests">0</div>
-                            <p><i class="fas fa-exclamation-circle" style="color: var(--warning);"></i> Requerem atenção</p>
-                        </div>
+                    <span class="stat-title">Total Devido</span>
+                    <span class="stat-value" id="total-due">R$ 0,00</span>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-warning">
+                        <i class="fas fa-user-clock"></i>
                     </div>
+                    <span class="stat-title">Devedores Ativos</span>
+                    <span class="stat-value" id="active-debtors">0</span>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <span class="stat-title">Vencimentos Hoje</span>
+                    <span class="stat-value" id="due-today">0</span>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-success">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <span class="stat-title">Lucro Total</span>
+                    <span class="stat-value" id="total-profit">R$ 0,00</span>
+                </div>
+            </div>
+            
+            <!-- Summary Card -->
+            <div class="summary-card">
+                <h2 class="summary-title">
+                    <i class="fas fa-chart-pie"></i> Resumo Financeiro
+                </h2>
+                
+                <div class="summary-item">
+                    <span>Total Pendente:</span>
+                    <span id="pending-total">R$ 0,00</span>
+                </div>
+                <div class="summary-item">
+                    <span>Total Atrasado:</span>
+                    <span id="overdue-total">R$ 0,00</span>
+                </div>
+                <div class="summary-item">
+                    <span>Total Pago:</span>
+                    <span id="paid-total">R$ 0,00</span>
                 </div>
                 
-                <div class="card">
-                    <h2><i class="fas fa-chart-line"></i> Desempenho Mensal</h2>
-                    <div class="chart-container">
-                        <canvas id="monthlyChart"></canvas>
-                    </div>
+                <div class="summary-total" id="all-total">
+                    R$ 0,00
                 </div>
             </div>
             
-            <!-- Cadastrar Produtos -->
-            <div class="tab-content" id="products">
-                <div class="card">
-                    <h2><i class="fas fa-box"></i> Cadastrar Novo Produto</h2>
-                    
-                    <div class="ai-suggestion">
-                        <i class="fas fa-robot"></i> Dica: Use fotos de alta qualidade para aumentar as vendas em 25%.
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="productName">Nome do Produto</label>
-                        <input type="text" id="productName" placeholder="Nome do produto">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="productPrice">Preço (R$)</label>
-                        <input type="number" id="productPrice" placeholder="Preço" step="0.01">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="productImage">Foto do Produto (URL)</label>
-                        <input type="text" id="productImage" placeholder="URL da imagem">
-                        <small>Ou deixe em branco para usar ícone padrão</small>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="productDescription">Descrição</label>
-                        <textarea id="productDescription" rows="3" placeholder="Descrição do produto"></textarea>
-                    </div>
-                    
-                    <button class="btn" onclick="addProduct()"><i class="fas fa-plus"></i> Cadastrar Produto</button>
-                </div>
-                
-                <div class="card">
-                    <h2><i class="fas fa-list"></i> Produtos Cadastrados</h2>
-                    
-                    <div class="table-container">
-                        <table id="productsTable">
-                            <thead>
-                                <tr>
-                                    <th>Produto</th>
-                                    <th>Preço</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Produtos serão inseridos aqui via JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Cadastrar Clientes -->
-            <div class="tab-content" id="clients">
-                <div class="card">
-                    <h2><i class="fas fa-user-plus"></i> Cadastrar Novo Cliente</h2>
-                    
-                    <div class="ai-suggestion">
-                        <i class="fas fa-robot"></i> Clientes com login fácil têm 3x mais chance de retornar.
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="clientName">Nome Completo</label>
-                        <input type="text" id="clientName" placeholder="Nome completo">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="clientPhone">Telefone</label>
-                        <input type="tel" id="clientPhone" placeholder="Telefone">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="clientLogin">Login</label>
-                        <input type="text" id="clientLogin" placeholder="Login">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="clientPassword">Senha</label>
-                        <input type="password" id="clientPassword" placeholder="Senha">
-                    </div>
-                    
-                    <button class="btn" onclick="addClient()"><i class="fas fa-user-plus"></i> Cadastrar Cliente</button>
-                </div>
-                
-                <div class="card">
-                    <h2><i class="fas fa-users"></i> Clientes Cadastrados</h2>
-                    
-                    <div class="table-container">
-                        <table id="clientsTable">
-                            <thead>
-                                <tr>
-                                    <th>Nome</th>
-                                    <th>Telefone</th>
-                                    <th>Última Compra</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Clientes serão inseridos aqui via JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Solicitações -->
-            <div class="tab-content" id="requests">
-                <div class="card">
-                    <h2><i class="fas fa-shopping-cart"></i> Solicitações de Compra</h2>
-                    
-                    <div class="ai-suggestion">
-                        <i class="fas fa-robot"></i> Clientes que aguardam aprovação há mais de 24h têm 40% de chance de desistir.
-                    </div>
-                    
-                    <div class="table-container">
-                        <table id="requestsTable">
-                            <thead>
-                                <tr>
-                                    <th>Cliente</th>
-                                    <th>Produto</th>
-                                    <th>Quantidade</th>
-                                    <th>Valor Total</th>
-                                    <th>Data</th>
-                                    <th>Status</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Solicitações serão inseridas aqui via JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Estatísticas -->
-            <div class="tab-content" id="stats">
-                <div class="card">
-                    <h2><i class="fas fa-chart-pie"></i> Estatísticas de Vendas</h2>
-                    
-                    <div class="ai-suggestion">
-                        <i class="fas fa-robot"></i> Seus 5 principais clientes representam 60% do seu faturamento. Considere um programa de fidelidade.
-                    </div>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <h3>PRODUTO MAIS VENDIDO</h3>
-                            <p id="bestSellingProduct">-</p>
-                            <div class="stat-value" id="bestSellingQuantity">0 unidades</div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <h3>CLIENTE QUE MAIS COMPRA</h3>
-                            <p id="bestCustomer">-</p>
-                            <div class="stat-value" id="bestCustomerValue">R$ 0,00</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <h2><i class="fas fa-shopping-basket"></i> Desempenho por Produto</h2>
-                    <div class="chart-container">
-                        <canvas id="productsChart"></canvas>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <h2><i class="fas fa-user-tag"></i> Desempenho por Cliente</h2>
-                    <div class="chart-container">
-                        <canvas id="clientsChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Painel do Cliente -->
-    <div class="client-panel" id="clientPanel">
-        <div class="panel-header">
-            <h1><i class="fas fa-user"></i> PAINEL DO CLIENTE</h1>
-            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
-        </div>
-        
-        <div class="container">
+            <!-- Recent Debtors -->
             <div class="card">
-                <h2><i class="fas fa-boxes"></i> Produtos Disponíveis</h2>
-                <p>Solicite os produtos que deseja comprar</p>
-                
-                <div class="ai-suggestion">
-                    <i class="fas fa-robot"></i> Produtos em destaque: Smartphones e Eletrônicos com 10% de desconto para pedidos acima de R$ 1.000.
+                <div class="card-header">
+                    <h2 class="card-title">Últimas Vendas</h2>
+                    <i class="fas fa-history"></i>
                 </div>
-                
-                <div class="products-grid" id="clientProductsGrid">
-                    <!-- Produtos serão inseridos aqui via JavaScript -->
-                </div>
-            </div>
-            
-            <div class="card">
-                <h2><i class="fas fa-history"></i> Minhas Solicitações</h2>
-                
                 <div class="table-container">
-                    <table id="clientRequestsTable">
+                    <table class="table" id="recent-sales-table">
                         <thead>
                             <tr>
+                                <th>Devedor</th>
                                 <th>Produto</th>
-                                <th>Quantidade</th>
                                 <th>Valor</th>
-                                <th>Data</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Solicitações do cliente serão inseridas aqui via JavaScript -->
+                            <!-- Dinamicamente preenchido -->
                         </tbody>
                     </table>
                 </div>
+                <div class="empty-state" id="no-recent-sales">
+                    <i class="fas fa-shopping-cart"></i>
+                    <p>Nenhuma venda registrada</p>
+                    <p>Adicione vendas na aba "Vendas"</p>
+                </div>
+            </div>
+            
+            <!-- Top Products -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Produtos Mais Vendidos</h2>
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="table-container">
+                    <table class="table" id="top-products-table">
+                        <thead>
+                            <tr>
+                                <th>Produto</th>
+                                <th>Vendas</th>
+                                <th>Lucro</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dinamicamente preenchido -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="empty-state" id="no-top-products">
+                    <i class="fas fa-box-open"></i>
+                    <p>Nenhum produto cadastrado</p>
+                    <p>Adicione produtos ao registrar vendas</p>
+                </div>
             </div>
         </div>
-    </div>
-
-    <script>
-        // Banco de dados local (simulado com localStorage)
-        const db = {
-            init: function() {
-                if (!localStorage.getItem('vendaDoOliveira')) {
-                    const initialData = {
-                        admin: {
-                            username: 'admin',
-                            password: 'admin123'
-                        },
-                        clients: [
-                            {
-                                id: '1',
-                                name: 'João Silva',
-                                phone: '(11) 99999-9999',
-                                login: 'joao',
-                                password: '123456',
-                                lastPurchase: null
-                            }
-                        ],
-                        products: [
-                            {
-                                id: '1',
-                                name: 'Smartphone XYZ',
-                                price: 1299.90,
-                                description: 'Smartphone de última geração com câmera tripla e 128GB de armazenamento',
-                                image: ''
-                            },
-                            {
-                                id: '2',
-                                name: 'Notebook Pro',
-                                price: 4599.00,
-                                description: 'Notebook com processador i7, 16GB RAM e SSD 512GB',
-                                image: ''
-                            }
-                        ],
-                        requests: [],
-                        sales: []
-                    };
-                    localStorage.setItem('vendaDoOliveira', JSON.stringify(initialData));
-                }
-                return JSON.parse(localStorage.getItem('vendaDoOliveira'));
-            },
-            
-            save: function(data) {
-                localStorage.setItem('vendaDoOliveira', JSON.stringify(data));
-            },
-            
-            getData: function() {
-                return JSON.parse(localStorage.getItem('vendaDoOliveira'));
-            }
-        };
-
-        // Variáveis globais
-        let currentUser = null;
-        let loginType = 'client';
-        let monthlyChart, productsChart, clientsChart;
-
-        // Inicialização do sistema
-        document.addEventListener('DOMContentLoaded', function() {
-            db.init();
-            setupEventListeners();
-            updateRequestsBadge();
-        });
-
-        // Configura os event listeners
-        function setupEventListeners() {
-            // Tabs do painel administrativo
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    // Remove a classe ativa de todas as abas
-                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        <!-- Sales Tab -->
+        <div id="sales" class="tab-content">
+            <!-- Add Sale Form -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Registrar Venda</h2>
+                    <i class="fas fa-file-invoice-dollar"></i>
+                </div>
+                <form id="add-sale-form">
+                    <div class="form-group">
+                        <label for="debtor-name">Nome do Devedor *</label>
+                        <input type="text" id="debtor-name" class="form-control" placeholder="Nome completo" required>
+                    </div>
                     
-                    // Adiciona a classe ativa à aba clicada
+                    <div class="form-group">
+                        <label for="debtor-phone">Telefone (opcional)</label>
+                        <input type="tel" id="debtor-phone" class="form-control" placeholder="(00) 00000-0000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="product-selection">Produto Vendido *</label>
+                        <div class="product-selection">
+                            <select id="product-select" class="form-control product-select" required>
+                                <option value="">Selecione um produto</option>
+                                <!-- Dinamicamente preenchido -->
+                            </select>
+                            <button type="button" class="add-product-btn" id="add-product-btn">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sale-amount">Valor da Venda (R$) *</label>
+                        <input type="number" id="sale-amount" class="form-control" placeholder="0.00" min="0" step="0.01" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cost-amount">Custo do Produto (R$) *</label>
+                        <input type="number" id="cost-amount" class="form-control" placeholder="0.00" min="0" step="0.01" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="due-date">Data de Vencimento *</label>
+                        <input type="date" id="due-date" class="form-control" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fas fa-save"></i> Registrar Venda
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Sales List -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Histórico de Vendas</h2>
+                    <i class="fas fa-list"></i>
+                </div>
+                <div class="table-container">
+                    <table class="table" id="sales-table">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Devedor</th>
+                                <th>Produto</th>
+                                <th>Valor</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dinamicamente preenchido -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="empty-state" id="no-sales">
+                    <i class="fas fa-file-invoice"></i>
+                    <p>Nenhuma venda registrada</p>
+                    <p>Registre sua primeira venda usando o formulário acima</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Debtors Tab -->
+        <div id="debtors" class="tab-content">
+            <!-- Debtors List -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Lista de Devedores</h2>
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="table-container">
+                    <table class="table" id="debtors-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Telefone</th>
+                                <th>Total Devido</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dinamicamente preenchido -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="empty-state" id="no-debtors">
+                    <i class="fas fa-user-friends"></i>
+                    <p>Nenhum devedor cadastrado</p>
+                    <p>Os devedores serão cadastrados automaticamente ao registrar vendas</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Floating Action Button -->
+        <div class="fab" id="fab-button">
+            <i class="fas fa-plus"></i>
+        </div>
+    </div>
+    
+    <script>
+        // Sistema de armazenamento
+        const STORAGE_KEY_SALES = 'vendasOliveira_sales';
+        const STORAGE_KEY_DEBTORS = 'vendasOliveira_debtors';
+        const STORAGE_KEY_PRODUCTS = 'vendasOliveira_products';
+        
+        // Estado da aplicação
+        let sales = [];
+        let debtors = [];
+        let products = [];
+        
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            // Carregar dados do localStorage
+            loadData();
+            
+            // Atualizar dashboard
+            updateDashboard();
+            
+            // Configurar navegação por abas
+            setupTabs();
+            
+            // Configurar formulários
+            setupForms();
+            
+            // Configurar botão flutuante
+            setupFloatingButton();
+            
+            // Atualizar listas
+            updateSalesList();
+            updateDebtorsList();
+            updateProductSelect();
+        });
+        
+        // Carregar dados do localStorage
+        function loadData() {
+            // Carregar vendas
+            const savedSales = localStorage.getItem(STORAGE_KEY_SALES);
+            if (savedSales) {
+                sales = JSON.parse(savedSales);
+            }
+            
+            // Carregar devedores
+            const savedDebtors = localStorage.getItem(STORAGE_KEY_DEBTORS);
+            if (savedDebtors) {
+                debtors = JSON.parse(savedDebtors);
+            }
+            
+            // Carregar produtos
+            const savedProducts = localStorage.getItem(STORAGE_KEY_PRODUCTS);
+            if (savedProducts) {
+                products = JSON.parse(savedProducts);
+            } else {
+                // Produtos iniciais
+                products = [
+                    { id: 1, name: "Camiseta Básica", cost: 15.00, price: 35.00 },
+                    { id: 2, name: "Calça Jeans", cost: 45.00, price: 99.90 },
+                    { id: 3, name: "Tênis Esportivo", cost: 80.00, price: 179.90 },
+                    { id: 4, name: "Vestido Floral", cost: 35.00, price: 79.90 }
+                ];
+                localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(products));
+            }
+        }
+        
+        // Salvar dados no localStorage
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY_SALES, JSON.stringify(sales));
+            localStorage.setItem(STORAGE_KEY_DEBTORS, JSON.stringify(debtors));
+            localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(products));
+        }
+        
+        // Configurar navegação por abas
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remover classe ativa de todas as abas e conteúdos
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    // Adicionar classe ativa à aba clicada
                     tab.classList.add('active');
                     
-                    // Mostra o conteúdo correspondente
+                    // Mostrar o conteúdo correspondente
                     const tabId = tab.getAttribute('data-tab');
                     document.getElementById(tabId).classList.add('active');
                     
-                    // Atualiza os dados se necessário
-                    if (tabId === 'stats') {
-                        updateCharts();
-                    } else if (tabId === 'products') {
-                        loadProductsTable();
-                    } else if (tabId === 'clients') {
-                        loadClientsTable();
-                    } else if (tabId === 'requests') {
-                        loadRequestsTable();
-                    } else if (tabId === 'dashboard') {
-                        updateDashboard();
-                    }
+                    // Atualizar botão flutuante
+                    updateFloatingButton(tabId);
                 });
             });
         }
-
-        // Atualiza o badge de solicitações
-        function updateRequestsBadge() {
-            const data = db.getData();
-            const pendingRequests = data.requests.filter(r => r.status === 'Pendente').length;
-            const badge = document.getElementById('requestsBadge');
+        
+        // Atualizar botão flutuante
+        function updateFloatingButton(activeTab) {
+            const fab = document.getElementById('fab-button');
             
-            if (pendingRequests > 0) {
-                badge.style.display = 'flex';
-                badge.textContent = pendingRequests;
+            if (activeTab === 'sales') {
+                fab.innerHTML = '<i class="fas fa-cart-plus"></i>';
+                fab.onclick = () => {
+                    document.getElementById('debtor-name').focus();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                };
+            } else if (activeTab === 'debtors') {
+                fab.innerHTML = '<i class="fas fa-user-plus"></i>';
+                fab.onclick = () => {
+                    // Não há formulário para devedores, então vamos para vendas
+                    document.querySelector('.tab[data-tab="sales"]').click();
+                };
             } else {
-                badge.style.display = 'none';
+                fab.innerHTML = '<i class="fas fa-plus"></i>';
+                fab.onclick = () => {
+                    // Alternar para a aba de vendas
+                    document.querySelector('.tab[data-tab="sales"]').click();
+                };
             }
         }
-
-        // Define o tipo de login (admin ou cliente)
-        function setLoginType(type) {
-            loginType = type;
-            const loginForm = document.getElementById('loginForm');
+        
+        // Configurar botão flutuante
+        function setupFloatingButton() {
+            const activeTab = document.querySelector('.tab.active').getAttribute('data-tab');
+            updateFloatingButton(activeTab);
+        }
+        
+        // Atualizar seleção de produtos
+        function updateProductSelect() {
+            const select = document.getElementById('product-select');
+            select.innerHTML = '<option value="">Selecione um produto</option>';
             
-            if (type === 'admin') {
-                document.getElementById('adminOption').classList.add('active');
-                document.getElementById('clientOption').classList.remove('active');
-                loginForm.querySelector('h2').innerHTML = '<i class="fas fa-sign-in-alt"></i> Login Administrador';
-            } else {
-                document.getElementById('adminOption').classList.remove('active');
-                document.getElementById('clientOption').classList.add('active');
-                loginForm.querySelector('h2').innerHTML = '<i class="fas fa-sign-in-alt"></i> Login Cliente';
-            }
-        }
-
-        // Realiza o login
-        function login() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const errorMessage = document.getElementById('errorMessage');
-            const data = db.getData();
-            
-            if (loginType === 'admin') {
-                if (username === data.admin.username && password === data.admin.password) {
-                    currentUser = { type: 'admin', username: username };
-                    showAdminPanel();
-                } else {
-                    errorMessage.style.display = 'block';
-                }
-            } else {
-                const client = data.clients.find(c => c.login === username && c.password === password);
-                if (client) {
-                    currentUser = { type: 'client', ...client };
-                    showClientPanel();
-                } else {
-                    errorMessage.style.display = 'block';
-                }
-            }
-        }
-
-        // Faz logout
-        function logout() {
-            currentUser = null;
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-            document.getElementById('errorMessage').style.display = 'none';
-            showLoginScreen();
-        }
-
-        // Mostra a tela de login
-        function showLoginScreen() {
-            document.getElementById('loginScreen').style.display = 'flex';
-            document.getElementById('adminPanel').style.display = 'none';
-            document.getElementById('clientPanel').style.display = 'none';
-        }
-
-        // Mostra o painel administrativo
-        function showAdminPanel() {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
-            document.getElementById('clientPanel').style.display = 'none';
-            
-            // Atualiza os dados iniciais
-            updateDashboard();
-            loadProductsTable();
-            loadClientsTable();
-            loadRequestsTable();
-            updateRequestsBadge();
-        }
-
-        // Mostra o painel do cliente
-        function showClientPanel() {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'none';
-            document.getElementById('clientPanel').style.display = 'block';
-            
-            // Carrega os produtos e solicitações do cliente
-            loadClientProducts();
-            loadClientRequests();
-        }
-
-        // Atualiza o dashboard
-        function updateDashboard() {
-            const data = db.getData();
-            const now = new Date();
-            const currentMonth = now.getMonth();
-            const currentYear = now.getFullYear();
-            
-            // Filtra vendas do mês atual
-            const monthlySales = data.sales.filter(sale => {
-                const saleDate = new Date(sale.date);
-                return saleDate.getMonth() === currentMonth && saleDate.getFullYear() === currentYear;
+            products.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.id;
+                option.textContent = product.name;
+                select.appendChild(option);
             });
             
-            // Filtra vendas do mês anterior
-            const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
-            const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
-            const lastMonthSales = data.sales.filter(sale => {
-                const saleDate = new Date(sale.date);
-                return saleDate.getMonth() === lastMonth && saleDate.getFullYear() === lastMonthYear;
-            });
-            
-            // Calcula totais
-            const totalProfit = monthlySales.reduce((sum, sale) => sum + (sale.totalPrice - sale.totalCost), 0);
-            const lastMonthProfit = lastMonthSales.reduce((sum, sale) => sum + (sale.totalPrice - sale.totalCost), 0);
-            const profitChange = lastMonthProfit > 0 ? ((totalProfit - lastMonthProfit) / lastMonthProfit * 100) : 0;
-            
-            const salesCount = monthlySales.length;
-            const lastMonthSalesCount = lastMonthSales.length;
-            const salesChange = lastMonthSalesCount > 0 ? ((salesCount - lastMonthSalesCount) / lastMonthSalesCount * 100) : 0;
-            
-            // Atualiza a UI
-            document.getElementById('totalProfit').textContent = `R$ ${totalProfit.toFixed(2).replace('.', ',')}`;
-            document.getElementById('monthlySales').textContent = salesCount;
-            document.getElementById('activeClients').textContent = data.clients.length;
-            document.getElementById('pendingRequests').textContent = data.requests.filter(r => r.status === 'Pendente').length;
-            
-            const profitTrend = document.getElementById('profitTrend');
-            profitTrend.innerHTML = profitChange >= 0 ? 
-                `<i class="fas fa-arrow-up" style="color: var(--success);"></i> ${Math.abs(profitChange).toFixed(1)}% em relação ao mês anterior` :
-                `<i class="fas fa-arrow-down" style="color: var(--danger);"></i> ${Math.abs(profitChange).toFixed(1)}% em relação ao mês anterior`;
-            
-            const salesTrend = document.getElementById('salesTrend');
-            salesTrend.innerHTML = salesChange >= 0 ? 
-                `<i class="fas fa-arrow-up" style="color: var(--success);"></i> ${Math.abs(salesChange).toFixed(1)}% em relação ao mês anterior` :
-                `<i class="fas fa-arrow-down" style="color: var(--danger);"></i> ${Math.abs(salesChange).toFixed(1)}% em relação ao mês anterior`;
-            
-            // Atualiza os gráficos
-            updateCharts();
-        }
-
-        // Atualiza os gráficos
-        function updateCharts() {
-            const data = db.getData();
-            const now = new Date();
-            const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dec'];
-            const currentYear = now.getFullYear();
-            
-            // Dados para o gráfico mensal
-            const monthlyData = months.map((month, index) => {
-                const monthSales = data.sales.filter(sale => {
-                    const saleDate = new Date(sale.date);
-                    return saleDate.getMonth() === index && saleDate.getFullYear() === currentYear;
-                });
-                return monthSales.reduce((sum, sale) => sum + sale.totalPrice, 0);
-            });
-            
-            // Dados para o gráfico de produtos
-            const productsData = {};
-            data.sales.forEach(sale => {
-                sale.items.forEach(item => {
-                    if (!productsData[item.productName]) {
-                        productsData[item.productName] = 0;
+            // Adicionar evento para preencher valores ao selecionar produto
+            select.addEventListener('change', function() {
+                const productId = parseInt(this.value);
+                if (productId) {
+                    const product = products.find(p => p.id === productId);
+                    if (product) {
+                        document.getElementById('sale-amount').value = product.price.toFixed(2);
+                        document.getElementById('cost-amount').value = product.cost.toFixed(2);
                     }
-                    productsData[item.productName] += item.quantity;
-                });
-            });
-            
-            // Dados para o gráfico de clientes
-            const clientsData = {};
-            data.sales.forEach(sale => {
-                const client = data.clients.find(c => c.id === sale.clientId);
-                if (client) {
-                    if (!clientsData[client.name]) {
-                        clientsData[client.name] = 0;
-                    }
-                    clientsData[client.name] += sale.totalPrice;
                 }
             });
             
-            // Atualiza o gráfico mensal
-            if (monthlyChart) {
-                monthlyChart.data.datasets[0].data = monthlyData;
-                monthlyChart.update();
-            } else {
-                const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
-                monthlyChart = new Chart(monthlyCtx, {
-                    type: 'line',
-                    data: {
-                        labels: months,
-                        datasets: [{
-                            label: 'Vendas (R$)',
-                            data: monthlyData,
-                            borderColor: '#00f7ff',
-                            backgroundColor: 'rgba(0, 247, 255, 0.1)',
-                            borderWidth: 3,
-                            tension: 0.3,
-                            fill: true
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                labels: {
-                                    color: '#e0e0ff'
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: {
-                                    color: 'rgba(255, 255, 255, 0.1)'
-                                },
-                                ticks: {
-                                    color: '#e0e0ff'
-                                }
-                            },
-                            x: {
-                                grid: {
-                                    color: 'rgba(255, 255, 255, 0.1)'
-                                },
-                                ticks: {
-                                    color: '#e0e0ff'
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-            
-            // Atualiza o gráfico de produtos
-            const productNames = Object.keys(productsData);
-            const productQuantities = Object.values(productsData);
-            
-            if (productsChart) {
-                productsChart.data.labels = productNames;
-                productsChart.data.datasets[0].data = productQuantities;
-                productsChart.update();
-            } else {
-                const productsCtx = document.getElementById('productsChart').getContext('2d');
-                productsChart = new Chart(productsCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: productNames,
-                        datasets: [{
-                            label: 'Unidades Vendidas',
-                            data: productQuantities,
-                            backgroundColor: [
-                                'rgba(0, 247, 255, 0.7)',
-                                'rgba(255, 0, 85, 0.7)',
-                                'rgba(0, 255, 157, 0.7)',
-                                'rgba(255, 204, 0, 0.7)',
-                                'rgba(153, 102, 255, 0.7)'
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                labels: {
-                                    color: '#e0e0ff'
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: {
-                                    color: 'rgba(255, 255, 255, 0.1)'
-                                },
-                                ticks: {
-                                    color: '#e0e0ff'
-                                }
-                            },
-                            x: {
-                                grid: {
-                                    color: 'rgba(255, 255, 255, 0.1)'
-                                },
-                                ticks: {
-                                    color: '#e0e0ff'
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-            
-            // Atualiza o gráfico de clientes
-            const clientNames = Object.keys(clientsData);
-            const clientValues = Object.values(clientsData);
-            
-            if (clientsChart) {
-                clientsChart.data.labels = clientNames;
-                clientsChart.data.datasets[0].data = clientValues;
-                clientsChart.update();
-            } else {
-                const clientsCtx = document.getElementById('clientsChart').getContext('2d');
-                clientsChart = new Chart(clientsCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: clientNames,
-                        datasets: [{
-                            label: 'Valor Gasto (R$)',
-                            data: clientValues,
-                            backgroundColor: [
-                                'rgba(0, 247, 255, 0.7)',
-                                'rgba(255, 0, 85, 0.7)',
-                                'rgba(0, 255, 157, 0.7)',
-                                'rgba(255, 204, 0, 0.7)'
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'right',
-                                labels: {
-                                    color: '#e0e0ff'
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-            
-            // Atualiza as estatísticas
-            if (productNames.length > 0) {
-                const maxQuantity = Math.max(...productQuantities);
-                const bestProductIndex = productQuantities.indexOf(maxQuantity);
-                document.getElementById('bestSellingProduct').textContent = productNames[bestProductIndex];
-                document.getElementById('bestSellingQuantity').textContent = `${maxQuantity} unidades`;
-            }
-            
-            if (clientNames.length > 0) {
-                const maxValue = Math.max(...clientValues);
-                const bestClientIndex = clientValues.indexOf(maxValue);
-                document.getElementById('bestCustomer').textContent = clientNames[bestClientIndex];
-                document.getElementById('bestCustomerValue').textContent = `R$ ${maxValue.toFixed(2).replace('.', ',')}`;
-            }
-        }
-
-        // Adiciona um novo produto
-        function addProduct() {
-            const name = document.getElementById('productName').value;
-            const price = parseFloat(document.getElementById('productPrice').value);
-            const image = document.getElementById('productImage').value;
-            const description = document.getElementById('productDescription').value;
-            
-            if (!name || isNaN(price)) {
-                alert('Preencha todos os campos obrigatórios!');
-                return;
-            }
-            
-            const data = db.getData();
-            const newProduct = {
-                id: Date.now().toString(),
-                name,
-                price,
-                image,
-                description
-            };
-            
-            data.products.push(newProduct);
-            db.save(data);
-            
-            // Limpa o formulário
-            document.getElementById('productName').value = '';
-            document.getElementById('productPrice').value = '';
-            document.getElementById('productImage').value = '';
-            document.getElementById('productDescription').value = '';
-            
-            // Atualiza a tabela
-            loadProductsTable();
-            
-            alert('Produto cadastrado com sucesso!');
-        }
-
-        // Carrega a tabela de produtos
-        function loadProductsTable() {
-            const data = db.getData();
-            const tbody = document.querySelector('#productsTable tbody');
-            tbody.innerHTML = '';
-            
-            data.products.forEach(product => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${product.name}</td>
-                    <td>R$ ${product.price.toFixed(2).replace('.', ',')}</td>
-                    <td>
-                        <button class="btn" style="padding: 10px 16px;" onclick="editProduct('${product.id}')">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn" style="padding: 10px 16px; background: var(--danger);" onclick="deleteProduct('${product.id}')">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        // Edita um produto
-        function editProduct(id) {
-            const data = db.getData();
-            const product = data.products.find(p => p.id === id);
-            
-            if (product) {
-                document.getElementById('productName').value = product.name;
-                document.getElementById('productPrice').value = product.price;
-                document.getElementById('productImage').value = product.image || '';
-                document.getElementById('productDescription').value = product.description || '';
-                
-                // Remove o produto para ser readicionado depois
-                data.products = data.products.filter(p => p.id !== id);
-                db.save(data);
-                
-                // Rola até o formulário
-                document.getElementById('products').scrollIntoView();
-            }
-        }
-
-        // Exclui um produto
-        function deleteProduct(id) {
-            if (confirm('Tem certeza que deseja excluir este produto?')) {
-                const data = db.getData();
-                data.products = data.products.filter(p => p.id !== id);
-                db.save(data);
-                loadProductsTable();
-            }
-        }
-
-        // Adiciona um novo cliente
-        function addClient() {
-            const name = document.getElementById('clientName').value;
-            const phone = document.getElementById('clientPhone').value;
-            const login = document.getElementById('clientLogin').value;
-            const password = document.getElementById('clientPassword').value;
-            
-            if (!name || !phone || !login || !password) {
-                alert('Preencha todos os campos!');
-                return;
-            }
-            
-            const data = db.getData();
-            
-            // Verifica se o login já existe
-            if (data.clients.some(c => c.login === login)) {
-                alert('Este login já está em uso!');
-                return;
-            }
-            
-            const newClient = {
-                id: Date.now().toString(),
-                name,
-                phone,
-                login,
-                password,
-                lastPurchase: null
-            };
-            
-            data.clients.push(newClient);
-            db.save(data);
-            
-            // Limpa o formulário
-            document.getElementById('clientName').value = '';
-            document.getElementById('clientPhone').value = '';
-            document.getElementById('clientLogin').value = '';
-            document.getElementById('clientPassword').value = '';
-            
-            // Atualiza a tabela
-            loadClientsTable();
-            
-            alert('Cliente cadastrado com sucesso!');
-        }
-
-        // Carrega a tabela de clientes
-        function loadClientsTable() {
-            const data = db.getData();
-            const tbody = document.querySelector('#clientsTable tbody');
-            tbody.innerHTML = '';
-            
-            data.clients.forEach(client => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${client.name}</td>
-                    <td>${client.phone}</td>
-                    <td>${client.lastPurchase || 'Nenhuma'}</td>
-                    <td>
-                        <button class="btn" style="padding: 10px 16px;" onclick="editClient('${client.id}')">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn" style="padding: 10px 16px; background: var(--danger);" onclick="deleteClient('${client.id}')">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        // Edita um cliente
-        function editClient(id) {
-            const data = db.getData();
-            const client = data.clients.find(c => c.id === id);
-            
-            if (client) {
-                document.getElementById('clientName').value = client.name;
-                document.getElementById('clientPhone').value = client.phone;
-                document.getElementById('clientLogin').value = client.login;
-                document.getElementById('clientPassword').value = client.password;
-                
-                // Remove o cliente para ser readicionado depois
-                data.clients = data.clients.filter(c => c.id !== id);
-                db.save(data);
-                
-                // Rola até o formulário
-                document.getElementById('clients').scrollIntoView();
-            }
-        }
-
-        // Exclui um cliente
-        function deleteClient(id) {
-            if (confirm('Tem certeza que deseja excluir este cliente?')) {
-                const data = db.getData();
-                data.clients = data.clients.filter(c => c.id !== id);
-                db.save(data);
-                loadClientsTable();
-            }
-        }
-
-        // Carrega a tabela de solicitações
-        function loadRequestsTable() {
-            const data = db.getData();
-            const tbody = document.querySelector('#requestsTable tbody');
-            tbody.innerHTML = '';
-            
-            data.requests.forEach(request => {
-                const client = data.clients.find(c => c.id === request.clientId);
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${client ? client.name : 'Cliente não encontrado'}</td>
-                    <td>${request.items.map(item => item.productName).join(', ')}</td>
-                    <td>${request.items.reduce((sum, item) => sum + item.quantity, 0)}</td>
-                    <td>R$ ${request.totalPrice.toFixed(2).replace('.', ',')}</td>
-                    <td>${new Date(request.date).toLocaleDateString()}</td>
-                    <td style="color: ${request.status === 'Aprovado' ? 'var(--success)' : request.status === 'Pendente' ? 'var(--warning)' : 'var(--danger)'}">${request.status}</td>
-                    <td>
-                        <button class="btn" style="padding: 10px 16px; background: ${request.status === 'Pendente' ? 'var(--success)' : 'var(--warning)'};" onclick="updateRequestStatus('${request.id}', '${request.status}')">
-                            <i class="fas ${request.status === 'Pendente' ? 'fa-check' : 'fa-undo'}"></i>
-                        </button>
-                        <button class="btn" style="padding: 10px 16px; background: var(--danger);" onclick="deleteRequest('${request.id}')">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-            
-            updateRequestsBadge();
-        }
-
-        // Atualiza o status de uma solicitação
-        function updateRequestStatus(id, currentStatus) {
-            const data = db.getData();
-            const request = data.requests.find(r => r.id === id);
-            
-            if (request) {
-                request.status = currentStatus === 'Pendente' ? 'Aprovado' : 'Pendente';
-                
-                // Se foi aprovado, adiciona às vendas
-                if (request.status === 'Aprovado') {
-                    const sale = {
-                        id: Date.now().toString(),
-                        clientId: request.clientId,
-                        date: new Date().toISOString(),
-                        items: request.items,
-                        totalPrice: request.totalPrice,
-                        totalCost: request.items.reduce((sum, item) => {
-                            const product = data.products.find(p => p.name === item.productName);
-                            return sum + (product ? (product.price * 0.7) * item.quantity : 0); // Estimativa de custo
-                        }, 0)
+            // Botão para adicionar novo produto
+            document.getElementById('add-product-btn').addEventListener('click', function() {
+                const productName = prompt("Digite o nome do novo produto:");
+                if (productName && productName.trim() !== "") {
+                    const newProduct = {
+                        id: Date.now(),
+                        name: productName.trim(),
+                        cost: 0,
+                        price: 0
                     };
                     
-                    data.sales.push(sale);
+                    products.push(newProduct);
+                    saveData();
+                    updateProductSelect();
                     
-                    // Atualiza a última compra do cliente
-                    const client = data.clients.find(c => c.id === request.clientId);
-                    if (client) {
-                        client.lastPurchase = new Date().toLocaleDateString();
-                    }
+                    // Selecionar o novo produto
+                    document.getElementById('product-select').value = newProduct.id;
+                    
+                    // Solicitar valores
+                    setTimeout(() => {
+                        const cost = parseFloat(prompt("Digite o custo do produto:"));
+                        const price = parseFloat(prompt("Digite o preço de venda:"));
+                        
+                        if (!isNaN(cost) && !isNaN(price)) {
+                            newProduct.cost = cost;
+                            newProduct.price = price;
+                            saveData();
+                            
+                            // Atualizar campos
+                            document.getElementById('sale-amount').value = price.toFixed(2);
+                            document.getElementById('cost-amount').value = cost.toFixed(2);
+                        }
+                    }, 100);
+                }
+            });
+        }
+        
+        // Configurar formulários
+        function setupForms() {
+            // Formulário de vendas
+            document.getElementById('add-sale-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Obter valores do formulário
+                const debtorName = document.getElementById('debtor-name').value.trim();
+                const debtorPhone = document.getElementById('debtor-phone').value.trim();
+                const productId = parseInt(document.getElementById('product-select').value);
+                const saleAmount = parseFloat(document.getElementById('sale-amount').value);
+                const costAmount = parseFloat(document.getElementById('cost-amount').value);
+                const dueDate = document.getElementById('due-date').value;
+                
+                // Validar dados
+                if (!debtorName || isNaN(productId) || isNaN(saleAmount) || isNaN(costAmount) || !dueDate) {
+                    alert('Por favor, preencha todos os campos obrigatórios corretamente.');
+                    return;
                 }
                 
-                db.save(data);
-                loadRequestsTable();
+                // Encontrar ou criar devedor
+                let debtor = debtors.find(d => d.name.toLowerCase() === debtorName.toLowerCase());
+                if (!debtor) {
+                    debtor = {
+                        id: Date.now(),
+                        name: debtorName,
+                        phone: debtorPhone,
+                        totalDebt: 0,
+                        sales: []
+                    };
+                    debtors.push(debtor);
+                }
+                
+                // Calcular lucro
+                const profit = saleAmount - costAmount;
+                
+                // Criar nova venda
+                const product = products.find(p => p.id === productId);
+                const newSale = {
+                    id: Date.now(),
+                    debtorId: debtor.id,
+                    productId: productId,
+                    productName: product ? product.name : "Produto Desconhecido",
+                    amount: saleAmount,
+                    cost: costAmount,
+                    profit: profit,
+                    dueDate: dueDate,
+                    status: 'pending',
+                    createdAt: new Date().toISOString()
+                };
+                
+                // Adicionar à lista de vendas
+                sales.push(newSale);
+                
+                // Atualizar devedor
+                debtor.totalDebt += saleAmount;
+                debtor.sales.push(newSale.id);
+                
+                // Salvar dados
+                saveData();
+                
+                // Atualizar listas e dashboard
+                updateSalesList();
+                updateDebtorsList();
                 updateDashboard();
-            }
+                
+                // Limpar formulário
+                this.reset();
+                document.getElementById('product-select').value = "";
+                
+                // Mostrar mensagem de sucesso
+                alert('Venda registrada com sucesso!');
+            });
         }
-
-        // Exclui uma solicitação
-        function deleteRequest(id) {
-            if (confirm('Tem certeza que deseja excluir esta solicitação?')) {
-                const data = db.getData();
-                data.requests = data.requests.filter(r => r.id !== id);
-                db.save(data);
-                loadRequestsTable();
-            }
-        }
-
-        // Carrega os produtos para o cliente
-        function loadClientProducts() {
-            const data = db.getData();
-            const grid = document.getElementById('clientProductsGrid');
-            grid.innerHTML = '';
+        
+        // Atualizar lista de vendas
+        function updateSalesList() {
+            const tableBody = document.querySelector('#sales-table tbody');
+            const emptyState = document.getElementById('no-sales');
             
-            data.products.forEach(product => {
-                const productCard = document.createElement('div');
-                productCard.className = 'product-card';
+            // Limpar tabela
+            tableBody.innerHTML = '';
+            
+            if (sales.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            // Adicionar vendas à tabela (ordenadas por data)
+            const sortedSales = [...sales].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            
+            sortedSales.forEach(sale => {
+                const saleDate = new Date(sale.createdAt);
+                const formattedDate = saleDate.toLocaleDateString('pt-BR');
                 
-                // Verifica se há imagem
-                const imageContent = product.image ? 
-                    `<img src="${product.image}" alt="${product.name}">` :
-                    `<div class="placeholder"><i class="fas fa-box"></i></div>`;
+                // Encontrar devedor
+                const debtor = debtors.find(d => d.id === sale.debtorId);
                 
-                productCard.innerHTML = `
-                    <div class="product-image">
-                        ${imageContent}
-                    </div>
-                    <div class="product-info">
-                        <h3>${product.name}</h3>
-                        <p>${product.description}</p>
-                        <div class="product-price">R$ ${product.price.toFixed(2).replace('.', ',')}</div>
-                        <div class="form-group">
-                            <label for="quantity_${product.id}">Quantidade</label>
-                            <input type="number" id="quantity_${product.id}" min="1" value="1">
-                        </div>
-                        <button class="btn request-btn" onclick="requestProduct('${product.id}')">
-                            <i class="fas fa-cart-plus"></i> Solicitar Compra
+                // Determinar status
+                let statusClass = 'pending';
+                let statusText = 'Pendente';
+                const dueDate = new Date(sale.dueDate);
+                
+                if (sale.status === 'paid') {
+                    statusClass = 'paid';
+                    statusText = 'Pago';
+                } else if (sale.status === 'overdue' || new Date() > dueDate) {
+                    statusClass = 'overdue';
+                    statusText = 'Atrasado';
+                }
+                
+                const row = document.createElement('tr');
+                row.className = 'sale-row';
+                row.innerHTML = `
+                    <td>${formattedDate}</td>
+                    <td>${debtor ? debtor.name : 'Desconhecido'}</td>
+                    <td>${sale.productName}</td>
+                    <td>R$ ${sale.amount.toFixed(2)}</td>
+                    <td><span class="status ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <button class="action-btn btn-paid" title="Marcar como pago" data-id="${sale.id}">
+                            <i class="fas fa-check-circle"></i>
                         </button>
-                    </div>
+                        <button class="action-btn btn-delete" title="Excluir" data-id="${sale.id}">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
                 `;
-                grid.appendChild(productCard);
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Adicionar event listeners para botões de ação
+            document.querySelectorAll('.btn-paid').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const saleId = parseInt(this.getAttribute('data-id'));
+                    markSaleAsPaid(saleId);
+                });
+            });
+            
+            document.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const saleId = parseInt(this.getAttribute('data-id'));
+                    deleteSale(saleId);
+                });
             });
         }
-
-        // Solicita um produto (cliente)
-        function requestProduct(productId) {
-            const quantity = parseInt(document.getElementById(`quantity_${productId}`).value);
+        
+        // Atualizar lista de devedores
+        function updateDebtorsList() {
+            const tableBody = document.querySelector('#debtors-table tbody');
+            const emptyState = document.getElementById('no-debtors');
             
-            if (isNaN(quantity) || quantity < 1) {
-                alert('Informe uma quantidade válida!');
+            // Limpar tabela
+            tableBody.innerHTML = '';
+            
+            if (debtors.length === 0) {
+                emptyState.style.display = 'block';
                 return;
             }
             
-            const data = db.getData();
-            const product = data.products.find(p => p.id === productId);
+            emptyState.style.display = 'none';
             
-            if (!product) {
-                alert('Produto não encontrado!');
+            // Adicionar devedores à tabela
+            debtors.forEach(debtor => {
+                // Verificar se há vendas pendentes
+                const hasPendingSales = sales.some(s => 
+                    s.debtorId === debtor.id && 
+                    (s.status === 'pending' || s.status === 'overdue')
+                );
+                
+                const statusClass = hasPendingSales ? 'pending' : 'paid';
+                const statusText = hasPendingSales ? 'Pendente' : 'Quitado';
+                
+                const row = document.createElement('tr');
+                row.className = 'debtor-row';
+                row.innerHTML = `
+                    <td>${debtor.name}</td>
+                    <td>${debtor.phone || '---'}</td>
+                    <td>R$ ${debtor.totalDebt.toFixed(2)}</td>
+                    <td><span class="status ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <button class="action-btn btn-delete" title="Excluir" data-id="${debtor.id}">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Adicionar event listeners para botões de ação
+            document.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const debtorId = parseInt(this.getAttribute('data-id'));
+                    deleteDebtor(debtorId);
+                });
+            });
+        }
+        
+        // Atualizar dashboard
+        function updateDashboard() {
+            // Calcular estatísticas
+            const pendingSales = sales.filter(s => s.status === 'pending');
+            const paidSales = sales.filter(s => s.status === 'paid');
+            const overdueSales = sales.filter(s => s.status === 'overdue' || (s.status === 'pending' && new Date() > new Date(s.dueDate)));
+            
+            const totalDue = sales
+                .filter(s => s.status !== 'paid')
+                .reduce((sum, sale) => sum + sale.amount, 0);
+                
+            const pendingTotal = pendingSales.reduce((sum, sale) => sum + sale.amount, 0);
+            const paidTotal = paidSales.reduce((sum, sale) => sum + sale.amount, 0);
+            const overdueTotal = overdueSales.reduce((sum, sale) => sum + sale.amount, 0);
+            
+            const totalProfit = sales
+                .filter(s => s.status === 'paid')
+                .reduce((sum, sale) => sum + sale.profit, 0);
+            
+            // Contar vencimentos para hoje
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const dueToday = sales.filter(s => {
+                const dueDate = new Date(s.dueDate);
+                dueDate.setHours(0, 0, 0, 0);
+                return s.status === 'pending' && dueDate.getTime() === today.getTime();
+            }).length;
+            
+            // Atualizar estatísticas
+            document.getElementById('total-due').textContent = `R$ ${totalDue.toFixed(2)}`;
+            document.getElementById('active-debtors').textContent = debtors.filter(d => d.totalDebt > 0).length;
+            document.getElementById('due-today').textContent = dueToday;
+            document.getElementById('total-profit').textContent = `R$ ${totalProfit.toFixed(2)}`;
+            
+            // Atualizar resumo financeiro
+            document.getElementById('pending-total').textContent = `R$ ${pendingTotal.toFixed(2)}`;
+            document.getElementById('overdue-total').textContent = `R$ ${overdueTotal.toFixed(2)}`;
+            document.getElementById('paid-total').textContent = `R$ ${paidTotal.toFixed(2)}`;
+            document.getElementById('all-total').textContent = `R$ ${totalDue.toFixed(2)}`;
+            
+            // Atualizar lista de últimas vendas
+            updateRecentSales();
+            
+            // Atualizar lista de produtos mais vendidos
+            updateTopProducts();
+        }
+        
+        // Atualizar lista de últimas vendas
+        function updateRecentSales() {
+            const tableBody = document.querySelector('#recent-sales-table tbody');
+            const emptyState = document.getElementById('no-recent-sales');
+            
+            // Limpar tabela
+            tableBody.innerHTML = '';
+            
+            if (sales.length === 0) {
+                emptyState.style.display = 'block';
                 return;
             }
             
-            const newRequest = {
-                id: Date.now().toString(),
-                clientId: currentUser.id,
-                date: new Date().toISOString(),
-                items: [{
-                    productName: product.name,
-                    productId: product.id,
-                    quantity: quantity,
-                    unitPrice: product.price
-                }],
-                totalPrice: product.price * quantity,
-                status: 'Pendente'
-            };
+            emptyState.style.display = 'none';
             
-            data.requests.push(newRequest);
-            db.save(data);
+            // Ordenar vendas por data (mais recentes primeiro)
+            const recentSales = [...sales]
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                .slice(0, 5); // Limitar a 5 itens
             
-            alert('Solicitação enviada com sucesso! Aguarde aprovação.');
-            loadClientRequests();
-            updateRequestsBadge();
-        }
-
-        // Carrega as solicitações do cliente
-        function loadClientRequests() {
-            if (!currentUser) return;
-            
-            const data = db.getData();
-            const tbody = document.querySelector('#clientRequestsTable tbody');
-            tbody.innerHTML = '';
-            
-            const clientRequests = data.requests.filter(r => r.clientId === currentUser.id);
-            
-            clientRequests.forEach(request => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${request.items.map(item => item.productName).join(', ')}</td>
-                    <td>${request.items.reduce((sum, item) => sum + item.quantity, 0)}</td>
-                    <td>R$ ${request.totalPrice.toFixed(2).replace('.', ',')}</td>
-                    <td>${new Date(request.date).toLocaleDateString()}</td>
-                    <td style="color: ${request.status === 'Aprovado' ? 'var(--success)' : request.status === 'Pendente' ? 'var(--warning)' : 'var(--danger)'}">${request.status}</td>
+            // Adicionar vendas à tabela
+            recentSales.forEach(sale => {
+                // Encontrar devedor
+                const debtor = debtors.find(d => d.id === sale.debtorId);
+                
+                // Determinar status
+                let statusClass = 'pending';
+                let statusText = 'Pendente';
+                const dueDate = new Date(sale.dueDate);
+                
+                if (sale.status === 'paid') {
+                    statusClass = 'paid';
+                    statusText = 'Pago';
+                } else if (sale.status === 'overdue' || new Date() > dueDate) {
+                    statusClass = 'overdue';
+                    statusText = 'Atrasado';
+                }
+                
+                const row = document.createElement('tr');
+                row.className = 'sale-row';
+                row.innerHTML = `
+                    <td>${debtor ? debtor.name : 'Desconhecido'}</td>
+                    <td>${sale.productName}</td>
+                    <td>R$ ${sale.amount.toFixed(2)}</td>
+                    <td><span class="status ${statusClass}">${statusText}</span></td>
                 `;
-                tbody.appendChild(tr);
+                
+                tableBody.appendChild(row);
             });
+        }
+        
+        // Atualizar lista de produtos mais vendidos
+        function updateTopProducts() {
+            const tableBody = document.querySelector('#top-products-table tbody');
+            const emptyState = document.getElementById('no-top-products');
+            
+            // Limpar tabela
+            tableBody.innerHTML = '';
+            
+            if (sales.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            // Agrupar vendas por produto
+            const productSales = {};
+            
+            sales.forEach(sale => {
+                if (!productSales[sale.productId]) {
+                    productSales[sale.productId] = {
+                        name: sale.productName,
+                        count: 0,
+                        profit: 0
+                    };
+                }
+                
+                productSales[sale.productId].count++;
+                if (sale.status === 'paid') {
+                    productSales[sale.productId].profit += sale.profit;
+                }
+            });
+            
+            // Converter para array e ordenar por quantidade vendida
+            const topProducts = Object.values(productSales)
+                .sort((a, b) => b.count - a.count)
+                .slice(0, 5); // Limitar a 5 itens
+            
+            // Adicionar produtos à tabela
+            topProducts.forEach(product => {
+                const row = document.createElement('tr');
+                row.className = 'product-row';
+                row.innerHTML = `
+                    <td>${product.name}</td>
+                    <td>${product.count}</td>
+                    <td>R$ ${product.profit.toFixed(2)}</td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Marcar venda como paga
+        function markSaleAsPaid(id) {
+            const sale = sales.find(s => s.id === id);
+            if (sale) {
+                sale.status = 'paid';
+                
+                // Atualizar devedor
+                const debtor = debtors.find(d => d.id === sale.debtorId);
+                if (debtor) {
+                    debtor.totalDebt -= sale.amount;
+                }
+                
+                saveData();
+                updateSalesList();
+                updateDebtorsList();
+                updateDashboard();
+                alert('Venda marcada como paga!');
+            }
+        }
+        
+        // Excluir venda
+        function deleteSale(id) {
+            if (confirm('Tem certeza que deseja excluir esta venda?')) {
+                const sale = sales.find(s => s.id === id);
+                if (sale) {
+                    // Atualizar devedor
+                    const debtor = debtors.find(d => d.id === sale.debtorId);
+                    if (debtor) {
+                        debtor.totalDebt -= sale.amount;
+                        debtor.sales = debtor.sales.filter(saleId => saleId !== id);
+                        
+                        // Remover devedor se não tiver mais dívidas
+                        if (debtor.totalDebt <= 0) {
+                            debtors = debtors.filter(d => d.id !== debtor.id);
+                        }
+                    }
+                    
+                    // Remover venda
+                    sales = sales.filter(s => s.id !== id);
+                    saveData();
+                    updateSalesList();
+                    updateDebtorsList();
+                    updateDashboard();
+                    alert('Venda excluída com sucesso!');
+                }
+            }
+        }
+        
+        // Excluir devedor
+        function deleteDebtor(id) {
+            if (confirm('Tem certeza que deseja excluir este devedor e todas as suas vendas?')) {
+                // Remover vendas do devedor
+                sales = sales.filter(s => s.debtorId !== id);
+                
+                // Remover devedor
+                debtors = debtors.filter(d => d.id !== id);
+                
+                saveData();
+                updateSalesList();
+                updateDebtorsList();
+                updateDashboard();
+                alert('Devedor excluído com sucesso!');
+            }
         }
     </script>
 </body>
