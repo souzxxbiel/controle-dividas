@@ -1,8 +1,3 @@
-# Site para Anotar Devedores Automático
-
-Vou criar um site completo em um único arquivo HTML para gerenciar devedores de forma simples e automática.
-
-```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -10,26 +5,29 @@ Vou criar um site completo em um único arquivo HTML para gerenciar devedores de
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Devedores Manager - Controle de Dívidas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Poppins', sans-serif;
         }
         
         :root {
-            --primary: #3498db;
-            --secondary: #2ecc71;
-            --danger: #e74c3c;
-            --warning: #f39c12;
-            --dark: #2c3e50;
-            --light: #ecf0f1;
-            --gray: #95a5a6;
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --dark: #1d3557;
+            --light: #f1faee;
+            --gray: #8d99ae;
+            --card-bg: #ffffff;
         }
         
         body {
-            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            background: linear-gradient(135deg, #1d3557, #457b9d);
             min-height: 100vh;
             padding: 20px;
             color: #333;
@@ -44,12 +42,17 @@ Vou criar um site completo em um único arquivo HTML para gerenciar devedores de
             text-align: center;
             padding: 30px 0;
             color: white;
+            animation: fadeIn 1s ease;
         }
         
         header h1 {
             font-size: 2.8rem;
             margin-bottom: 10px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
         }
         
         header p {
@@ -57,14 +60,16 @@ Vou criar um site completo em um único arquivo HTML para gerenciar devedores de
             max-width: 600px;
             margin: 0 auto;
             opacity: 0.9;
+            color: #a8dadc;
         }
         
         .card {
-            background: white;
+            background: var(--card-bg);
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             overflow: hidden;
             margin-bottom: 30px;
+            animation: slideUp 0.8s ease;
         }
         
         .form-container {
@@ -92,6 +97,7 @@ Vou criar um site completo em um único arquivo HTML para gerenciar devedores de
         
         .input-group {
             flex: 1;
+            position: relative;
         }
         
         .input-group label {
@@ -103,17 +109,19 @@ Vou criar um site completo em um único arquivo HTML para gerenciar devedores de
         
         .input-group input {
             width: 100%;
-            padding: 14px;
-            border: 2px solid #ddd;
+            padding: 14px 20px;
+            border: 2px solid #e9ecef;
             border-radius: 10px;
             font-size: 1rem;
             transition: all 0.3s;
+            background: #f8f9fa;
         }
         
         .input-group input:focus {
             border-color: var(--primary);
             outline: none;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+            background: white;
         }
         
         .btn {
@@ -136,8 +144,9 @@ Vou criar um site completo em um único arquivo HTML para gerenciar devedores de
         }
         
         .btn-primary:hover {
-            background: #2980b9;
+            background: var(--secondary);
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
         }
         
         .btn-danger {
@@ -146,7 +155,20 @@ Vou criar um site completo em um único arquivo HTML para gerenciar devedores de
         }
         
         .btn-danger:hover {
-            background: #c0392b;
+            background: #d9046d;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(247, 37, 133, 0.4);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #3ab4d9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 201, 240, 0.4);
         }
         
         .btn-block {
@@ -175,10 +197,13 @@ Vou criar um site completo em um único arquivo HTML para gerenciar devedores de
         
         .total-container {
             background: rgba(255,255,255,0.1);
-            padding: 8px 15px;
+            padding: 10px 20px;
             border-radius: 8px;
             font-size: 1.2rem;
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
         .debtors-list {
@@ -190,10 +215,13 @@ Vou criar um site completo em um único arquivo HTML para gerenciar devedores de
             padding: 20px 25px;
             border-bottom: 1px solid #eee;
             transition: all 0.3s;
+            animation: fadeInItem 0.5s ease;
         }
         
         .debtor-item:hover {
-            background: #f9f9f9;
+            background: #f9f9ff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
         
         .debtor-info {
@@ -205,11 +233,26 @@ Vou criar um site completo em um único arquivo HTML para gerenciar devedores de
             font-weight: 600;
             margin-bottom: 5px;
             color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .name-badge {
+            background: var(--primary);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
         }
         
         .debtor-date {
             color: var(--gray);
             font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
         
         .debtor-amount {
@@ -247,11 +290,13 @@ Vou criar um site completo em um único arquivo HTML para gerenciar devedores de
         .action-btn.edit:hover {
             background: var(--warning);
             color: white;
+            transform: scale(1.1);
         }
         
         .action-btn.delete:hover {
             background: var(--danger);
             color: white;
+            transform: scale(1.1);
         }
         
         .empty-state {
@@ -269,6 +314,7 @@ Vou criar um site completo em um único arquivo HTML para gerenciar devedores de
         .empty-state h3 {
             font-size: 1.5rem;
             margin-bottom: 10px;
+            color: var(--dark);
         }
         
         .notification {
@@ -283,6 +329,9 @@ Vou criar um site completo em um único arquivo HTML para gerenciar devedores de
             transform: translateX(120%);
             transition: transform 0.4s ease-in-out;
             z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .notification.show {
@@ -290,7 +339,7 @@ Vou criar um site completo em um único arquivo HTML para gerenciar devedores de
         }
         
         .notification.success {
-            background: var(--secondary);
+            background: var(--success);
         }
         
         .notification.error {
@@ -301,10 +350,13 @@ Vou criar um site completo em um único arquivo HTML para gerenciar devedores de
             padding: 15px 25px;
             background: #f8f9fa;
             border-bottom: 1px solid #eee;
+            display: flex;
+            gap: 15px;
         }
         
         .search-box {
             position: relative;
+            flex: 1;
         }
         
         .search-box input {
@@ -313,6 +365,7 @@ Vou criar um site completo em um único arquivo HTML para gerenciar devedores de
             border: 2px solid #ddd;
             border-radius: 30px;
             font-size: 1rem;
+            background: white;
         }
         
         .search-box i {
@@ -321,6 +374,122 @@ Vou criar um site completo em um único arquivo HTML para gerenciar devedores de
             top: 50%;
             transform: translateY(-50%);
             color: var(--gray);
+        }
+        
+        .stats-container {
+            display: flex;
+            gap: 15px;
+            padding: 15px 25px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .stat-card {
+            flex: 1;
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        .total-positive {
+            color: var(--success);
+        }
+        
+        .total-negative {
+            color: var(--danger);
+        }
+        
+        .confirmation-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .confirmation-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            transform: translateY(-20px);
+            transition: transform 0.3s;
+        }
+        
+        .confirmation-modal.show .modal-content {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header i {
+            font-size: 2rem;
+            color: var(--danger);
+        }
+        
+        .modal-header h3 {
+            font-size: 1.5rem;
+            color: var(--dark);
+        }
+        
+        .modal-body {
+            margin-bottom: 25px;
+            line-height: 1.6;
+            color: #555;
+        }
+        
+        .modal-footer {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeInItem {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
         }
         
         @media (max-width: 768px) {
@@ -341,6 +510,16 @@ Vou criar um site completo em um único arquivo HTML para gerenciar devedores de
             .debtor-actions {
                 margin-left: 0;
                 justify-content: flex-end;
+            }
+            
+            .debtors-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .stats-container {
+                flex-direction: column;
             }
         }
     </style>
@@ -369,7 +548,7 @@ Vou criar um site completo em um único arquivo HTML para gerenciar devedores de
                             
                             <div class="input-group">
                                 <label for="amount">Valor Devido (R$)</label>
-                                <input type="number" id="amount" placeholder="Digite o valor" min="0" step="0.01" required>
+                                <input type="number" id="amount" placeholder="Digite o valor (ex: 150.75)" min="0" step="0.01" required>
                             </div>
                         </div>
                         
@@ -384,7 +563,23 @@ Vou criar um site completo em um único arquivo HTML para gerenciar devedores de
                 <div class="debtors-header">
                     <h2><i class="fas fa-list"></i> Lista de Devedores</h2>
                     <div class="total-container">
+                        <i class="fas fa-wallet"></i>
                         Total Devido: R$ <span id="total-amount">0.00</span>
+                    </div>
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-label">Total de Devedores</div>
+                        <div class="stat-value" id="total-debtors">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Maior Dívida</div>
+                        <div class="stat-value total-negative" id="biggest-debt">R$ 0.00</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Dívida Média</div>
+                        <div class="stat-value total-negative" id="average-debt">R$ 0.00</div>
                     </div>
                 </div>
                 
@@ -393,10 +588,12 @@ Vou criar um site completo em um único arquivo HTML para gerenciar devedores de
                         <i class="fas fa-search"></i>
                         <input type="text" id="search-input" placeholder="Pesquisar devedores...">
                     </div>
+                    <button class="btn btn-success" id="clear-search">
+                        <i class="fas fa-times"></i> Limpar
+                    </button>
                 </div>
                 
                 <div class="debtors-list" id="debtors-list">
-                    <!-- Lista de devedores será inserida aqui via JavaScript -->
                     <div class="empty-state">
                         <i class="fas fa-user-slash"></i>
                         <h3>Nenhum devedor cadastrado</h3>
@@ -407,7 +604,32 @@ Vou criar um site completo em um único arquivo HTML para gerenciar devedores de
         </main>
     </div>
     
-    <div class="notification" id="notification"></div>
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notification-text"></span>
+    </div>
+    
+    <div class="confirmation-modal" id="confirmation-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Confirmar Exclusão</h3>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir este devedor? Esta ação não pode ser desfeita.</p>
+                <p>Devedor: <strong id="debtor-to-delete-name"></strong></p>
+                <p>Valor: <strong id="debtor-to-delete-amount"></strong></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" id="cancel-delete">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button class="btn btn-danger" id="confirm-delete">
+                    <i class="fas fa-trash-alt"></i> Excluir
+                </button>
+            </div>
+        </div>
+    </div>
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -419,184 +641,23 @@ Vou criar um site completo em um único arquivo HTML para gerenciar devedores de
             const totalAmount = document.getElementById('total-amount');
             const searchInput = document.getElementById('search-input');
             const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notification-text');
+            const totalDebtorsEl = document.getElementById('total-debtors');
+            const biggestDebtEl = document.getElementById('biggest-debt');
+            const averageDebtEl = document.getElementById('average-debt');
+            const clearSearchBtn = document.getElementById('clear-search');
+            const confirmationModal = document.getElementById('confirmation-modal');
+            const cancelDeleteBtn = document.getElementById('cancel-delete');
+            const confirmDeleteBtn = document.getElementById('confirm-delete');
+            const debtorToDeleteName = document.getElementById('debtor-to-delete-name');
+            const debtorToDeleteAmount = document.getElementById('debtor-to-delete-amount');
             
-            // Carregar devedores do localStorage
+            // Variáveis de estado
             let debtors = JSON.parse(localStorage.getItem('debtors')) || [];
+            let currentDebtorToDelete = null;
             
             // Exibir notificação
             function showNotification(message, type) {
-                notification.textContent = message;
+                notificationText.textContent = message;
                 notification.className = 'notification ' + type;
-                notification.classList.add('show');
-                
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 3000);
-            }
-            
-            // Formatar valor monetário
-            function formatCurrency(value) {
-                return value.toFixed(2).replace('.', ',');
-            }
-            
-            // Formatar data
-            function formatDate(dateString) {
-                const options = { 
-                    day: '2-digit', 
-                    month: '2-digit', 
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                };
-                return new Date(dateString).toLocaleDateString('pt-BR', options);
-            }
-            
-            // Calcular total devido
-            function calculateTotal() {
-                const total = debtors.reduce((sum, debtor) => sum + parseFloat(debtor.amount), 0);
-                totalAmount.textContent = formatCurrency(total);
-                return total;
-            }
-            
-            // Renderizar lista de devedores
-            function renderDebtors(debtorsArray = debtors) {
-                if (debtorsArray.length === 0) {
-                    debtorsList.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-user-slash"></i>
-                            <h3>Nenhum devedor encontrado</h3>
-                            <p>Tente ajustar sua pesquisa ou adicione um novo devedor</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                debtorsList.innerHTML = debtorsArray.map(debtor => `
-                    <div class="debtor-item" data-id="${debtor.id}">
-                        <div class="debtor-info">
-                            <div class="debtor-name">${debtor.name}</div>
-                            <div class="debtor-date">Adicionado em: ${formatDate(debtor.date)}</div>
-                        </div>
-                        <div class="debtor-amount">
-                            <i class="fas fa-money-bill-wave"></i>
-                            R$ ${formatCurrency(parseFloat(debtor.amount))}
-                        </div>
-                        <div class="debtor-actions">
-                            <button class="action-btn edit" onclick="editDebtor('${debtor.id}')">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="action-btn delete" onclick="deleteDebtor('${debtor.id}')">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
-            }
-            
-            // Adicionar novo devedor
-            debtorForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const name = nameInput.value.trim();
-                const amount = parseFloat(amountInput.value);
-                
-                if (!name || isNaN(amount)) {
-                    showNotification('Por favor, preencha todos os campos corretamente!', 'error');
-                    return;
-                }
-                
-                const newDebtor = {
-                    id: Date.now().toString(),
-                    name: name,
-                    amount: amount,
-                    date: new Date().toISOString()
-                };
-                
-                debtors.push(newDebtor);
-                localStorage.setItem('debtors', JSON.stringify(debtors));
-                
-                nameInput.value = '';
-                amountInput.value = '';
-                nameInput.focus();
-                
-                renderDebtors();
-                calculateTotal();
-                showNotification('Devedor adicionado com sucesso!', 'success');
-            });
-            
-            // Pesquisar devedores
-            searchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase();
-                
-                if (searchTerm === '') {
-                    renderDebtors();
-                    return;
-                }
-                
-                const filteredDebtors = debtors.filter(debtor => 
-                    debtor.name.toLowerCase().includes(searchTerm)
-                );
-                
-                renderDebtors(filteredDebtors);
-            });
-            
-            // Funções globais para editar/excluir
-            window.editDebtor = function(id) {
-                const debtor = debtors.find(d => d.id === id);
-                if (debtor) {
-                    nameInput.value = debtor.name;
-                    amountInput.value = debtor.amount;
-                    
-                    // Remover o devedor da lista
-                    debtors = debtors.filter(d => d.id !== id);
-                    localStorage.setItem('debtors', JSON.stringify(debtors));
-                    
-                    renderDebtors();
-                    calculateTotal();
-                    
-                    showNotification('Devedor carregado para edição!', 'success');
-                }
-            };
-            
-            window.deleteDebtor = function(id) {
-                if (confirm('Tem certeza que deseja excluir este devedor?')) {
-                    debtors = debtors.filter(d => d.id !== id);
-                    localStorage.setItem('debtors', JSON.stringify(debtors));
-                    
-                    renderDebtors();
-                    calculateTotal();
-                    showNotification('Devedor excluído com sucesso!', 'success');
-                }
-            };
-            
-            // Inicializar
-            renderDebtors();
-            calculateTotal();
-        });
-    </script>
-</body>
-</html>
-```
-
-## Recursos e Funcionalidades do Site
-
-1. **Interface moderna e responsiva** - Design limpo com gradientes, cards e elementos visuais agradáveis
-2. **Adição rápida de devedores** - Basta digitar nome e valor e clicar em "Salvar Devedor"
-3. **Lista de devedores completa** - Exibe nome, valor devido e data/hora do registro
-4. **Cálculo automático do total** - Mostra o valor total devido por todos os devedores
-5. **Pesquisa em tempo real** - Filtra a lista de devedores conforme você digita
-6. **Edição de registros** - Clique no ícone de edição para carregar um devedor no formulário
-7. **Exclusão de registros** - Remova devedores com confirmação
-8. **Armazenamento local** - Os dados são salvos no navegador (localStorage)
-9. **Notificações** - Feedback visual para ações realizadas
-10. **Totalmente responsivo** - Funciona em dispositivos móveis e desktop
-
-## Como Usar
-
-1. Preencha o nome do devedor e o valor devido
-2. Clique em "Salvar Devedor" para adicionar à lista
-3. Use a barra de pesquisa para encontrar devedores específicos
-4. Clique no ícone de lápis para editar um devedor existente
-5. Clique no ícone de lixeira para remover um devedor
-
-Os dados são automaticamente salvos no seu navegador, então você pode fechar e reabrir a página que as informações permanecerão salvas.
+                notification.classList.add('show'
