@@ -660,4 +660,195 @@
             function showNotification(message, type) {
                 notificationText.textContent = message;
                 notification.className = 'notification ' + type;
-                notification.classList.add('show'
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+            
+            // Formatar valor monetário
+            function formatCurrency(value) {
+                return value.toLocaleString('pt-BR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            }
+            
+            // Formatar data
+            function formatDate(dateString) {
+                const options = { 
+                    day: '2-digit', 
+                    month: '2-digit', 
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                };
+                return new Date(dateString).toLocaleDateString('pt-BR', options);
+            }
+            
+            // Calcular estatísticas
+            function calculateStats() {
+                const total = debtors.reduce((sum, debtor) => sum + parseFloat(debtor.amount), 0);
+                totalAmount.textContent = formatCurrency(total);
+                
+                totalDebtorsEl.textContent = debtors.length;
+                
+                if (debtors.length > 0) {
+                    const amounts = debtors.map(debtor => parseFloat(debtor.amount));
+                    const maxDebt = Math.max(...amounts);
+                    const avgDebt = total / debtors.length;
+                    
+                    biggestDebtEl.textContent = 'R$ ' + formatCurrency(maxDebt);
+                    averageDebtEl.textContent = 'R$ ' + formatCurrency(avgDebt);
+                } else {
+                    biggestDebtEl.textContent = 'R$ 0.00';
+                    averageDebtEl.textContent = 'R$ 0.00';
+                }
+            }
+            
+            // Renderizar lista de devedores
+            function renderDebtors(debtorsArray = debtors) {
+                if (debtorsArray.length === 0) {
+                    debtorsList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-user-slash"></i>
+                            <h3>Nenhum devedor encontrado</h3>
+                            <p>Tente ajustar sua pesquisa ou adicione um novo devedor</p>
+                        </div>
+                    `;
+                    calculateStats();
+                    return;
+                }
+                
+                debtorsList.innerHTML = debtorsArray.map(debtor => `
+                    <div class="debtor-item" data-id="${debtor.id}">
+                        <div class="debtor-info">
+                            <div class="debtor-name">
+                                <span class="name-badge">${debtor.name.charAt(0)}</span>
+                                ${debtor.name}
+                            </div>
+                            <div class="debtor-date">
+                                <i class="far fa-calendar-alt"></i>
+                                Adicionado em: ${formatDate(debtor.date)}
+                            </div>
+                        </div>
+                        <div class="debtor-amount">
+                            <i class="fas fa-money-bill-wave"></i>
+                            R$ ${formatCurrency(parseFloat(debtor.amount))}
+                        </div>
+                        <div class="debtor-actions">
+                            <button class="action-btn edit" onclick="editDebtor('${debtor.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete" onclick="showDeleteConfirmation('${debtor.id}')">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+                
+                calculateStats();
+            }
+            
+            // Adicionar novo devedor
+            debtorForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const name = nameInput.value.trim();
+                const amount = parseFloat(amountInput.value);
+                
+                if (!name || isNaN(amount)) {
+                    showNotification('Por favor, preencha todos os campos corretamente!', 'error');
+                    return;
+                }
+                
+                const newDebtor = {
+                    id: Date.now().toString(),
+                    name: name,
+                    amount: amount,
+                    date: new Date().toISOString()
+                };
+                
+                debtors.push(newDebtor);
+                localStorage.setItem('debtors', JSON.stringify(debtors));
+                
+                nameInput.value = '';
+                amountInput.value = '';
+                nameInput.focus();
+                
+                renderDebtors();
+                showNotification('Devedor adicionado com sucesso!', 'success');
+            });
+            
+            // Pesquisar devedores
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                if (searchTerm === '') {
+                    renderDebtors();
+                    return;
+                }
+                
+                const filteredDebtors = debtors.filter(debtor => 
+                    debtor.name.toLowerCase().includes(searchTerm) || 
+                    debtor.amount.toString().includes(searchTerm)
+                );
+                
+                renderDebtors(filteredDebtors);
+            });
+            
+            // Limpar pesquisa
+            clearSearchBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                renderDebtors();
+            });
+            
+            // Mostrar confirmação de exclusão
+            window.showDeleteConfirmation = function(id) {
+                const debtor = debtors.find(d => d.id === id);
+                if (debtor) {
+                    currentDebtorToDelete = id;
+                    debtorToDeleteName.textContent = debtor.name;
+                    debtorToDeleteAmount.textContent = 'R$ ' + formatCurrency(parseFloat(debtor.amount));
+                    confirmationModal.classList.add('show');
+                }
+            };
+            
+            // Cancelar exclusão
+            cancelDeleteBtn.addEventListener('click', function() {
+                confirmationModal.classList.remove('show');
+                currentDebtorToDelete = null;
+            });
+            
+            // Confirmar exclusão
+            confirmDeleteBtn.addEventListener('click', function() {
+                if (currentDebtorToDelete) {
+                    debtors = debtors.filter(d => d.id !== currentDebtorToDelete);
+                    localStorage.setItem('debtors', JSON.stringify(debtors));
+                    
+                    renderDebtors();
+                    showNotification('Devedor excluído com sucesso!', 'success');
+                    confirmationModal.classList.remove('show');
+                    currentDebtorToDelete = null;
+                }
+            });
+            
+            // Editar devedor
+            window.editDebtor = function(id) {
+                const debtor = debtors.find(d => d.id === id);
+                if (debtor) {
+                    nameInput.value = debtor.name;
+                    amountInput.value = debtor.amount;
+                    nameInput.focus();
+                    
+                    showNotification('Devedor carregado para edição. Atualize os valores e salve novamente.', 'success');
+                }
+            };
+            
+            // Inicializar
+            renderDebtors();
+        });
+    </script>
+</body>
+</html>
