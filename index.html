@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oliveira - Controle de Dívidas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <style>
         * {
             margin: 0;
@@ -473,6 +475,22 @@
             justify-content: flex-end;
         }
         
+        .sync-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            background: var(--success);
+            color: white;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -535,7 +553,7 @@
                 <div class="logo">O</div>
                 Oliveira - Controle de Dívidas
             </h1>
-            <p>$$</p>
+            <p>Gerencie seus devedores de forma simples e automática. Dados sincronizados em tempo real!</p>
         </header>
         
         <main>
@@ -602,13 +620,18 @@
         </main>
         
         <footer>
-            <p>Oliveira - Sistema de Controle de Dívidas &copy; 2023</p>
+            <p>Oliveira - Sistema de Controle de Dívidas &copy; 2023 | Sincronizado em tempo real</p>
         </footer>
     </div>
     
     <div class="notification" id="notification">
         <i class="fas fa-check-circle"></i>
         <span id="notification-text"></span>
+    </div>
+    
+    <div class="sync-status" id="sync-status">
+        <i class="fas fa-sync-alt"></i>
+        <span>Sincronizado</span>
     </div>
     
     <div class="confirmation-modal" id="confirmation-modal">
@@ -634,6 +657,20 @@
     </div>
     
     <script>
+        // Configuração do Firebase (substitua com suas credenciais)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDcM1Q8R2c4rK-9t1kZvV5Wx7yY8zXwvBc",
+            authDomain: "oliveira-devedores.firebaseapp.com",
+            projectId: "oliveira-devedores",
+            storageBucket: "oliveira-devedores.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdef1234567890"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        
         document.addEventListener('DOMContentLoaded', function() {
             // Elementos DOM
             const debtorForm = document.getElementById('debtor-form');
@@ -652,10 +689,11 @@
             const confirmDeleteBtn = document.getElementById('confirm-delete');
             const debtorToDeleteName = document.getElementById('debtor-to-delete-name');
             const debtorToDeleteAmount = document.getElementById('debtor-to-delete-amount');
+            const syncStatus = document.getElementById('sync-status');
             
             // Variáveis de estado
-            let debtors = JSON.parse(localStorage.getItem('oliveira_debtors')) || {};
-            let customerNames = JSON.parse(localStorage.getItem('oliveira_customer_names')) || [];
+            let debtors = {};
+            let customerNames = [];
             let currentDebtorToDelete = null;
             
             // Exibir notificação
@@ -778,6 +816,40 @@
                 calculateStats();
             }
             
+            // Carregar dados do Firebase
+            function loadData() {
+                // Atualizar status de sincronização
+                syncStatus.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Sincronizando...';
+                
+                // Carregar clientes
+                db.collection("customers").get().then(querySnapshot => {
+                    customerNames = [];
+                    querySnapshot.forEach(doc => {
+                        customerNames.push(doc.data().name);
+                    });
+                });
+                
+                // Carregar devedores em tempo real
+                db.collection("debtors").onSnapshot(querySnapshot => {
+                    debtors = {};
+                    querySnapshot.forEach(doc => {
+                        const data = doc.data();
+                        debtors[data.name] = data;
+                    });
+                    renderDebtors();
+                    
+                    // Atualizar status de sincronização
+                    syncStatus.innerHTML = '<i class="fas fa-check-circle"></i> Sincronizado';
+                    setTimeout(() => {
+                        syncStatus.style.opacity = '0.7';
+                    }, 2000);
+                }, error => {
+                    console.error("Erro ao carregar devedores: ", error);
+                    showNotification('Erro ao sincronizar dados', 'error');
+                    syncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Erro de sincronização';
+                });
+            }
+            
             // Adicionar novo débito
             debtorForm.addEventListener('submit', function(e) {
                 e.preventDefault();
@@ -790,43 +862,55 @@
                     return;
                 }
                 
-                // Adicionar nome à lista de clientes se não existir
-                if (!customerNames.includes(name)) {
-                    customerNames.push(name);
-                    localStorage.setItem('oliveira_customer_names', JSON.stringify(customerNames));
-                }
+                // Atualizar status de sincronização
+                syncStatus.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Salvando...';
                 
-                // Atualizar o devedor
-                if (!debtors[name]) {
-                    debtors[name] = {
-                        name: name,
-                        total: 0,
-                        debts: [],
-                        lastUpdate: new Date().toISOString()
-                    };
-                }
-                
-                // Adicionar nova dívida
-                debtors[name].debts.push({
-                    amount: amount,
-                    date: new Date().toISOString()
+                // Verificar se o cliente já existe
+                db.collection("debtors").doc(name).get().then(doc => {
+                    if (doc.exists) {
+                        // Atualizar o cliente existente
+                        const debtor = doc.data();
+                        const newDebts = [...debtor.debts, { amount, date: new Date().toISOString() }];
+                        const newTotal = debtor.total + amount;
+                        
+                        db.collection("debtors").doc(name).update({
+                            debts: newDebts,
+                            total: newTotal,
+                            lastUpdate: new Date().toISOString()
+                        }).then(() => {
+                            // Adicionar o nome à lista de clientes se não existir
+                            if (!customerNames.includes(name)) {
+                                customerNames.push(name);
+                                db.collection("customers").doc(name).set({ name });
+                            }
+                            
+                            showNotification(`Dívida de R$ ${formatCurrency(amount)} adicionada para ${name}`, 'success');
+                            syncStatus.innerHTML = '<i class="fas fa-check-circle"></i> Sincronizado';
+                        });
+                    } else {
+                        // Criar novo cliente
+                        const newDebtor = {
+                            name: name,
+                            total: amount,
+                            debts: [{ amount, date: new Date().toISOString() }],
+                            lastUpdate: new Date().toISOString()
+                        };
+                        
+                        db.collection("debtors").doc(name).set(newDebtor).then(() => {
+                            // Adicionar à lista de clientes
+                            customerNames.push(name);
+                            db.collection("customers").doc(name).set({ name });
+                            
+                            showNotification(`Cliente ${name} adicionado com dívida de R$ ${formatCurrency(amount)}`, 'success');
+                            syncStatus.innerHTML = '<i class="fas fa-check-circle"></i> Sincronizado';
+                        });
+                    }
                 });
-                
-                // Atualizar total
-                debtors[name].total += amount;
-                debtors[name].lastUpdate = new Date().toISOString();
-                
-                // Salvar no localStorage
-                localStorage.setItem('oliveira_debtors', JSON.stringify(debtors));
                 
                 // Resetar formulário
                 nameInput.value = '';
                 amountInput.value = '';
                 nameInput.focus();
-                
-                // Atualizar UI
-                renderDebtors();
-                showNotification(`Dívida de R$ ${formatCurrency(amount)} adicionada para ${name}`, 'success');
             });
             
             // Atualizar sugestões ao digitar
@@ -859,19 +943,23 @@
             // Confirmar exclusão
             confirmDeleteBtn.addEventListener('click', function() {
                 if (currentDebtorToDelete) {
-                    // Remover devedor
-                    delete debtors[currentDebtorToDelete];
+                    // Atualizar status de sincronização
+                    syncStatus.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Excluindo...';
                     
-                    // Salvar alterações
-                    localStorage.setItem('oliveira_debtors', JSON.stringify(debtors));
-                    
-                    // Atualizar UI
-                    renderDebtors();
-                    showNotification('Cliente excluído com sucesso!', 'success');
-                    
-                    // Fechar modal
-                    confirmationModal.classList.remove('show');
-                    currentDebtorToDelete = null;
+                    // Remover devedor do Firebase
+                    db.collection("debtors").doc(currentDebtorToDelete).delete().then(() => {
+                        // Remover devedor localmente
+                        delete debtors[currentDebtorToDelete];
+                        
+                        // Atualizar UI
+                        renderDebtors();
+                        showNotification('Cliente excluído com sucesso!', 'success');
+                        syncStatus.innerHTML = '<i class="fas fa-check-circle"></i> Sincronizado';
+                        
+                        // Fechar modal
+                        confirmationModal.classList.remove('show');
+                        currentDebtorToDelete = null;
+                    });
                 }
             });
             
@@ -886,7 +974,7 @@
             };
             
             // Inicializar
-            renderDebtors();
+            loadData();
         });
     </script>
 </body>
