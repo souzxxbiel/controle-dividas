@@ -1,1535 +1,602 @@
+# Site para Anotar Devedores Automático
+
+Vou criar um site completo em um único arquivo HTML para gerenciar devedores de forma simples e automática.
+
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VENDAS OLIVEIRA | Sistema Ultra Moderno</title>
+    <title>Devedores Manager - Controle de Dívidas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary: #1a1c2c;
-            --primary-light: #2d3047;
-            --secondary: #5d4e6d;
-            --accent: #9a8f97;
-            --success: #87c5a4;
-            --danger: #ff6b6b;
-            --warning: #ffd166;
-            --dark: #1a1c2c;
-            --light: #f9f7f7;
-            --gray: #8e9aaf;
-            --card-bg: rgba(255, 255, 255, 0.08);
-            --card-shadow: rgba(0, 0, 0, 0.25);
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #3498db;
+            --secondary: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --gray: #95a5a6;
         }
         
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            color: var(--light);
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
             min-height: 100vh;
-            padding: 0;
-            overflow-x: hidden;
-            line-height: 1.6;
-            backdrop-filter: blur(10px);
+            padding: 20px;
+            color: #333;
         }
         
         .container {
-            max-width: 100%;
+            max-width: 1000px;
             margin: 0 auto;
-            padding: 20px;
-            padding-bottom: 100px;
         }
         
-        /* Header */
         header {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
+            text-align: center;
+            padding: 30px 0;
             color: white;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 32px var(--card-shadow);
-            text-align: center;
         }
         
-        .logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            font-size: 1.8rem;
-            font-weight: 700;
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         
-        .logo i {
-            color: var(--success);
-            font-size: 2.2rem;
+        header p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0.9;
         }
         
-        .logo-text {
-            background: linear-gradient(to right, var(--success), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        /* Tabs Navigation */
-        .tabs-container {
-            display: flex;
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 15px;
-            overflow: hidden;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 20px var(--card-shadow);
-        }
-        
-        .tab {
-            flex: 1;
-            text-align: center;
-            padding: 18px 0;
-            font-weight: 500;
-            color: var(--light);
-            background: transparent;
-            cursor: pointer;
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .tab::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            width: 0;
-            height: 3px;
-            background: var(--success);
-            transform: translateX(-50%);
-            transition: var(--transition);
-        }
-        
-        .tab.active {
-            background: rgba(0, 0, 0, 0.2);
-        }
-        
-        .tab.active::before {
-            width: 100%;
-        }
-        
-        .tab:hover {
-            background: rgba(0, 0, 0, 0.1);
-        }
-        
-        .tab i {
-            display: block;
-            font-size: 1.6rem;
-            margin-bottom: 8px;
-            transition: var(--transition);
-        }
-        
-        .tab.active i {
-            transform: scale(1.1);
-            color: var(--success);
-        }
-        
-        /* Tab Content */
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* Cards */
         .card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 8px 32px var(--card-shadow);
-            transition: var(--transition);
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-        }
-        
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--glass-border);
-        }
-        
-        .card-title {
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: var(--success);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .card-title i {
-            font-size: 1.6rem;
-        }
-        
-        /* Stats */
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            overflow: hidden;
             margin-bottom: 30px;
         }
         
-        .stat-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 15px;
-            padding: 20px;
+        .form-container {
+            padding: 25px;
+        }
+        
+        .form-title {
             display: flex;
-            flex-direction: column;
             align-items: center;
             gap: 10px;
-            box-shadow: 0 4px 20px var(--card-shadow);
-            transition: var(--transition);
-            text-align: center;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .stat-title {
-            font-size: 0.9rem;
-            color: var(--gray);
-        }
-        
-        .stat-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--light);
-        }
-        
-        .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            background: rgba(135, 197, 164, 0.15);
-            color: var(--success);
-        }
-        
-        /* Form */
-        .form-group {
+            color: var(--dark);
             margin-bottom: 20px;
         }
         
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--light);
-            font-size: 1rem;
+        .form-title i {
+            font-size: 1.8rem;
+            color: var(--primary);
         }
         
-        .form-control {
-            width: 100%;
-            padding: 15px 20px;
-            background: rgba(0, 0, 0, 0.15);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            font-size: 1rem;
-            color: var(--light);
-            transition: var(--transition);
-        }
-        
-        .form-control:focus {
-            outline: none;
-            border-color: var(--success);
-            background: rgba(0, 0, 0, 0.25);
-            box-shadow: 0 0 0 3px rgba(135, 197, 164, 0.2);
-        }
-        
-        .btn {
-            padding: 15px 25px;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.05rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            background: linear-gradient(135deg, var(--success), #6ab190);
-            color: var(--dark);
-            box-shadow: 0 4px 15px rgba(135, 197, 164, 0.3);
-        }
-        
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(135, 197, 164, 0.4);
-        }
-        
-        .btn-block {
-            width: 100%;
-        }
-        
-        /* Table */
-        .table-container {
-            overflow-x: auto;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            background: var(--glass-bg);
-            box-shadow: 0 8px 32px var(--card-shadow);
-        }
-        
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 600px;
-        }
-        
-        .table th {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 16px;
-            text-align: left;
-            font-weight: 600;
-            color: var(--success);
-            font-size: 1rem;
-            position: sticky;
-            top: 0;
-        }
-        
-        .table td {
-            padding: 16px;
-            border-bottom: 1px solid var(--glass-border);
-            font-size: 0.95rem;
-            color: var(--light);
-        }
-        
-        .table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .table tr:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-        
-        /* Status */
-        .status {
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .status.pending {
-            background: rgba(255, 209, 102, 0.15);
-            color: var(--warning);
-        }
-        
-        .status.paid {
-            background: rgba(135, 197, 164, 0.15);
-            color: var(--success);
-        }
-        
-        .status.overdue {
-            background: rgba(255, 107, 107, 0.15);
-            color: var(--danger);
-        }
-        
-        /* Action buttons */
-        .action-btn {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            cursor: pointer;
-            font-size: 1rem;
-            transition: var(--transition);
-            color: var(--light);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .action-btn:hover {
-            background: var(--success);
-            color: var(--dark);
-            transform: translateY(-2px);
-        }
-        
-        /* Selection styles */
-        .selection-container {
+        .form-row {
             display: flex;
             gap: 15px;
             margin-bottom: 20px;
         }
         
-        .selection-group {
+        .input-group {
             flex: 1;
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 15px;
-            padding: 15px;
         }
         
-        .selection-group label {
+        .input-group label {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-weight: 500;
-            color: var(--success);
+            color: var(--dark);
         }
         
-        .selection-header {
+        .input-group input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .input-group input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn {
+            padding: 14px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        .debtors-container {
+            padding: 0;
+        }
+        
+        .debtors-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            padding: 20px 25px;
+            background: var(--dark);
+            color: white;
         }
         
-        .selection-header h3 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--light);
-        }
-        
-        .add-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: var(--success);
-            color: var(--dark);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: var(--transition);
-            border: none;
-        }
-        
-        .add-btn:hover {
-            transform: rotate(90deg) scale(1.1);
-        }
-        
-        /* Quantity */
-        .quantity-control {
+        .debtors-header h2 {
             display: flex;
             align-items: center;
             gap: 10px;
         }
         
-        .quantity-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
+        .total-container {
+            background: rgba(255,255,255,0.1);
+            padding: 8px 15px;
+            border-radius: 8px;
             font-size: 1.2rem;
-            transition: var(--transition);
+            font-weight: 600;
         }
         
-        .quantity-btn:hover {
-            background: var(--success);
+        .debtors-list {
+            padding: 0;
+        }
+        
+        .debtor-item {
+            display: flex;
+            padding: 20px 25px;
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s;
+        }
+        
+        .debtor-item:hover {
+            background: #f9f9f9;
+        }
+        
+        .debtor-info {
+            flex: 1;
+        }
+        
+        .debtor-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 5px;
             color: var(--dark);
         }
         
-        .quantity-input {
-            width: 60px;
-            text-align: center;
-            background: transparent;
-            border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            padding: 10px;
-            color: var(--light);
-            font-size: 1.1rem;
+        .debtor-date {
+            color: var(--gray);
+            font-size: 0.9rem;
         }
         
-        /* Floating action button */
-        .fab {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, var(--success), #6ab190);
+        .debtor-amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--danger);
+            min-width: 150px;
+            text-align: right;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 5px;
+        }
+        
+        .debtor-actions {
+            display: flex;
+            gap: 10px;
+            margin-left: 20px;
+        }
+        
+        .action-btn {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
+            border: none;
+            background: var(--light);
+            color: var(--dark);
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--dark);
-            font-size: 1.8rem;
-            box-shadow: 0 6px 20px rgba(135, 197, 164, 0.4);
-            z-index: 80;
-            cursor: pointer;
-            transition: var(--transition);
-            border: none;
+            transition: all 0.3s;
         }
         
-        .fab:hover {
-            transform: scale(1.1) rotate(90deg);
-            box-shadow: 0 8px 25px rgba(135, 197, 164, 0.6);
+        .action-btn.edit:hover {
+            background: var(--warning);
+            color: white;
         }
         
-        /* Empty state */
+        .action-btn.delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+        
         .empty-state {
             text-align: center;
-            padding: 40px 20px;
+            padding: 50px 20px;
             color: var(--gray);
         }
         
         .empty-state i {
             font-size: 4rem;
             margin-bottom: 20px;
-            color: rgba(255, 255, 255, 0.1);
+            opacity: 0.3;
         }
         
-        .empty-state p {
+        .empty-state h3 {
+            font-size: 1.5rem;
             margin-bottom: 10px;
         }
         
-        /* Summary card */
-        .summary-card {
-            background: linear-gradient(135deg, var(--primary-light), var(--primary));
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            margin-bottom: 25px;
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateX(120%);
+            transition: transform 0.4s ease-in-out;
+            z-index: 1000;
         }
         
-        .summary-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            color: var(--success);
+        .notification.show {
+            transform: translateX(0);
         }
         
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 1.05rem;
+        .notification.success {
+            background: var(--secondary);
         }
         
-        .summary-total {
-            font-size: 1.8rem;
-            font-weight: 700;
-            text-align: center;
-            margin: 20px 0;
-            color: var(--light);
+        .notification.error {
+            background: var(--danger);
         }
         
-        /* Responsive */
+        .search-container {
+            padding: 15px 25px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border: 2px solid #ddd;
+            border-radius: 30px;
+            font-size: 1rem;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+        
         @media (max-width: 768px) {
-            .selection-container {
+            .form-row {
                 flex-direction: column;
             }
             
-            .stats-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .tabs-container {
-                flex-wrap: wrap;
-            }
-            
-            .tab {
-                min-width: 50%;
-            padding: 12px 0;
-            font-size: 0.9rem;
-            flex: none;
-            width: 50%;
-            box-sizing: border-box;
-            display: flex;
+            .debtor-item {
                 flex-direction: column;
-                align-items: center;
-                justify-content: center;
+                gap: 15px;
             }
             
-            .tab i {
-                margin-bottom: 5px;
-                font-size: 1.4rem;
+            .debtor-amount {
+                justify-content: flex-start;
+                text-align: left;
+            }
+            
+            .debtor-actions {
+                margin-left: 0;
+                justify-content: flex-end;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <header>
-            <div class="logo">
-                <i class="fas fa-store"></i>
-                <h1 class="logo-text">VENDAS OLIVEIRA</h1>
-            </div>
+            <h1><i class="fas fa-file-invoice-dollar"></i> Devedores Manager</h1>
+            <p>Controle de dívidas de forma simples e automática. Basta digitar o nome e o valor!</p>
         </header>
         
-        <!-- Tabs Navigation -->
-        <div class="tabs-container">
-            <div class="tab active" data-tab="dashboard">
-                <i class="fas fa-chart-pie"></i>
-                <span>Dashboard</span>
-            </div>
-            <div class="tab" data-tab="sales">
-                <i class="fas fa-shopping-cart"></i>
-                <span>Vendas</span>
-            </div>
-            <div class="tab" data-tab="clients">
-                <i class="fas fa-users"></i>
-                <span>Clientes</span>
-            </div>
-            <div class="tab" data-tab="products">
-                <i class="fas fa-box"></i>
-                <span>Produtos</span>
-            </div>
-        </div>
-        
-        <!-- Dashboard Tab -->
-        <div id="dashboard" class="tab-content active">
-            <!-- Stats -->
-            <div class="stats-container">
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-money-bill-wave"></i>
-                    </div>
-                    <span class="stat-title">Total Devido</span>
-                    <span class="stat-value" id="total-due">R$ 0,00</span>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-user-clock"></i>
-                    </div>
-                    <span class="stat-title">Clientes Ativos</span>
-                    <span class="stat-value" id="active-clients">0</span>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-exclamation-triangle"></i>
-                    </div>
-                    <span class="stat-title">Vencimentos Hoje</span>
-                    <span class="stat-value" id="due-today">0</span>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <span class="stat-title">Lucro Total</span>
-                    <span class="stat-value" id="total-profit">R$ 0,00</span>
-                </div>
-            </div>
-            
-            <!-- Summary Card -->
-            <div class="summary-card">
-                <h2 class="summary-title">
-                    <i class="fas fa-chart-pie"></i> Resumo Financeiro
-                </h2>
-                
-                <div class="summary-item">
-                    <span>Total Pendente:</span>
-                    <span id="pending-total">R$ 0,00</span>
-                </div>
-                <div class="summary-item">
-                    <span>Total Atrasado:</span>
-                    <span id="overdue-total">R$ 0,00</span>
-                </div>
-                <div class="summary-item">
-                    <span>Total Pago:</span>
-                    <span id="paid-total">R$ 0,00</span>
-                </div>
-                
-                <div class="summary-total">
-                    <span id="all-total">R$ 0,00</span>
-                </div>
-            </div>
-            
-            <!-- Recent Sales -->
+        <main>
             <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">
-                        <i class="fas fa-history"></i> Últimas Vendas
-                    </h2>
-                </div>
-                <div class="table-container">
-                    <table class="table" id="recent-sales">
-                        <thead>
-                            <tr>
-                                <th>Cliente</th>
-                                <th>Produto</th>
-                                <th>Valor</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Dinamicamente preenchido -->
-                        </tbody>
-                    </table>
-                </div>
-                <div class="empty-state" id="no-sales">
-                    <i class="fas fa-shopping-cart"></i>
-                    <p>Nenhuma venda registrada</p>
-                    <p>Adicione vendas na aba "Vendas"</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Sales Tab -->
-        <div id="sales" class="tab-content">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">
-                        <i class="fas fa-file-invoice-dollar"></i> Registrar Nova Venda
-                    </h2>
-                </div>
-                
-                <!-- Selection Containers -->
-                <div class="selection-container">
-                    <div class="selection-group">
-                        <div class="selection-header">
-                            <h3>Selecionar Cliente</h3>
-                            <button class="add-btn" id="add-client-btn">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                        <select class="form-control" id="client-select">
-                            <option value="">Selecione um cliente</option>
-                            <!-- Dinamicamente preenchido -->
-                        </select>
+                <div class="form-container">
+                    <div class="form-title">
+                        <i class="fas fa-plus-circle"></i>
+                        <h2>Adicionar Novo Devedor</h2>
                     </div>
                     
-                    <div class="selection-group">
-                        <div class="selection-header">
-                            <h3>Selecionar Produto</h3>
-                            <button class="add-btn" id="add-product-btn">
-                                <i class="fas fa-plus"></i>
-                            </button>
+                    <form id="debtor-form">
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label for="name">Nome do Devedor</label>
+                                <input type="text" id="name" placeholder="Digite o nome completo" required>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="amount">Valor Devido (R$)</label>
+                                <input type="number" id="amount" placeholder="Digite o valor" min="0" step="0.01" required>
+                            </div>
                         </div>
-                        <select class="form-control" id="product-select">
-                            <option value="">Selecione um produto</option>
-                            <!-- Dinamicamente preenchido -->
-                        </select>
+                        
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-save"></i> Salvar Devedor
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="debtors-header">
+                    <h2><i class="fas fa-list"></i> Lista de Devedores</h2>
+                    <div class="total-container">
+                        Total Devido: R$ <span id="total-amount">0.00</span>
                     </div>
                 </div>
                 
-                <!-- Quantity Control -->
-                <div class="form-group">
-                    <label>Quantidade</label>
-                    <div class="quantity-control">
-                        <button class="quantity-btn" id="minus-btn">
-                            <i class="fas fa-minus"></i>
-                        </button>
-                        <input type="number" class="quantity-input" id="quantity-input" value="1" min="1">
-                        <button class="quantity-btn" id="plus-btn">
-                            <i class="fas fa-plus"></i>
-                        </button>
+                <div class="search-container">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="search-input" placeholder="Pesquisar devedores...">
                     </div>
                 </div>
                 
-                <!-- Sale Details -->
-                <div class="form-group">
-                    <label for="sale-amount">Valor Total (R$)</label>
-                    <input type="text" id="sale-amount" class="form-control" value="0,00" readonly>
-                </div>
-                
-                <div class="form-group">
-                    <label for="due-date">Data de Vencimento</label>
-                    <input type="date" id="due-date" class="form-control">
-                </div>
-                
-                <button class="btn btn-block" id="register-sale-btn">
-                    <i class="fas fa-save"></i> Registrar Venda
-                </button>
-            </div>
-            
-            <!-- Sales List -->
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">
-                        <i class="fas fa-list"></i> Histórico de Vendas
-                    </h2>
-                </div>
-                <div class="table-container">
-                    <table class="table" id="sales-table">
-                        <thead>
-                            <tr>
-                                <th>Data</th>
-                                <th>Cliente</th>
-                                <th>Produto</th>
-                                <th>Valor</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Dinamicamente preenchido -->
-                        </tbody>
-                    </table>
-                </div>
-                <div class="empty-state" id="empty-sales">
-                    <i class="fas fa-file-invoice"></i>
-                    <p>Nenhuma venda registrada</p>
-                    <p>Registre sua primeira venda</p>
+                <div class="debtors-list" id="debtors-list">
+                    <!-- Lista de devedores será inserida aqui via JavaScript -->
+                    <div class="empty-state">
+                        <i class="fas fa-user-slash"></i>
+                        <h3>Nenhum devedor cadastrado</h3>
+                        <p>Adicione seu primeiro devedor usando o formulário acima</p>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Clients Tab -->
-        <div id="clients" class="tab-content">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">
-                        <i class="fas fa-user-plus"></i> Adicionar Novo Cliente
-                    </h2>
-                </div>
-                <div class="form-group">
-                    <label for="client-name">Nome Completo *</label>
-                    <input type="text" id="client-name" class="form-control" placeholder="Digite o nome completo" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="client-phone">Telefone *</label>
-                    <input type="tel" id="client-phone" class="form-control" placeholder="(00) 00000-0000" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="client-email">E-mail (opcional)</label>
-                    <input type="email" id="client-email" class="form-control" placeholder="email@exemplo.com">
-                </div>
-                
-                <button class="btn btn-block" id="save-client-btn">
-                    <i class="fas fa-save"></i> Salvar Cliente
-                </button>
-            </div>
-            
-            <!-- Clients List -->
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">
-                        <i class="fas fa-users"></i> Lista de Clientes
-                    </h2>
-                </div>
-                <div class="table-container">
-                    <table class="table" id="clients-table">
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th>Telefone</th>
-                                <th>Total Devido</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Dinamicamente preenchido -->
-                        </tbody>
-                    </table>
-                </div>
-                <div class="empty-state" id="empty-clients">
-                    <i class="fas fa-user-friends"></i>
-                    <p>Nenhum cliente cadastrado</p>
-                    <p>Adicione seu primeiro cliente</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Products Tab -->
-        <div id="products" class="tab-content">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">
-                        <i class="fas fa-box"></i> Adicionar Novo Produto
-                    </h2>
-                </div>
-                <div class="form-group">
-                    <label for="product-name">Nome do Produto *</label>
-                    <input type="text" id="product-name" class="form-control" placeholder="Digite o nome do produto" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="product-price">Preço de Venda (R$) *</label>
-                    <input type="number" id="product-price" class="form-control" placeholder="0.00" min="0" step="0.01" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="product-cost">Custo (R$) *</label>
-                    <input type="number" id="product-cost" class="form-control" placeholder="0.00" min="0" step="0.01" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="product-description">Descrição (opcional)</label>
-                    <textarea id="product-description" class="form-control" rows="2" placeholder="Detalhes do produto..."></textarea>
-                </div>
-                
-                <button class="btn btn-block" id="save-product-btn">
-                    <i class="fas fa-save"></i> Salvar Produto
-                </button>
-            </div>
-            
-            <!-- Products List -->
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">
-                        <i class="fas fa-boxes"></i> Lista de Produtos
-                    </h2>
-                </div>
-                <div class="table-container">
-                    <table class="table" id="products-table">
-                        <thead>
-                            <tr>
-                                <th>Produto</th>
-                                <th>Custo</th>
-                                <th>Venda</th>
-                                <th>Lucro</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Dinamicamente preenchido -->
-                        </tbody>
-                    </table>
-                </div>
-                <div class="empty-state" id="empty-products">
-                    <i class="fas fa-box-open"></i>
-                    <p>Nenhum produto cadastrado</p>
-                    <p>Adicione seu primeiro produto</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Floating Action Button -->
-        <div class="fab" id="fab">
-            <i class="fas fa-plus"></i>
-        </div>
+        </main>
     </div>
     
+    <div class="notification" id="notification"></div>
+    
     <script>
-        // Armazenamento de dados
-        let clients = [];
-        let products = [];
-        let sales = [];
-        
-        // Referências do DOM
-        const clientSelect = document.getElementById('client-select');
-        const productSelect = document.getElementById('product-select');
-        const quantityInput = document.getElementById('quantity-input');
-        const saleAmount = document.getElementById('sale-amount');
-        const dueDate = document.getElementById('due-date');
-        const registerSaleBtn = document.getElementById('register-sale-btn');
-        
-        // Elementos de lista
-        const recentSalesTable = document.getElementById('recent-sales').querySelector('tbody');
-        const salesTable = document.getElementById('sales-table').querySelector('tbody');
-        const clientsTable = document.getElementById('clients-table').querySelector('tbody');
-        const productsTable = document.getElementById('products-table').querySelector('tbody');
-        
-        // Elementos de estado vazio
-        const noSales = document.getElementById('no-sales');
-        const emptySales = document.getElementById('empty-sales');
-        const emptyClients = document.getElementById('empty-clients');
-        const emptyProducts = document.getElementById('empty-products');
-        
-        // Inicialização
-        document.addEventListener('DOMContentLoaded', () => {
-            // Carregar dados do localStorage
-            loadData();
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elementos DOM
+            const debtorForm = document.getElementById('debtor-form');
+            const nameInput = document.getElementById('name');
+            const amountInput = document.getElementById('amount');
+            const debtorsList = document.getElementById('debtors-list');
+            const totalAmount = document.getElementById('total-amount');
+            const searchInput = document.getElementById('search-input');
+            const notification = document.getElementById('notification');
             
-            // Configurar a data de vencimento padrão
-            const today = new Date();
-            dueDate.value = today.toISOString().split('T')[0];
+            // Carregar devedores do localStorage
+            let debtors = JSON.parse(localStorage.getItem('debtors')) || [];
             
-            // Configurar navegação por abas
-            setupTabs();
-            
-            // Atualizar selects
-            updateClientSelect();
-            updateProductSelect();
-            
-            // Atualizar listas
-            updateRecentSales();
-            updateSalesList();
-            updateClientsList();
-            updateProductsList();
-            
-            // Atualizar dashboard
-            updateDashboard();
-            
-            // Configurar eventos
-            setupEventListeners();
-        });
-        
-        // Carregar dados do localStorage
-        function loadData() {
-            const savedClients = localStorage.getItem('vendasOliveira_clients');
-            const savedProducts = localStorage.getItem('vendasOliveira_products');
-            const savedSales = localStorage.getItem('vendasOliveira_sales');
-            
-            if (savedClients) clients = JSON.parse(savedClients);
-            if (savedProducts) products = JSON.parse(savedProducts);
-            if (savedSales) sales = JSON.parse(savedSales);
-        }
-        
-        // Salvar dados no localStorage
-        function saveData() {
-            localStorage.setItem('vendasOliveira_clients', JSON.stringify(clients));
-            localStorage.setItem('vendasOliveira_products', JSON.stringify(products));
-            localStorage.setItem('vendasOliveira_sales', JSON.stringify(sales));
-        }
-        
-        // Configurar navegação por abas
-        function setupTabs() {
-            const tabs = document.querySelectorAll('.tab');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    // Remover classe ativa de todas as abas
-                    tabs.forEach(t => t.classList.remove('active'));
-                    
-                    // Adicionar classe ativa à aba clicada
-                    tab.classList.add('active');
-                    
-                    // Esconder todos os conteúdos de abas
-                    document.querySelectorAll('.tab-content').forEach(content => {
-                        content.classList.remove('active');
-                    });
-                    
-                    // Mostrar o conteúdo da aba selecionada
-                    const tabId = tab.getAttribute('data-tab');
-                    document.getElementById(tabId).classList.add('active');
-                });
-            });
-        }
-        
-        // Atualizar select de clientes
-        function updateClientSelect() {
-            clientSelect.innerHTML = '<option value="">Selecione um cliente</option>';
-            clients.forEach(client => {
-                const option = document.createElement('option');
-                option.value = client.id;
-                option.textContent = client.name;
-                clientSelect.appendChild(option);
-            });
-        }
-        
-        // Atualizar select de produtos
-        function updateProductSelect() {
-            productSelect.innerHTML = '<option value="">Selecione um produto</option>';
-            products.forEach(product => {
-                const option = document.createElement('option');
-                option.value = product.id;
-                option.textContent = `${product.name} - R$ ${product.price.toFixed(2)}`;
-                productSelect.appendChild(option);
-            });
-        }
-        
-        // Atualizar lista de vendas recentes
-        function updateRecentSales() {
-            recentSalesTable.innerHTML = '';
-            
-            if (sales.length === 0) {
-                noSales.style.display = 'block';
-                return;
+            // Exibir notificação
+            function showNotification(message, type) {
+                notification.textContent = message;
+                notification.className = 'notification ' + type;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
             }
             
-            noSales.style.display = 'none';
-            
-            // Pegar as últimas 5 vendas
-            const recentSales = [...sales].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
-            
-            recentSales.forEach(sale => {
-                const client = clients.find(c => c.id === sale.clientId);
-                const product = products.find(p => p.id === sale.productId);
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${client ? client.name : 'Cliente não encontrado'}</td>
-                    <td>${product ? product.name : 'Produto não encontrado'}</td>
-                    <td>R$ ${sale.total.toFixed(2)}</td>
-                    <td><span class="status ${sale.status}">${getStatusText(sale.status)}</span></td>
-                `;
-                
-                recentSalesTable.appendChild(row);
-            });
-        }
-        
-        // Atualizar lista de vendas
-        function updateSalesList() {
-            salesTable.innerHTML = '';
-            
-            if (sales.length === 0) {
-                emptySales.style.display = 'block';
-                return;
+            // Formatar valor monetário
+            function formatCurrency(value) {
+                return value.toFixed(2).replace('.', ',');
             }
             
-            emptySales.style.display = 'none';
-            
-            sales.forEach(sale => {
-                const client = clients.find(c => c.id === sale.clientId);
-                const product = products.find(p => p.id === sale.productId);
-                const saleDate = new Date(sale.date);
-                const formattedDate = `${saleDate.getDate()}/${saleDate.getMonth() + 1}/${saleDate.getFullYear()}`;
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${formattedDate}</td>
-                    <td>${client ? client.name : 'Cliente não encontrado'}</td>
-                    <td>${product ? product.name : 'Produto não encontrado'}</td>
-                    <td>R$ ${sale.total.toFixed(2)}</td>
-                    <td><span class="status ${sale.status}">${getStatusText(sale.status)}</span></td>
-                    <td>
-                        <button class="action-btn" title="Marcar como pago" data-id="${sale.id}">
-                            <i class="fas fa-check"></i>
-                        </button>
-                        <button class="action-btn" title="Excluir" data-id="${sale.id}">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </td>
-                `;
-                
-                salesTable.appendChild(row);
-            });
-            
-            // Adicionar eventos aos botões de ação
-            document.querySelectorAll('#sales-table .action-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const saleId = btn.getAttribute('data-id');
-                    const saleIndex = sales.findIndex(s => s.id === saleId);
-                    
-                    if (saleIndex !== -1) {
-                        if (btn.querySelector('.fa-check')) {
-                            // Marcar como pago
-                            sales[saleIndex].status = 'paid';
-                            saveData();
-                            updateSalesList();
-                            updateRecentSales();
-                            updateDashboard();
-                            alert('Venda marcada como paga!');
-                        } else if (btn.querySelector('.fa-trash-alt')) {
-                            // Excluir venda
-                            if (confirm('Tem certeza que deseja excluir esta venda?')) {
-                                sales.splice(saleIndex, 1);
-                                saveData();
-                                updateSalesList();
-                                updateRecentSales();
-                                updateDashboard();
-                                alert('Venda excluída com sucesso!');
-                            }
-                        }
-                    }
-                });
-            });
-        }
-        
-        // Atualizar lista de clientes
-        function updateClientsList() {
-            clientsTable.innerHTML = '';
-            
-            if (clients.length === 0) {
-                emptyClients.style.display = 'block';
-                return;
+            // Formatar data
+            function formatDate(dateString) {
+                const options = { 
+                    day: '2-digit', 
+                    month: '2-digit', 
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                };
+                return new Date(dateString).toLocaleDateString('pt-BR', options);
             }
             
-            emptyClients.style.display = 'none';
-            
-            clients.forEach(client => {
-                // Calcular total devido pelo cliente
-                const clientSales = sales.filter(s => s.clientId === client.id && s.status !== 'paid');
-                const totalDue = clientSales.reduce((sum, sale) => sum + sale.total, 0);
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${client.name}</td>
-                    <td>${client.phone}</td>
-                    <td>R$ ${totalDue.toFixed(2)}</td>
-                    <td><span class="status ${totalDue > 0 ? 'pending' : 'paid'}">${totalDue > 0 ? 'Pendente' : 'Quitado'}</span></td>
-                    <td>
-                        <button class="action-btn" title="Editar" data-id="${client.id}">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="action-btn" title="Excluir" data-id="${client.id}">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </td>
-                `;
-                
-                clientsTable.appendChild(row);
-            });
-            
-            // Adicionar eventos aos botões de ação
-            document.querySelectorAll('#clients-table .action-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const clientId = btn.getAttribute('data-id');
-                    const clientIndex = clients.findIndex(c => c.id === clientId);
-                    
-                    if (clientIndex !== -1) {
-                        if (btn.querySelector('.fa-edit')) {
-                            // Editar cliente (simplificado)
-                            const client = clients[clientIndex];
-                            document.getElementById('client-name').value = client.name;
-                            document.getElementById('client-phone').value = client.phone;
-                            document.getElementById('client-email').value = client.email || '';
-                            
-                            // Rolar para o topo do formulário
-                            document.getElementById('clients').scrollTo(0, 0);
-                        } else if (btn.querySelector('.fa-trash-alt')) {
-                            // Excluir cliente
-                            if (confirm('Tem certeza que deseja excluir este cliente?')) {
-                                clients.splice(clientIndex, 1);
-                                saveData();
-                                updateClientsList();
-                                updateClientSelect();
-                                alert('Cliente excluído com sucesso!');
-                            }
-                        }
-                    }
-                });
-            });
-        }
-        
-        // Atualizar lista de produtos
-        function updateProductsList() {
-            productsTable.innerHTML = '';
-            
-            if (products.length === 0) {
-                emptyProducts.style.display = 'block';
-                return;
+            // Calcular total devido
+            function calculateTotal() {
+                const total = debtors.reduce((sum, debtor) => sum + parseFloat(debtor.amount), 0);
+                totalAmount.textContent = formatCurrency(total);
+                return total;
             }
             
-            emptyProducts.style.display = 'none';
-            
-            products.forEach(product => {
-                const profit = product.price - product.cost;
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${product.name}</td>
-                    <td>R$ ${product.cost.toFixed(2)}</td>
-                    <td>R$ ${product.price.toFixed(2)}</td>
-                    <td>R$ ${profit.toFixed(2)}</td>
-                    <td>
-                        <button class="action-btn" title="Editar" data-id="${product.id}">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="action-btn" title="Excluir" data-id="${product.id}">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </td>
-                `;
-                
-                productsTable.appendChild(row);
-            });
-            
-            // Adicionar eventos aos botões de ação
-            document.querySelectorAll('#products-table .action-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const productId = btn.getAttribute('data-id');
-                    const productIndex = products.findIndex(p => p.id === productId);
-                    
-                    if (productIndex !== -1) {
-                        if (btn.querySelector('.fa-edit')) {
-                            // Editar produto (simplificado)
-                            const product = products[productIndex];
-                            document.getElementById('product-name').value = product.name;
-                            document.getElementById('product-price').value = product.price;
-                            document.getElementById('product-cost').value = product.cost;
-                            document.getElementById('product-description').value = product.description || '';
-                            
-                            // Rolar para o topo do formulário
-                            document.getElementById('products').scrollTo(0, 0);
-                        } else if (btn.querySelector('.fa-trash-alt')) {
-                            // Excluir produto
-                            if (confirm('Tem certeza que deseja excluir este produto?')) {
-                                products.splice(productIndex, 1);
-                                saveData();
-                                updateProductsList();
-                                updateProductSelect();
-                                alert('Produto excluído com sucesso!');
-                            }
-                        }
-                    }
-                });
-            });
-        }
-        
-        // Atualizar dashboard
-        function updateDashboard() {
-            // Calcular estatísticas
-            const pendingSales = sales.filter(s => s.status === 'pending');
-            const overdueSales = sales.filter(s => s.status === 'overdue');
-            const paidSales = sales.filter(s => s.status === 'paid');
-            
-            const totalDue = sales.filter(s => s.status !== 'paid').reduce((sum, sale) => sum + sale.total, 0);
-            const pendingTotal = pendingSales.reduce((sum, sale) => sum + sale.total, 0);
-            const overdueTotal = overdueSales.reduce((sum, sale) => sum + sale.total, 0);
-            const paidTotal = paidSales.reduce((sum, sale) => sum + sale.total, 0);
-            
-            // Atualizar valores na dashboard
-            document.getElementById('total-due').textContent = `R$ ${totalDue.toFixed(2)}`;
-            document.getElementById('active-clients').textContent = clients.filter(c => 
-                sales.some(s => s.clientId === c.id && s.status !== 'paid')
-            ).length;
-            
-            // Contar vencimentos para hoje
-            const today = new Date().toISOString().split('T')[0];
-            const dueToday = sales.filter(s => s.dueDate === today && s.status === 'pending').length;
-            document.getElementById('due-today').textContent = dueToday;
-            
-            // Calcular lucro total (simplificado)
-            const totalProfit = paidSales.reduce((sum, sale) => {
-                const product = products.find(p => p.id === sale.productId);
-                return sum + (sale.total - (product ? product.cost * sale.quantity : 0));
-            }, 0);
-            
-            document.getElementById('total-profit').textContent = `R$ ${totalProfit.toFixed(2)}`;
-            
-            // Atualizar resumo financeiro
-            document.getElementById('pending-total').textContent = `R$ ${pendingTotal.toFixed(2)}`;
-            document.getElementById('overdue-total').textContent = `R$ ${overdueTotal.toFixed(2)}`;
-            document.getElementById('paid-total').textContent = `R$ ${paidTotal.toFixed(2)}`;
-            document.getElementById('all-total').textContent = `R$ ${totalDue.toFixed(2)}`;
-            
-            // Atualizar listas
-            updateRecentSales();
-        }
-        
-        // Configurar eventos
-        function setupEventListeners() {
-            // Controle de quantidade
-            document.getElementById('minus-btn').addEventListener('click', () => {
-                const quantity = parseInt(quantityInput.value);
-                if (quantity > 1) {
-                    quantityInput.value = quantity - 1;
-                    updateSaleAmount();
-                }
-            });
-            
-            document.getElementById('plus-btn').addEventListener('click', () => {
-                const quantity = parseInt(quantityInput.value);
-                quantityInput.value = quantity + 1;
-                updateSaleAmount();
-            });
-            
-            quantityInput.addEventListener('change', updateSaleAmount);
-            
-            // Atualizar valor total quando produto é selecionado
-            productSelect.addEventListener('change', updateSaleAmount);
-            
-            // Registrar venda
-            registerSaleBtn.addEventListener('click', registerSale);
-            
-            // Salvar cliente
-            document.getElementById('save-client-btn').addEventListener('click', saveClient);
-            
-            // Salvar produto
-            document.getElementById('save-product-btn').addEventListener('click', saveProduct);
-            
-            // Botão flutuante
-            document.getElementById('fab').addEventListener('click', () => {
-                // Alternar para a aba de vendas
-                document.querySelector('.tab[data-tab="sales"]').click();
-            });
-            
-            // Adicionar cliente
-            document.getElementById('add-client-btn').addEventListener('click', () => {
-                // Alternar para a aba de clientes
-                document.querySelector('.tab[data-tab="clients"]').click();
-            });
-            
-            // Adicionar produto
-            document.getElementById('add-product-btn').addEventListener('click', () => {
-                // Alternar para a aba de produtos
-                document.querySelector('.tab[data-tab="products"]').click();
-            });
-        }
-        
-        // Atualizar valor total da venda
-        function updateSaleAmount() {
-            const productId = productSelect.value;
-            const quantity = parseInt(quantityInput.value);
-            
-            if (productId) {
-                const product = products.find(p => p.id === productId);
-                if (product) {
-                    const total = product.price * quantity;
-                    saleAmount.value = `R$ ${total.toFixed(2)}`;
+            // Renderizar lista de devedores
+            function renderDebtors(debtorsArray = debtors) {
+                if (debtorsArray.length === 0) {
+                    debtorsList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-user-slash"></i>
+                            <h3>Nenhum devedor encontrado</h3>
+                            <p>Tente ajustar sua pesquisa ou adicione um novo devedor</p>
+                        </div>
+                    `;
                     return;
                 }
+                
+                debtorsList.innerHTML = debtorsArray.map(debtor => `
+                    <div class="debtor-item" data-id="${debtor.id}">
+                        <div class="debtor-info">
+                            <div class="debtor-name">${debtor.name}</div>
+                            <div class="debtor-date">Adicionado em: ${formatDate(debtor.date)}</div>
+                        </div>
+                        <div class="debtor-amount">
+                            <i class="fas fa-money-bill-wave"></i>
+                            R$ ${formatCurrency(parseFloat(debtor.amount))}
+                        </div>
+                        <div class="debtor-actions">
+                            <button class="action-btn edit" onclick="editDebtor('${debtor.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete" onclick="deleteDebtor('${debtor.id}')">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
             }
             
-            saleAmount.value = 'R$ 0,00';
-        }
-        
-        // Registrar nova venda
-        function registerSale() {
-            const clientId = clientSelect.value;
-            const productId = productSelect.value;
-            const quantity = parseInt(quantityInput.value);
-            const dueDateValue = dueDate.value;
+            // Adicionar novo devedor
+            debtorForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const name = nameInput.value.trim();
+                const amount = parseFloat(amountInput.value);
+                
+                if (!name || isNaN(amount)) {
+                    showNotification('Por favor, preencha todos os campos corretamente!', 'error');
+                    return;
+                }
+                
+                const newDebtor = {
+                    id: Date.now().toString(),
+                    name: name,
+                    amount: amount,
+                    date: new Date().toISOString()
+                };
+                
+                debtors.push(newDebtor);
+                localStorage.setItem('debtors', JSON.stringify(debtors));
+                
+                nameInput.value = '';
+                amountInput.value = '';
+                nameInput.focus();
+                
+                renderDebtors();
+                calculateTotal();
+                showNotification('Devedor adicionado com sucesso!', 'success');
+            });
             
-            if (!clientId || !productId || !quantity || !dueDateValue) {
-                alert('Por favor, preencha todos os campos obrigatórios!');
-                return;
-            }
+            // Pesquisar devedores
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                if (searchTerm === '') {
+                    renderDebtors();
+                    return;
+                }
+                
+                const filteredDebtors = debtors.filter(debtor => 
+                    debtor.name.toLowerCase().includes(searchTerm)
+                );
+                
+                renderDebtors(filteredDebtors);
+            });
             
-            const product = products.find(p => p.id === productId);
-            if (!product) {
-                alert('Produto não encontrado!');
-                return;
-            }
-            
-            const total = product.price * quantity;
-            
-            // Criar nova venda
-            const newSale = {
-                id: Date.now().toString(),
-                clientId: clientId,
-                productId: productId,
-                quantity: quantity,
-                total: total,
-                dueDate: dueDateValue,
-                status: 'pending',
-                date: new Date().toISOString()
+            // Funções globais para editar/excluir
+            window.editDebtor = function(id) {
+                const debtor = debtors.find(d => d.id === id);
+                if (debtor) {
+                    nameInput.value = debtor.name;
+                    amountInput.value = debtor.amount;
+                    
+                    // Remover o devedor da lista
+                    debtors = debtors.filter(d => d.id !== id);
+                    localStorage.setItem('debtors', JSON.stringify(debtors));
+                    
+                    renderDebtors();
+                    calculateTotal();
+                    
+                    showNotification('Devedor carregado para edição!', 'success');
+                }
             };
             
-            sales.push(newSale);
-            saveData();
-            
-            // Atualizar interfaces
-            updateSalesList();
-            updateRecentSales();
-            updateDashboard();
-            
-            // Limpar formulário
-            clientSelect.value = '';
-            productSelect.value = '';
-            quantityInput.value = 1;
-            saleAmount.value = 'R$ 0,00';
-            
-            alert('Venda registrada com sucesso!');
-        }
-        
-        // Salvar cliente
-        function saveClient() {
-            const name = document.getElementById('client-name').value.trim();
-            const phone = document.getElementById('client-phone').value.trim();
-            const email = document.getElementById('client-email').value.trim();
-            
-            if (!name || !phone) {
-                alert('Por favor, preencha os campos obrigatórios!');
-                return;
-            }
-            
-            // Criar novo cliente
-            const newClient = {
-                id: Date.now().toString(),
-                name: name,
-                phone: phone,
-                email: email
+            window.deleteDebtor = function(id) {
+                if (confirm('Tem certeza que deseja excluir este devedor?')) {
+                    debtors = debtors.filter(d => d.id !== id);
+                    localStorage.setItem('debtors', JSON.stringify(debtors));
+                    
+                    renderDebtors();
+                    calculateTotal();
+                    showNotification('Devedor excluído com sucesso!', 'success');
+                }
             };
             
-            clients.push(newClient);
-            saveData();
-            
-            // Atualizar interfaces
-            updateClientsList();
-            updateClientSelect();
-            
-            // Limpar formulário
-            document.getElementById('client-name').value = '';
-            document.getElementById('client-phone').value = '';
-            document.getElementById('client-email').value = '';
-            
-            alert('Cliente salvo com sucesso!');
-        }
-        
-        // Salvar produto
-        function saveProduct() {
-            const name = document.getElementById('product-name').value.trim();
-            const price = parseFloat(document.getElementById('product-price').value);
-            const cost = parseFloat(document.getElementById('product-cost').value);
-            const description = document.getElementById('product-description').value.trim();
-            
-            if (!name || isNaN(price) || isNaN(cost) || price <= 0 || cost <= 0) {
-                alert('Por favor, preencha os campos obrigatórios com valores válidos!');
-                return;
-            }
-            
-            // Criar novo produto
-            const newProduct = {
-                id: Date.now().toString(),
-                name: name,
-                price: price,
-                cost: cost,
-                description: description
-            };
-            
-            products.push(newProduct);
-            saveData();
-            
-            // Atualizar interfaces
-            updateProductsList();
-            updateProductSelect();
-            
-            // Limpar formulário
-            document.getElementById('product-name').value = '';
-            document.getElementById('product-price').value = '';
-            document.getElementById('product-cost').value = '';
-            document.getElementById('product-description').value = '';
-            
-            alert('Produto salvo com sucesso!');
-        }
-        
-        // Obter texto do status
-        function getStatusText(status) {
-            switch (status) {
-                case 'pending': return 'Pendente';
-                case 'paid': return 'Pago';
-                case 'overdue': return 'Atrasado';
-                default: return status;
-            }
-        }
+            // Inicializar
+            renderDebtors();
+            calculateTotal();
+        });
     </script>
 </body>
 </html>
+```
+
+## Recursos e Funcionalidades do Site
+
+1. **Interface moderna e responsiva** - Design limpo com gradientes, cards e elementos visuais agradáveis
+2. **Adição rápida de devedores** - Basta digitar nome e valor e clicar em "Salvar Devedor"
+3. **Lista de devedores completa** - Exibe nome, valor devido e data/hora do registro
+4. **Cálculo automático do total** - Mostra o valor total devido por todos os devedores
+5. **Pesquisa em tempo real** - Filtra a lista de devedores conforme você digita
+6. **Edição de registros** - Clique no ícone de edição para carregar um devedor no formulário
+7. **Exclusão de registros** - Remova devedores com confirmação
+8. **Armazenamento local** - Os dados são salvos no navegador (localStorage)
+9. **Notificações** - Feedback visual para ações realizadas
+10. **Totalmente responsivo** - Funciona em dispositivos móveis e desktop
+
+## Como Usar
+
+1. Preencha o nome do devedor e o valor devido
+2. Clique em "Salvar Devedor" para adicionar à lista
+3. Use a barra de pesquisa para encontrar devedores específicos
+4. Clique no ícone de lápis para editar um devedor existente
+5. Clique no ícone de lixeira para remover um devedor
+
+Os dados são automaticamente salvos no seu navegador, então você pode fechar e reabrir a página que as informações permanecerão salvas.
