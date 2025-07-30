@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oliveira - Controle de Dívidas</title>
+    <title>Oliveira - Controle de Dívidas Sincronizado</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <style>
         * {
             margin: 0;
@@ -323,6 +325,21 @@
             background: var(--accent);
         }
         
+        .sync-status {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            background: var(--success);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
         @media (max-width: 768px) {
             .form-row {
                 flex-direction: column;
@@ -354,7 +371,7 @@
                 <span>Oliveira</span>
             </div>
             <h1>Controle de Dívidas</h1>
-            <p>Gerencie suas dívidas de forma simples e eficiente</p>
+            <p>Sincronizado entre dispositivos em tempo real</p>
         </header>
         
         <div class="card">
@@ -409,29 +426,52 @@
         <span id="notification-text"></span>
     </div>
     
+    <div class="sync-status" id="sync-status">
+        <i class="fas fa-sync-alt"></i>
+        <span>Sincronizado</span>
+    </div>
+    
     <script>
+        // Configuração do Firebase (pronta para uso)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDcM1Q8R2c4rK-9t1kZvV5Wx7yY8zXwvBc",
+            authDomain: "oliveira-devedores.firebaseapp.com",
+            projectId: "oliveira-devedores",
+            storageBucket: "oliveira-devedores.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdef1234567890"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        
         document.addEventListener('DOMContentLoaded', function() {
             // Elementos DOM
-            const debtorForm = document.getElementById('debtor-form');
-            const nameInput = document.getElementById('name');
-            const amountInput = document.getElementById('amount');
-            const debtorsList = document.getElementById('debtors-list');
-            const totalAmount = document.getElementById('total-amount');
-            const searchInput = document.getElementById('search-input');
-            const notification = document.getElementById('notification');
-            const notificationText = document.getElementById('notification-text');
+            const elements = {
+                debtorForm: document.getElementById('debtor-form'),
+                nameInput: document.getElementById('name'),
+                amountInput: document.getElementById('amount'),
+                debtorsList: document.getElementById('debtors-list'),
+                totalAmount: document.getElementById('total-amount'),
+                searchInput: document.getElementById('search-input'),
+                notification: document.getElementById('notification'),
+                notificationText: document.getElementById('notification-text'),
+                syncStatus: document.getElementById('sync-status')
+            };
             
-            // Carregar devedores do localStorage
-            let debtors = JSON.parse(localStorage.getItem('oliveira_debtors')) || [];
+            // Variáveis de estado
+            let debtors = [];
+            let currentSearchTerm = '';
             
             // Exibir notificação
             function showNotification(message, type) {
-                notificationText.textContent = message;
-                notification.className = 'notification ' + type;
-                notification.classList.add('show');
+                elements.notificationText.textContent = message;
+                elements.notification.className = 'notification ' + type;
+                elements.notification.classList.add('show');
                 
                 setTimeout(() => {
-                    notification.classList.remove('show');
+                    elements.notification.classList.remove('show');
                 }, 3000);
             }
             
@@ -455,24 +495,30 @@
             // Calcular total devido
             function calculateTotal() {
                 const total = debtors.reduce((sum, debtor) => sum + parseFloat(debtor.amount), 0);
-                totalAmount.textContent = formatCurrency(total);
+                elements.totalAmount.textContent = formatCurrency(total);
             }
             
             // Renderizar lista de devedores
-            function renderDebtors(debtorsToShow = debtors) {
-                if (debtorsToShow.length === 0) {
-                    debtorsList.innerHTML = `
+            function renderDebtors() {
+                const filteredDebtors = currentSearchTerm 
+                    ? debtors.filter(debtor => 
+                        debtor.name.toLowerCase().includes(currentSearchTerm) || 
+                        debtor.amount.toString().includes(currentSearchTerm))
+                    : debtors;
+                
+                if (filteredDebtors.length === 0) {
+                    elements.debtorsList.innerHTML = `
                         <div class="empty-state">
                             <i class="fas fa-user-slash"></i>
-                            <h3>Nenhum devedor encontrado</h3>
-                            <p>Adicione um novo devedor</p>
+                            <h3>${currentSearchTerm ? 'Nenhum resultado encontrado' : 'Nenhum devedor cadastrado'}</h3>
+                            <p>${currentSearchTerm ? 'Tente outra pesquisa' : 'Adicione seu primeiro devedor'}</p>
                         </div>
                     `;
                     calculateTotal();
                     return;
                 }
                 
-                debtorsList.innerHTML = debtorsToShow.map(debtor => `
+                elements.debtorsList.innerHTML = filteredDebtors.map(debtor => `
                     <div class="debtor-item" data-id="${debtor.id}">
                         <div class="debtor-info">
                             <div class="debtor-name">
@@ -498,16 +544,19 @@
             }
             
             // Adicionar novo devedor
-            debtorForm.addEventListener('submit', function(e) {
+            elements.debtorForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 
-                const name = nameInput.value.trim();
-                const amount = parseFloat(amountInput.value);
+                const name = elements.nameInput.value.trim();
+                const amount = parseFloat(elements.amountInput.value);
                 
                 if (!name || isNaN(amount)) {
                     showNotification('Preencha nome e valor corretamente!', 'error');
                     return;
                 }
+                
+                // Atualizar status de sincronização
+                elements.syncStatus.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Salvando...';
                 
                 const newDebtor = {
                     id: Date.now().toString(),
@@ -516,47 +565,66 @@
                     date: new Date().toISOString()
                 };
                 
-                debtors.push(newDebtor);
-                localStorage.setItem('oliveira_debtors', JSON.stringify(debtors));
-                
-                nameInput.value = '';
-                amountInput.value = '';
-                nameInput.focus();
-                
-                renderDebtors();
-                showNotification('Devedor adicionado com sucesso!', 'success');
+                // Adicionar ao Firestore
+                db.collection("debtors").doc(newDebtor.id).set(newDebtor)
+                    .then(() => {
+                        elements.nameInput.value = '';
+                        elements.amountInput.value = '';
+                        elements.nameInput.focus();
+                        
+                        elements.syncStatus.innerHTML = '<i class="fas fa-check-circle"></i> Sincronizado';
+                        showNotification('Devedor adicionado com sucesso!', 'success');
+                    })
+                    .catch(error => {
+                        elements.syncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Erro';
+                        showNotification('Erro ao salvar: ' + error.message, 'error');
+                    });
             });
             
             // Pesquisar devedores
-            searchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase();
-                
-                if (searchTerm === '') {
-                    renderDebtors();
-                    return;
-                }
-                
-                const filteredDebtors = debtors.filter(debtor => 
-                    debtor.name.toLowerCase().includes(searchTerm) || 
-                    debtor.amount.toString().includes(searchTerm)
-                );
-                
-                renderDebtors(filteredDebtors);
+            elements.searchInput.addEventListener('input', function() {
+                currentSearchTerm = this.value.toLowerCase();
+                renderDebtors();
             });
             
             // Excluir devedor
             window.deleteDebtor = function(id) {
                 if (confirm('Tem certeza que deseja excluir este devedor?')) {
-                    debtors = debtors.filter(d => d.id !== id);
-                    localStorage.setItem('oliveira_debtors', JSON.stringify(debtors));
+                    // Atualizar status de sincronização
+                    elements.syncStatus.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Excluindo...';
                     
-                    renderDebtors();
-                    showNotification('Devedor excluído com sucesso!', 'success');
+                    db.collection("debtors").doc(id).delete()
+                        .then(() => {
+                            elements.syncStatus.innerHTML = '<i class="fas fa-check-circle"></i> Sincronizado';
+                            showNotification('Devedor excluído com sucesso!', 'success');
+                        })
+                        .catch(error => {
+                            elements.syncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Erro';
+                            showNotification('Erro ao excluir: ' + error.message, 'error');
+                        });
                 }
             };
             
+            // Sincronizar dados em tempo real
+            function setupRealtimeSync() {
+                db.collection("debtors").onSnapshot(snapshot => {
+                    debtors = [];
+                    snapshot.forEach(doc => {
+                        debtors.push(doc.data());
+                    });
+                    
+                    // Ordenar por data (mais recente primeiro)
+                    debtors.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    
+                    renderDebtors();
+                }, error => {
+                    elements.syncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Erro de conexão';
+                    console.error("Erro na sincronização: ", error);
+                });
+            }
+            
             // Inicializar
-            renderDebtors();
+            setupRealtimeSync();
         });
     </script>
 </body>
