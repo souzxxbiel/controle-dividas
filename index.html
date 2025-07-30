@@ -3,62 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oliveira - Gestão de Dívidas Profissional</title>
+    <title>Oliveira - Controle de Dívidas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <style>
-        :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --accent: #e74c3c;
-            --light: #f8f9fa;
-            --dark: #1a252f;
-            --success: #27ae60;
-            --warning: #f39c12;
-            --gray: #95a5a6;
-            --card-bg: #ffffff;
-            --sidebar-bg: #2c3e50;
-            --sidebar-text: #ecf0f1;
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
+        
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #1a252f;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --card-bg: #ffffff;
+        }
+        
         body {
-            background-color: #f5f7fa;
-            color: #333;
-            display: flex;
+            background: #f5f7fa;
             min-height: 100vh;
+            padding: 20px;
+            color: #333;
         }
-
-        /* Sidebar */
-        .sidebar {
-            width: 280px;
-            background: var(--sidebar-bg);
-            color: var(--sidebar-text);
-            padding: 25px 0;
-            transition: all 0.3s;
-            position: fixed;
-            height: 100vh;
-            z-index: 100;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
         }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
             margin-bottom: 30px;
-            padding: 0 25px;
         }
-
+        
         .logo {
+            display: inline-flex;
+            align-items: center;
+            background: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            margin-bottom: 15px;
+        }
+        
+        .logo-icon {
             background: var(--accent);
             width: 40px;
             height: 40px;
@@ -68,1244 +62,501 @@
             justify-content: center;
             font-weight: bold;
             font-size: 1.5rem;
-            margin-right: 12px;
+            margin-right: 10px;
         }
-
-        .logo-text {
-            font-size: 1.4rem;
-            font-weight: 600;
+        
+        header h1 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 10px;
         }
-
-        .nav-menu {
-            margin-top: 40px;
+        
+        header p {
+            color: #7f8c8d;
+            max-width: 500px;
+            margin: 0 auto;
         }
-
-        .nav-item {
-            padding: 12px 25px;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            border-left: 4px solid transparent;
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            overflow: hidden;
         }
-
-        .nav-item:hover {
-            background: rgba(255,255,255,0.1);
-        }
-
-        .nav-item.active {
-            background: rgba(255,255,255,0.1);
-            border-left: 4px solid var(--secondary);
-        }
-
-        .nav-item i {
-            margin-right: 12px;
-            font-size: 1.1rem;
-            width: 20px;
-            text-align: center;
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            margin-left: 280px;
-            padding: 30px;
-            transition: all 0.3s;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .page-title {
-            font-size: 1.8rem;
-            color: var(--dark);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--secondary);
+        
+        .card-header {
+            padding: 15px 20px;
+            background: var(--primary);
             color: white;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-weight: 600;
-        }
-
-        /* Cards */
-        .card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
-            overflow: hidden;
-        }
-
-        .card-header {
-            padding: 18px 25px;
-            border-bottom: 1px solid #eee;
-            display: flex;
             justify-content: space-between;
-            align-items: center;
         }
-
-        .card-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--dark);
+        
+        .card-header h2 {
             display: flex;
             align-items: center;
             gap: 10px;
+            font-size: 1.2rem;
         }
-
+        
+        .total-container {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+        
         .card-body {
-            padding: 25px;
+            padding: 20px;
         }
-
-        /* Formulário */
+        
         .form-row {
             display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
+            gap: 15px;
+            margin-bottom: 15px;
         }
-
+        
         .input-group {
             flex: 1;
-            position: relative;
         }
-
+        
         .input-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             font-weight: 500;
-            color: var(--dark);
-            font-size: 0.95rem;
+            color: var(--primary);
+            font-size: 0.9rem;
         }
-
+        
         .input-group input {
             width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s;
-            background: var(--light);
-        }
-
-        .input-group input:focus {
-            border-color: var(--secondary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-            background: white;
-        }
-
-        .suggestions {
-            position: absolute;
-            width: 100%;
-            max-height: 200px;
-            overflow-y: auto;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 0 0 8px 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            z-index: 10;
-            display: none;
-        }
-
-        .suggestion-item {
             padding: 10px 15px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.95rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
         }
-
-        .suggestion-item:hover {
-            background-color: #f0f7ff;
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
         }
-
+        
         .btn {
-            padding: 12px 20px;
+            padding: 10px 20px;
             border: none;
-            border-radius: 8px;
+            border-radius: 5px;
             font-size: 1rem;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            transition: all 0.3s;
         }
-
+        
         .btn-primary {
             background: var(--secondary);
             color: white;
         }
-
+        
         .btn-primary:hover {
             background: #2980b9;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.2);
         }
-
+        
         .btn-block {
             display: block;
             width: 100%;
         }
-
-        /* Tabela de Devedores */
-        .debtors-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .debtors-table th {
-            background: #f8f9fa;
-            padding: 12px 15px;
-            text-align: left;
-            font-weight: 600;
-            color: var(--dark);
-            font-size: 0.9rem;
-            border-bottom: 2px solid #eee;
-        }
-
-        .debtors-table td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            vertical-align: middle;
-        }
-
-        .debtors-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .debtors-table tr:hover {
-            background: #f8f9fa;
-        }
-
-        .debtor-name {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .name-badge {
-            background: var(--secondary);
-            color: white;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .debtor-details {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .debtor-main-name {
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        .debtor-phone {
-            font-size: 0.85rem;
-            color: var(--gray);
-            margin-top: 3px;
-        }
-
-        .debtor-amount {
-            font-weight: 700;
-            color: var(--accent);
-        }
-
-        .debtor-date {
-            font-size: 0.9rem;
-            color: var(--gray);
-        }
-
-        .debtor-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .action-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: none;
-            background: var(--light);
-            color: var(--dark);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-
-        .action-btn:hover {
-            transform: scale(1.1);
-        }
-
-        .action-btn.edit:hover {
-            background: var(--warning);
-            color: white;
-        }
-
-        .action-btn.delete:hover {
-            background: var(--accent);
-            color: white;
-        }
-
-        /* Histórico */
-        .history-item {
-            display: flex;
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            transition: all 0.3s;
-        }
-
-        .history-item:last-child {
-            border-bottom: none;
-        }
-
-        .history-item:hover {
-            background: #f8f9fa;
-        }
-
-        .history-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #f0f7ff;
-            color: var(--secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            flex-shrink: 0;
-        }
-
-        .history-content {
-            flex: 1;
-        }
-
-        .history-title {
-            font-weight: 600;
-            color: var(--dark);
-            margin-bottom: 5px;
-        }
-
-        .history-description {
-            font-size: 0.9rem;
-            color: var(--gray);
-            margin-bottom: 5px;
-        }
-
-        .history-date {
-            font-size: 0.8rem;
-            color: var(--gray);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        /* Search */
+        
         .search-container {
-            position: relative;
             margin-bottom: 20px;
+            position: relative;
         }
-
+        
         .search-input {
             width: 100%;
-            padding: 12px 15px 12px 45px;
+            padding: 10px 15px 10px 40px;
             border: 1px solid #ddd;
-            border-radius: 8px;
+            border-radius: 5px;
             font-size: 1rem;
-            background: var(--light);
-            transition: all 0.3s;
         }
-
-        .search-input:focus {
-            border-color: var(--secondary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-            background: white;
-        }
-
+        
         .search-icon {
             position: absolute;
             left: 15px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--gray);
+            color: #95a5a6;
         }
-
-        /* Stats */
-        .stats-container {
+        
+        .debtors-list {
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .debtor-item {
             display: flex;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            flex: 1;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
             background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            display: flex;
-            align-items: center;
-            gap: 15px;
+            transition: all 0.3s;
         }
-
-        .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
+        
+        .debtor-item:hover {
+            background: #f8f9fa;
         }
-
-        .stat-icon.primary {
-            background: rgba(52, 152, 219, 0.1);
-            color: var(--secondary);
-        }
-
-        .stat-icon.accent {
-            background: rgba(231, 76, 60, 0.1);
-            color: var(--accent);
-        }
-
-        .stat-icon.success {
-            background: rgba(39, 174, 96, 0.1);
-            color: var(--success);
-        }
-
-        .stat-info {
+        
+        .debtor-info {
             flex: 1;
         }
-
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
+        
+        .debtor-name {
+            font-weight: 600;
+            color: var(--primary);
             margin-bottom: 5px;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: var(--gray);
-        }
-
-        /* Notifications */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 25px;
-            border-radius: 8px;
-            color: white;
-            font-weight: 500;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-            transform: translateX(120%);
-            transition: transform 0.4s ease-in-out;
-            z-index: 1000;
             display: flex;
             align-items: center;
             gap: 10px;
         }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        .notification.success {
-            background: var(--success);
-        }
-
-        .notification.error {
-            background: var(--accent);
-        }
-
-        /* Modal */
-        .confirmation-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
+        
+        .name-badge {
+            background: var(--secondary);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 2000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
+            font-size: 0.9rem;
+            font-weight: 600;
         }
-
-        .confirmation-modal.show {
-            opacity: 1;
-            visibility: visible;
+        
+        .debtor-date {
+            font-size: 0.8rem;
+            color: #95a5a6;
         }
-
-        .modal-content {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-            transform: translateY(-20px);
-            transition: transform 0.3s;
-        }
-
-        .confirmation-modal.show .modal-content {
-            transform: translateY(0);
-        }
-
-        .modal-header {
+        
+        .debtor-amount {
+            font-weight: 700;
+            color: var(--accent);
+            min-width: 100px;
+            text-align: right;
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .modal-header i {
-            font-size: 1.8rem;
-            color: var(--accent);
-        }
-
-        .modal-header h3 {
-            font-size: 1.4rem;
-            color: var(--dark);
-        }
-
-        .modal-body {
-            margin-bottom: 25px;
-            line-height: 1.6;
-            color: #555;
-        }
-
-        .modal-footer {
-            display: flex;
-            gap: 15px;
             justify-content: flex-end;
+            gap: 5px;
         }
-
-        /* Responsivo */
-        @media (max-width: 992px) {
-            .sidebar {
-                width: 80px;
-                overflow: hidden;
-            }
-
-            .sidebar:hover {
-                width: 280px;
-            }
-
-            .logo-text, .nav-text {
-                opacity: 0;
-                transition: opacity 0.3s;
-            }
-
-            .sidebar:hover .logo-text,
-            .sidebar:hover .nav-text {
-                opacity: 1;
-            }
-
-            .main-content {
-                margin-left: 80px;
-            }
+        
+        .debtor-actions {
+            display: flex;
+            gap: 5px;
+            margin-left: 10px;
         }
-
+        
+        .action-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: none;
+            background: #f1f1f1;
+            color: var(--primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .action-btn.delete:hover {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #95a5a6;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            transform: translateX(120%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: var(--success);
+        }
+        
+        .notification.error {
+            background: var(--accent);
+        }
+        
         @media (max-width: 768px) {
             .form-row {
                 flex-direction: column;
-                gap: 15px;
+                gap: 10px;
             }
-
-            .stats-container {
+            
+            .debtor-item {
                 flex-direction: column;
+                gap: 10px;
             }
-
+            
+            .debtor-amount {
+                justify-content: flex-start;
+                text-align: left;
+            }
+            
             .debtor-actions {
-                flex-direction: column;
-                gap: 5px;
-            }
-
-            .action-btn {
-                width: 30px;
-                height: 30px;
-                font-size: 0.8rem;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .main-content {
-                padding: 20px 15px;
-            }
-
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-
-            .card-body {
-                padding: 15px;
-            }
-
-            .debtor-name {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
+                justify-content: flex-end;
+                margin-left: 0;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="logo-container">
-            <div class="logo">O</div>
-            <div class="logo-text">Oliveira</div>
-        </div>
-
-        <div class="nav-menu">
-            <div class="nav-item active">
-                <i class="fas fa-users"></i>
-                <span class="nav-text">Devedores</span>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">O</div>
+                <span>Oliveira</span>
             </div>
-            <div class="nav-item">
-                <i class="fas fa-history"></i>
-                <span class="nav-text">Histórico</span>
-            </div>
-            <div class="nav-item">
-                <i class="fas fa-chart-line"></i>
-                <span class="nav-text">Relatórios</span>
-            </div>
-            <div class="nav-item">
-                <i class="fas fa-cog"></i>
-                <span class="nav-text">Configurações</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="main-content">
-        <div class="header">
-            <h1 class="page-title">
-                <i class="fas fa-users"></i>
-                Controle de Devedores
-            </h1>
-            <div class="user-profile">
-                <div class="user-avatar">VO</div>
-                <div class="user-info">
-                    <div class="user-name">Vinícius Oliveira</div>
-                    <div class="user-role">Administrador</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Estatísticas -->
-        <div class="stats-container">
-            <div class="stat-card">
-                <div class="stat-icon primary">
-                    <i class="fas fa-wallet"></i>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-value" id="total-amount">R$ 0,00</div>
-                    <div class="stat-label">Total Devido</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon accent">
-                    <i class="fas fa-user-times"></i>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-value" id="total-debtors">0</div>
-                    <div class="stat-label">Clientes</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon success">
-                    <i class="fas fa-calendar-check"></i>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-value" id="today-amount">R$ 0,00</div>
-                    <div class="stat-label">Hoje</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Formulário de Adição -->
+            <h1>Controle de Dívidas</h1>
+            <p>Gerencie suas dívidas de forma simples e eficiente</p>
+        </header>
+        
         <div class="card">
             <div class="card-header">
-                <h2 class="card-title">
-                    <i class="fas fa-plus-circle"></i>
-                    Adicionar Nova Dívida
-                </h2>
+                <h2><i class="fas fa-plus-circle"></i> Adicionar Devedor</h2>
             </div>
             <div class="card-body">
                 <form id="debtor-form">
                     <div class="form-row">
                         <div class="input-group">
-                            <label for="name">Nome do Cliente</label>
-                            <input type="text" id="name" placeholder="Digite o nome do cliente" required>
-                            <div class="suggestions" id="name-suggestions"></div>
+                            <label for="name">Nome do Devedor</label>
+                            <input type="text" id="name" placeholder="Digite o nome" required>
                         </div>
                         <div class="input-group">
-                            <label for="phone">Telefone (Opcional)</label>
-                            <input type="text" id="phone" placeholder="(00) 00000-0000">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="input-group">
-                            <label for="amount">Valor da Dívida (R$)</label>
+                            <label for="amount">Valor (R$)</label>
                             <input type="number" id="amount" placeholder="Digite o valor" min="0" step="0.01" required>
-                        </div>
-                        <div class="input-group">
-                            <label for="description">Descrição (Opcional)</label>
-                            <input type="text" id="description" placeholder="Motivo da dívida">
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary btn-block">
-                        <i class="fas fa-save"></i> Registrar Dívida
+                        <i class="fas fa-save"></i> Salvar
                     </button>
                 </form>
             </div>
         </div>
-
-        <!-- Lista de Devedores -->
+        
         <div class="card">
             <div class="card-header">
-                <h2 class="card-title">
-                    <i class="fas fa-list"></i>
-                    Lista de Devedores
-                </h2>
+                <h2><i class="fas fa-users"></i> Lista de Devedores</h2>
+                <div class="total-container">
+                    Total: R$ <span id="total-amount">0.00</span>
+                </div>
+            </div>
+            <div class="card-body">
                 <div class="search-container">
                     <i class="fas fa-search search-icon"></i>
-                    <input type="text" class="search-input" id="search-input" placeholder="Pesquisar por nome, telefone ou valor...">
+                    <input type="text" class="search-input" id="search-input" placeholder="Pesquisar devedores...">
                 </div>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="debtors-table" id="debtors-table">
-                        <thead>
-                            <tr>
-                                <th>Cliente</th>
-                                <th>Valor</th>
-                                <th>Última Atualização</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="debtors-list">
-                            <!-- Dados serão preenchidos via JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Histórico -->
-        <div class="card">
-            <div class="card-header">
-                <h2 class="card-title">
-                    <i class="fas fa-history"></i>
-                    Histórico Recente
-                </h2>
-            </div>
-            <div class="card-body">
-                <div class="history-list" id="history-list">
-                    <!-- Histórico será preenchido via JavaScript -->
+                
+                <div class="debtors-list" id="debtors-list">
                     <div class="empty-state">
-                        <i class="fas fa-clock"></i>
-                        <h3>Nenhum registro histórico</h3>
-                        <p>Seu histórico de atividades aparecerá aqui</p>
+                        <i class="fas fa-user-slash"></i>
+                        <h3>Nenhum devedor cadastrado</h3>
+                        <p>Adicione seu primeiro devedor</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Notificação -->
+    
     <div class="notification" id="notification">
         <i class="fas fa-check-circle"></i>
         <span id="notification-text"></span>
     </div>
-
-    <!-- Modal de Confirmação -->
-    <div class="confirmation-modal" id="confirmation-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <i class="fas fa-exclamation-triangle"></i>
-                <h3>Confirmar Exclusão</h3>
-            </div>
-            <div class="modal-body">
-                <p>Tem certeza que deseja excluir este cliente e todas as suas dívidas? Esta ação não pode ser desfeita.</p>
-                <p>Cliente: <strong id="debtor-to-delete-name"></strong></p>
-                <p>Valor Total: <strong id="debtor-to-delete-amount"></strong></p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn" id="cancel-delete">
-                    <i class="fas fa-times"></i> Cancelar
-                </button>
-                <button class="btn btn-accent" id="confirm-delete">
-                    <i class="fas fa-trash-alt"></i> Excluir
-                </button>
-            </div>
-        </div>
-    </div>
-
+    
     <script>
-        // Configuração do Firebase (substitua com suas credenciais)
-        const firebaseConfig = {
-            apiKey: "SUA_API_KEY_AQUI",
-            authDomain: "SEU_PROJETO.firebaseapp.com",
-            projectId: "SEU_PROJETO",
-            storageBucket: "SEU_PROJETO.appspot.com",
-            messagingSenderId: "1234567890",
-            appId: "1:1234567890:web:abcdef1234567890"
-        };
-
-        // Inicializar Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        
         document.addEventListener('DOMContentLoaded', function() {
             // Elementos DOM
-            const elements = {
-                debtorForm: document.getElementById('debtor-form'),
-                nameInput: document.getElementById('name'),
-                phoneInput: document.getElementById('phone'),
-                amountInput: document.getElementById('amount'),
-                descriptionInput: document.getElementById('description'),
-                debtorsList: document.getElementById('debtors-list'),
-                historyList: document.getElementById('history-list'),
-                totalAmount: document.getElementById('total-amount'),
-                totalDebtors: document.getElementById('total-debtors'),
-                todayAmount: document.getElementById('today-amount'),
-                notification: document.getElementById('notification'),
-                notificationText: document.getElementById('notification-text'),
-                searchInput: document.getElementById('search-input'),
-                confirmationModal: document.getElementById('confirmation-modal'),
-                cancelDeleteBtn: document.getElementById('cancel-delete'),
-                confirmDeleteBtn: document.getElementById('confirm-delete'),
-                debtorToDeleteName: document.getElementById('debtor-to-delete-name'),
-                debtorToDeleteAmount: document.getElementById('debtor-to-delete-amount'),
-                nameSuggestions: document.getElementById('name-suggestions')
-            };
+            const debtorForm = document.getElementById('debtor-form');
+            const nameInput = document.getElementById('name');
+            const amountInput = document.getElementById('amount');
+            const debtorsList = document.getElementById('debtors-list');
+            const totalAmount = document.getElementById('total-amount');
+            const searchInput = document.getElementById('search-input');
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notification-text');
             
-            // Variáveis de estado
-            let debtors = {};
-            let customerNames = [];
-            let currentDebtorToDelete = null;
-            let today = new Date().toISOString().split('T')[0];
+            // Carregar devedores do localStorage
+            let debtors = JSON.parse(localStorage.getItem('oliveira_debtors')) || [];
             
-            // Funções auxiliares
-            const helpers = {
-                showNotification: (message, type) => {
-                    elements.notificationText.textContent = message;
-                    elements.notification.className = 'notification ' + type;
-                    elements.notification.classList.add('show');
-                    
-                    setTimeout(() => {
-                        elements.notification.classList.remove('show');
-                    }, 3000);
-                },
+            // Exibir notificação
+            function showNotification(message, type) {
+                notificationText.textContent = message;
+                notification.className = 'notification ' + type;
+                notification.classList.add('show');
                 
-                formatCurrency: (value) => {
-                    return value.toLocaleString('pt-BR', {
-                        style: 'currency',
-                        currency: 'BRL'
-                    });
-                },
-                
-                formatDate: (dateString) => {
-                    const options = { 
-                        day: '2-digit', 
-                        month: '2-digit', 
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    };
-                    return new Date(dateString).toLocaleDateString('pt-BR', options);
-                },
-                
-                updateNameSuggestions: () => {
-                    elements.nameSuggestions.innerHTML = '';
-                    
-                    if (elements.nameInput.value.length > 0) {
-                        const searchTerm = elements.nameInput.value.toLowerCase();
-                        const filteredNames = customerNames.filter(name => 
-                            name.toLowerCase().includes(searchTerm)
-                            .slice(0, 5); // Limitar a 5 sugestões
-                        
-                        if (filteredNames.length > 0) {
-                            elements.nameSuggestions.style.display = 'block';
-                            filteredNames.forEach(name => {
-                                const div = document.createElement('div');
-                                div.className = 'suggestion-item';
-                                div.textContent = name;
-                                div.addEventListener('click', () => {
-                                    elements.nameInput.value = name;
-                                    elements.nameSuggestions.style.display = 'none';
-                                    elements.amountInput.focus();
-                                });
-                                elements.nameSuggestions.appendChild(div);
-                            });
-                        } else {
-                            elements.nameSuggestions.style.display = 'none';
-                        }
-                    } else {
-                        elements.nameSuggestions.style.display = 'none';
-                    }
-                },
-                
-                calculateStats: () => {
-                    const debtorsArray = Object.values(debtors);
-                    const total = debtorsArray.reduce((sum, debtor) => sum + debtor.total, 0);
-                    elements.totalAmount.textContent = helpers.formatCurrency(total);
-                    
-                    elements.totalDebtors.textContent = debtorsArray.length;
-                    
-                    // Calcular total de hoje
-                    const todayTotal = debtorsArray.reduce((sum, debtor) => {
-                        const todayDebts = debtor.debts.filter(debt => {
-                            return debt.date.split('T')[0] === today;
-                        });
-                        return sum + todayDebts.reduce((s, d) => s + d.amount, 0);
-                    }, 0);
-                    
-                    elements.todayAmount.textContent = helpers.formatCurrency(todayTotal);
-                },
-                
-                renderDebtors: (filteredDebtors = null) => {
-                    const debtorsArray = filteredDebtors ? filteredDebtors : Object.values(debtors);
-                    
-                    if (debtorsArray.length === 0) {
-                        elements.debtorsList.innerHTML = `
-                            <tr>
-                                <td colspan="4" style="text-align: center; padding: 30px;">
-                                    <i class="fas fa-user-slash" style="font-size: 2rem; color: #ddd; margin-bottom: 15px;"></i>
-                                    <h3 style="color: var(--gray);">Nenhum devedor encontrado</h3>
-                                </td>
-                            </tr>
-                        `;
-                        helpers.calculateStats();
-                        return;
-                    }
-                    
-                    // Ordenar por maior dívida
-                    debtorsArray.sort((a, b) => b.total - a.total);
-                    
-                    elements.debtorsList.innerHTML = debtorsArray.map(debtor => `
-                        <tr>
-                            <td>
-                                <div class="debtor-name">
-                                    <div class="name-badge">${debtor.name.charAt(0)}</div>
-                                    <div class="debtor-details">
-                                        <div class="debtor-main-name">${debtor.name}</div>
-                                        ${debtor.phone ? `<div class="debtor-phone">${debtor.phone}</div>` : ''}
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="debtor-amount">${helpers.formatCurrency(debtor.total)}</td>
-                            <td class="debtor-date">${helpers.formatDate(debtor.lastUpdate)}</td>
-                            <td>
-                                <div class="debtor-actions">
-                                    <button class="action-btn edit" onclick="app.editDebtor('${debtor.name}')">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
-                                    <button class="action-btn delete" onclick="app.showDeleteConfirmation('${debtor.name}')">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                    <button class="action-btn history" onclick="app.showHistory('${debtor.name}')">
-                                        <i class="fas fa-history"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    `).join('');
-                    
-                    helpers.calculateStats();
-                },
-                
-                renderHistory: (history) => {
-                    if (history.length === 0) {
-                        elements.historyList.innerHTML = `
-                            <div class="empty-state">
-                                <i class="fas fa-clock" style="font-size: 2rem; color: #ddd; margin-bottom: 15px;"></i>
-                                <h3 style="color: var(--gray);">Nenhum registro histórico</h3>
-                                <p>Seu histórico de atividades aparecerá aqui</p>
-                            </div>
-                        `;
-                        return;
-                    }
-                    
-                    elements.historyList.innerHTML = history.map(item => `
-                        <div class="history-item">
-                            <div class="history-icon">
-                                <i class="fas ${item.type === 'addition' ? 'fa-plus' : 'fa-trash-alt'}"></i>
-                            </div>
-                            <div class="history-content">
-                                <div class="history-title">${item.title}</div>
-                                <div class="history-description">${item.description}</div>
-                                <div class="history-date">
-                                    <i class="far fa-clock"></i>
-                                    ${helpers.formatDate(item.date)}
-                                </div>
-                            </div>
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+            
+            // Formatar valor monetário
+            function formatCurrency(value) {
+                return value.toFixed(2).replace('.', ',');
+            }
+            
+            // Formatar data
+            function formatDate(dateString) {
+                const options = { 
+                    day: '2-digit', 
+                    month: '2-digit', 
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                };
+                return new Date(dateString).toLocaleDateString('pt-BR', options);
+            }
+            
+            // Calcular total devido
+            function calculateTotal() {
+                const total = debtors.reduce((sum, debtor) => sum + parseFloat(debtor.amount), 0);
+                totalAmount.textContent = formatCurrency(total);
+            }
+            
+            // Renderizar lista de devedores
+            function renderDebtors(debtorsToShow = debtors) {
+                if (debtorsToShow.length === 0) {
+                    debtorsList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-user-slash"></i>
+                            <h3>Nenhum devedor encontrado</h3>
+                            <p>Adicione um novo devedor</p>
                         </div>
-                    `).join('');
-                },
-                
-                loadData: () => {
-                    // Carregar clientes
-                    db.collection("customers").get().then(querySnapshot => {
-                        customerNames = [];
-                        querySnapshot.forEach(doc => {
-                            customerNames.push(doc.data().name);
-                        });
-                    });
-                    
-                    // Carregar devedores em tempo real
-                    db.collection("debtors").onSnapshot(querySnapshot => {
-                        debtors = {};
-                        querySnapshot.forEach(doc => {
-                            const data = doc.data();
-                            debtors[data.name] = data;
-                        });
-                        helpers.renderDebtors();
-                    });
-                    
-                    // Carregar histórico
-                    db.collection("history")
-                        .orderBy("date", "desc")
-                        .limit(5)
-                        .onSnapshot(querySnapshot => {
-                            const history = [];
-                            querySnapshot.forEach(doc => {
-                                history.push(doc.data());
-                            });
-                            helpers.renderHistory(history);
-                        });
-                },
-                
-                addToHistory: (title, description, type) => {
-                    db.collection("history").add({
-                        title,
-                        description,
-                        type,
-                        date: new Date().toISOString()
-                    });
-                }
-            };
-            
-            // Event Listeners
-            elements.debtorForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const name = elements.nameInput.value.trim();
-                const phone = elements.phoneInput.value.trim();
-                const amount = parseFloat(elements.amountInput.value);
-                const description = elements.descriptionInput.value.trim();
-                
-                if (!name || isNaN(amount)) {
-                    helpers.showNotification('Por favor, preencha pelo menos o nome e o valor corretamente!', 'error');
+                    `;
+                    calculateTotal();
                     return;
                 }
                 
-                // Verificar se o cliente já existe
-                db.collection("debtors").doc(name).get().then(doc => {
-                    if (doc.exists) {
-                        // Atualizar o cliente existente
-                        const debtor = doc.data();
-                        const newDebts = [...debtor.debts, { 
-                            amount, 
-                            description,
-                            date: new Date().toISOString() 
-                        }];
-                        const newTotal = debtor.total + amount;
-                        
-                        db.collection("debtors").doc(name).update({
-                            debts: newDebts,
-                            total: newTotal,
-                            lastUpdate: new Date().toISOString(),
-                            phone: phone || debtor.phone
-                        }).then(() => {
-                            // Adicionar o nome à lista de clientes se não existir
-                            if (!customerNames.includes(name)) {
-                                customerNames.push(name);
-                                db.collection("customers").doc(name).set({ name });
-                            }
-                            
-                            // Adicionar ao histórico
-                            helpers.addToHistory(
-                                `Dívida adicionada para ${name}`,
-                                `Valor: ${helpers.formatCurrency(amount)}${description ? ' | Motivo: ' + description : ''}`,
-                                'addition'
-                            );
-                            
-                            helpers.showNotification(`Dívida de ${helpers.formatCurrency(amount)} adicionada para ${name}`, 'success');
-                        });
-                    } else {
-                        // Criar novo cliente
-                        const newDebtor = {
-                            name: name,
-                            phone: phone,
-                            total: amount,
-                            debts: [{ 
-                                amount, 
-                                description,
-                                date: new Date().toISOString() 
-                            }],
-                            lastUpdate: new Date().toISOString()
-                        };
-                        
-                        db.collection("debtors").doc(name).set(newDebtor).then(() => {
-                            // Adicionar à lista de clientes
-                            customerNames.push(name);
-                            db.collection("customers").doc(name).set({ name });
-                            
-                            // Adicionar ao histórico
-                            helpers.addToHistory(
-                                `Novo cliente adicionado: ${name}`,
-                                `Valor inicial: ${helpers.formatCurrency(amount)}${description ? ' | Motivo: ' + description : ''}`,
-                                'addition'
-                            );
-                            
-                            helpers.showNotification(`Cliente ${name} adicionado com dívida de ${helpers.formatCurrency(amount)}`, 'success');
-                        });
-                    }
-                });
+                debtorsList.innerHTML = debtorsToShow.map(debtor => `
+                    <div class="debtor-item" data-id="${debtor.id}">
+                        <div class="debtor-info">
+                            <div class="debtor-name">
+                                <span class="name-badge">${debtor.name.charAt(0)}</span>
+                                ${debtor.name}
+                            </div>
+                            <div class="debtor-date">
+                                ${formatDate(debtor.date)}
+                            </div>
+                        </div>
+                        <div class="debtor-amount">
+                            R$ ${formatCurrency(parseFloat(debtor.amount))}
+                        </div>
+                        <div class="debtor-actions">
+                            <button class="action-btn delete" onclick="deleteDebtor('${debtor.id}')">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
                 
-                // Resetar formulário
-                elements.nameInput.value = '';
-                elements.phoneInput.value = '';
-                elements.amountInput.value = '';
-                elements.descriptionInput.value = '';
-                elements.nameInput.focus();
-            });
+                calculateTotal();
+            }
             
-            elements.nameInput.addEventListener('input', helpers.updateNameSuggestions);
-            
-            document.addEventListener('click', (e) => {
-                if (e.target !== elements.nameInput) {
-                    elements.nameSuggestions.style.display = 'none';
+            // Adicionar novo devedor
+            debtorForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const name = nameInput.value.trim();
+                const amount = parseFloat(amountInput.value);
+                
+                if (!name || isNaN(amount)) {
+                    showNotification('Preencha nome e valor corretamente!', 'error');
+                    return;
                 }
+                
+                const newDebtor = {
+                    id: Date.now().toString(),
+                    name: name,
+                    amount: amount,
+                    date: new Date().toISOString()
+                };
+                
+                debtors.push(newDebtor);
+                localStorage.setItem('oliveira_debtors', JSON.stringify(debtors));
+                
+                nameInput.value = '';
+                amountInput.value = '';
+                nameInput.focus();
+                
+                renderDebtors();
+                showNotification('Devedor adicionado com sucesso!', 'success');
             });
             
-            elements.searchInput.addEventListener('input', function() {
+            // Pesquisar devedores
+            searchInput.addEventListener('input', function() {
                 const searchTerm = this.value.toLowerCase();
                 
                 if (searchTerm === '') {
-                    helpers.renderDebtors();
+                    renderDebtors();
                     return;
                 }
                 
-                const filteredDebtors = Object.values(debtors).filter(debtor => 
-                    debtor.name.toLowerCase().includes(searchTerm) ||
-                    (debtor.phone && debtor.phone.includes(searchTerm)) ||
-                    debtor.total.toString().includes(searchTerm)
+                const filteredDebtors = debtors.filter(debtor => 
+                    debtor.name.toLowerCase().includes(searchTerm) || 
+                    debtor.amount.toString().includes(searchTerm)
                 );
                 
-                helpers.renderDebtors(filteredDebtors);
+                renderDebtors(filteredDebtors);
             });
             
-            elements.cancelDeleteBtn.addEventListener('click', function() {
-                elements.confirmationModal.classList.remove('show');
-                currentDebtorToDelete = null;
-            });
-            
-            elements.confirmDeleteBtn.addEventListener('click', function() {
-                if (currentDebtorToDelete) {
-                    const debtor = debtors[currentDebtorToDelete];
+            // Excluir devedor
+            window.deleteDebtor = function(id) {
+                if (confirm('Tem certeza que deseja excluir este devedor?')) {
+                    debtors = debtors.filter(d => d.id !== id);
+                    localStorage.setItem('oliveira_debtors', JSON.stringify(debtors));
                     
-                    // Adicionar ao histórico antes de excluir
-                    helpers.addToHistory(
-                        `Cliente removido: ${debtor.name}`,
-                        `Valor total: ${helpers.formatCurrency(debtor.total)}`,
-                        'deletion'
-                    );
-                    
-                    // Remover devedor do Firebase
-                    db.collection("debtors").doc(currentDebtorToDelete).delete().then(() => {
-                        // Remover devedor localmente
-                        delete debtors[currentDebtorToDelete];
-                        
-                        // Atualizar UI
-                        helpers.renderDebtors();
-                        helpers.showNotification('Cliente excluído com sucesso!', 'success');
-                        
-                        // Fechar modal
-                        elements.confirmationModal.classList.remove('show');
-                        currentDebtorToDelete = null;
-                    });
-                }
-            });
-            
-            // Funções globais para acesso externo
-            window.app = {
-                showDeleteConfirmation: (name) => {
-                    const debtor = debtors[name];
-                    if (debtor) {
-                        currentDebtorToDelete = name;
-                        elements.debtorToDeleteName.textContent = debtor.name;
-                        elements.debtorToDeleteAmount.textContent = helpers.formatCurrency(debtor.total);
-                        elements.confirmationModal.classList.add('show');
-                    }
-                },
-                
-                editDebtor: (name) => {
-                    const debtor = debtors[name];
-                    if (debtor) {
-                        elements.nameInput.value = debtor.name;
-                        elements.phoneInput.value = debtor.phone || '';
-                        elements.amountInput.focus();
-                        helpers.showNotification(`Digite o valor para adicionar à dívida de ${debtor.name}`, 'success');
-                    }
-                },
-                
-                showHistory: (name) => {
-                    const debtor = debtors[name];
-                    if (debtor) {
-                        const history = debtor.debts.map(debt => ({
-                            title: `Dívida de ${helpers.formatCurrency(debt.amount)}`,
-                            description: debt.description || 'Sem descrição',
-                            date: debt.date,
-                            type: 'addition'
-                        })).reverse();
-                        
-                        helpers.renderHistory(history);
-                        helpers.showNotification(`Histórico de ${debtor.name} carregado`, 'success');
-                    }
+                    renderDebtors();
+                    showNotification('Devedor excluído com sucesso!', 'success');
                 }
             };
             
             // Inicializar
-            helpers.loadData();
+            renderDebtors();
         });
     </script>
 </body>
