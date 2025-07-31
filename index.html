@@ -1,140 +1,273 @@
+Claro! Abaixo está um exemplo de site completo de gestão de devedores feito em um único arquivo index.html, com todas as funcionalidades básicas diretamente integradas usando:
+
+HTML + CSS + JavaScript puro
+
+Design em gradiente azul royal
+
+Cadastro de devedores com validações
+
+Histórico local por cliente
+
+Dashboard básico
+
+Pesquisa simples
+
+Armazenamento local via localStorage
+
+
+🔧 Observação: Este é um protótipo funcional e responsivo para testes e uso local. Para ambientes reais, recomenda-se separação de camadas, uso de frameworks e banco de dados seguro.
+
+
+---
+
+✅ COPIE O CÓDIGO COMPLETO ABAIXO E SALVE COMO index.html:
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Formulário de Confirmação</title>
-
+  <title>Gestão de Devedores</title>
   <style>
-    /* Estilo básico e moderno */
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f2f5;
+    :root {
+      --gradiente: linear-gradient(135deg, #4169E1, #87CEFA);
+      --cor-primaria: #4169E1;
+      --cor-secundaria: #87CEFA;
+      --branco: #fff;
+      --cinza: #f4f4f4;
+      --sombra: rgba(0,0,0,0.1);
+      --borda: #dcdcdc;
+    }
+
+    * {
       margin: 0;
-      padding: 20px;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
     }
 
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      background-color: #fff;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 25px;
+    body {
+      background: var(--cinza);
       color: #333;
     }
 
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: bold;
-      color: #444;
+    header {
+      background: var(--gradiente);
+      padding: 20px;
+      color: white;
+      text-align: center;
+      box-shadow: 0 4px 10px var(--sombra);
     }
 
-    input, textarea {
-      width: 100%;
+    .container {
+      max-width: 900px;
+      margin: 20px auto;
+      background: var(--branco);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px var(--sombra);
+    }
+
+    h2 {
+      margin-bottom: 10px;
+      color: var(--cor-primaria);
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    input, textarea, select {
       padding: 10px;
       margin-bottom: 15px;
       border-radius: 5px;
-      border: 1px solid #ccc;
-      font-size: 14px;
+      border: 1px solid var(--borda);
+      font-size: 16px;
     }
 
     button {
-      padding: 10px 20px;
+      padding: 10px;
+      background: var(--gradiente);
+      color: white;
       border: none;
+      cursor: pointer;
       border-radius: 5px;
       font-weight: bold;
-      cursor: pointer;
-      margin-right: 10px;
+      transition: 0.3s;
     }
 
-    .btn-confirmar {
-      background-color: #28a745;
-      color: #fff;
+    button:hover {
+      opacity: 0.9;
     }
 
-    .btn-confirmar:hover {
-      background-color: #218838;
-    }
-
-    .btn-cancelar {
-      background-color: #dc3545;
-      color: #fff;
-    }
-
-    .btn-cancelar:hover {
-      background-color: #c82333;
-    }
-
-    .mensagem {
-      margin-top: 20px;
+    .devedor {
+      background: var(--cinza);
       padding: 15px;
       border-radius: 5px;
-      font-weight: bold;
+      margin-bottom: 10px;
+      border-left: 5px solid var(--cor-primaria);
     }
 
-    .mensagem.sucesso {
-      background-color: #d4edda;
-      color: #155724;
+    .dashboard {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
     }
 
-    .mensagem.cancelado {
-      background-color: #f8d7da;
-      color: #721c24;
+    .card {
+      background: var(--gradiente);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      flex: 1;
+      min-width: 120px;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      .dashboard {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
+  <header>
+    <h1>Gestão de Devedores</h1>
+    <p>Sistema local simples com histórico e armazenamento</p>
+  </header>
+
   <div class="container">
-    <h1>Confirmação de Cadastro</h1>
-    <form id="formulario">
-      <label for="nome">Nome:</label>
-      <input type="text" id="nome" name="nome" required />
+    <div class="dashboard">
+      <div class="card">
+        <h3>Total Devido</h3>
+        <p id="total">R$ 0,00</p>
+      </div>
+      <div class="card">
+        <h3>Devedores Ativos</h3>
+        <p id="ativos">0</p>
+      </div>
+    </div>
 
-      <label for="email">Email:</label>
-      <input type="email" id="email" name="email" required />
-
-      <label for="mensagem">Mensagem:</label>
-      <textarea id="mensagem" name="mensagem" rows="4" required></textarea>
-
-      <button type="submit" class="btn-confirmar">Confirmar</button>
-      <button type="button" class="btn-cancelar" onclick="cancelarFormulario()">Cancelar</button>
+    <h2>Cadastro de Devedor</h2>
+    <form id="formDevedor">
+      <input type="text" id="nome" placeholder="Nome completo" required />
+      <input type="tel" id="telefone" placeholder="Telefone (99) 99999-9999" pattern="^\(?\d{2}\)?[\s-]?\d{5}-\d{4}$" required />
+      <input type="number" id="valor" placeholder="Valor devido (ex: 1500.00)" required step="0.01" />
+      <textarea id="obs" placeholder="Observações"></textarea>
+      <button type="submit">Cadastrar</button>
     </form>
 
-    <div id="resposta" class="mensagem" style="display: none;"></div>
+    <h2>Pesquisar</h2>
+    <input type="text" id="busca" placeholder="Digite o nome para buscar..." />
+
+    <h2>Lista de Devedores</h2>
+    <div id="listaDevedores"></div>
   </div>
 
   <script>
-    const formulario = document.getElementById('formulario');
-    const resposta = document.getElementById('resposta');
+    const form = document.getElementById('formDevedor');
+    const lista = document.getElementById('listaDevedores');
+    const totalDisplay = document.getElementById('total');
+    const ativosDisplay = document.getElementById('ativos');
+    const busca = document.getElementById('busca');
 
-    formulario.addEventListener('submit', function(event) {
-      event.preventDefault();
+    let devedores = JSON.parse(localStorage.getItem('devedores')) || [];
 
-      const nome = document.getElementById('nome').value;
-      const email = document.getElementById('email').value;
-      const mensagem = document.getElementById('mensagem').value;
+    const formatarReal = valor => {
+      return valor.toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      });
+    };
 
-      if (nome && email && mensagem) {
-        resposta.textContent = "Cadastro confirmado com sucesso!";
-        resposta.className = "mensagem sucesso";
-        resposta.style.display = "block";
-        formulario.reset();
-      }
+    function atualizarDashboard() {
+      const total = devedores.reduce((acc, d) => acc + parseFloat(d.valor), 0);
+      totalDisplay.textContent = formatarReal(total);
+      ativosDisplay.textContent = devedores.length;
+    }
+
+    function salvar() {
+      localStorage.setItem('devedores', JSON.stringify(devedores));
+    }
+
+    function renderizarLista(filtro = '') {
+      lista.innerHTML = '';
+      devedores
+        .filter(d => d.nome.toLowerCase().includes(filtro.toLowerCase()))
+        .forEach(d => {
+          const div = document.createElement('div');
+          div.className = 'devedor';
+          div.innerHTML = `
+            <strong>${d.nome}</strong><br>
+            📞 ${d.telefone} | 💰 ${formatarReal(parseFloat(d.valor))}<br>
+            🕒 ${d.data}<br>
+            📝 ${d.obs || 'Nenhuma observação'}
+          `;
+          lista.appendChild(div);
+        });
+    }
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const nome = document.getElementById('nome').value.trim();
+      const telefone = document.getElementById('telefone').value.trim();
+      const valor = parseFloat(document.getElementById('valor').value);
+      const obs = document.getElementById('obs').value.trim();
+      const data = new Date().toLocaleString();
+
+      devedores.push({ nome, telefone, valor, obs, data });
+      salvar();
+      form.reset();
+      renderizarLista();
+      atualizarDashboard();
     });
 
-    function cancelarFormulario() {
-      resposta.textContent = "Cadastro cancelado.";
-      resposta.className = "mensagem cancelado";
-      resposta.style.display = "block";
-      formulario.reset();
-    }
+    busca.addEventListener('input', e => {
+      renderizarLista(e.target.value);
+    });
+
+    // Inicializar
+    renderizarLista();
+    atualizarDashboard();
   </script>
 </body>
 </html>
+
+
+---
+
+✅ O que está incluído:
+
+Design com gradiente azul royal
+
+Cadastro com validações e formatação
+
+Histórico por data de cadastro
+
+Filtro de busca por nome
+
+Dashboard com total devido e número de devedores
+
+Dados persistem no navegador com localStorage
+
+
+
+---
+
+Se quiser, posso evoluir isso para incluir:
+
+Exportação para PDF/CSV
+
+Gráficos de evolução (Chart.js)
+
+Multiusuário com login
+
+Backup automático via backend (Node.js ou PHP)
+
+
+Deseja isso como próximo passo?
+
