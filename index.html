@@ -1,967 +1,140 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BlueCred - Gestão de Devedores</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #6A5ACD, #4169E1);
-            color: #fff;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        header {
-            text-align: center;
-            padding: 20px 0;
-            margin-bottom: 30px;
-            animation: fadeIn 1s ease-in-out;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-
-        .logo i {
-            font-size: 2.5rem;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 50%;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 5px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .subtitle {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        .app-container {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 30px;
-        }
-
-        @media (min-width: 992px) {
-            .app-container {
-                grid-template-columns: 1fr 1fr 1fr;
-            }
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-        }
-
-        .card-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.5rem;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .card-title i {
-            background: rgba(255, 255, 255, 0.2);
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 14px;
-            border-radius: 10px;
-            border: none;
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-            font-size: 1rem;
-            transition: background 0.3s;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            background: rgba(255, 255, 255, 0.25);
-            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
-        }
-
-        input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .btn {
-            display: inline-block;
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-        }
-
-        .btn-primary {
-            background: linear-gradient(to right, #4facfe, #00f2fe);
-            color: white;
-            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
-        }
-
-        .btn-primary:hover {
-            background: linear-gradient(to right, #3a9dfc, #00d9e6);
-            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.4);
-        }
-
-        .btn-sm {
-            width: auto;
-            padding: 8px 15px;
-            font-size: 0.9rem;
-        }
-
-        .search-results {
-            margin-top: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 20px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .debtor-item {
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            margin-bottom: 10px;
-            transition: background 0.3s;
-            cursor: pointer;
-        }
-
-        .debtor-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .debtor-name {
-            font-weight: 600;
-            font-size: 1.1rem;
-            margin-bottom: 5px;
-        }
-
-        .debtor-details {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-
-        .total-amount {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #00f2fe;
-            margin-top: 5px;
-        }
-
-        .history-list {
-            max-height: 400px;
-            overflow-y: auto;
-            padding-right: 10px;
-        }
-
-        .history-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            position: relative;
-        }
-
-        .history-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-
-        .history-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .action-btn {
-            padding: 8px 15px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: none;
-        }
-
-        .edit-btn {
-            background: rgba(255, 193, 7, 0.2);
-            color: #FFC107;
-        }
-
-        .delete-btn {
-            background: rgba(244, 67, 54, 0.2);
-            color: #F44336;
-        }
-
-        .edit-btn:hover {
-            background: rgba(255, 193, 7, 0.3);
-        }
-
-        .delete-btn:hover {
-            background: rgba(244, 67, 54, 0.3);
-        }
-
-        .amount {
-            font-weight: 600;
-            font-size: 1.2rem;
-            margin: 5px 0;
-            color: #4facfe;
-        }
-
-        .notes {
-            font-size: 0.95rem;
-            opacity: 0.9;
-            margin-top: 8px;
-        }
-
-        /* Scrollbar styling */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .fade-in {
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 25px;
-            border-radius: 10px;
-            background: rgba(76, 175, 80, 0.9);
-            color: white;
-            font-weight: 500;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            transform: translateX(150%);
-            transition: transform 0.4s ease;
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        .confirmation-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1001;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-
-        .confirmation-modal.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .modal-content {
-            background: linear-gradient(135deg, #5a4bc0, #4169E1);
-            border-radius: 15px;
-            padding: 30px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            transform: scale(0.9);
-            transition: transform 0.3s;
-        }
-
-        .confirmation-modal.active .modal-content {
-            transform: scale(1);
-        }
-
-        .modal-title {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .modal-message {
-            margin-bottom: 30px;
-            text-align: center;
-            font-size: 1.1rem;
-            line-height: 1.6;
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 15px;
-        }
-
-        .modal-btn {
-            flex: 1;
-            padding: 12px;
-            border-radius: 10px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .confirm-btn {
-            background: #F44336;
-            color: white;
-        }
-
-        .cancel-btn {
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-        }
-
-        .modal-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            padding: 20px 0;
-            font-size: 0.9rem;
-            opacity: 0.7;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            opacity: 0.3;
-        }
-
-        .input-icon {
-            position: absolute;
-            right: 15px;
-            top: 40px;
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .error-message {
-            color: #ff6b6b;
-            font-size: 0.85rem;
-            margin-top: 5px;
-            display: none;
-        }
-
-        .input-with-icon {
-            position: relative;
-        }
-
-        .input-with-icon input {
-            padding-right: 40px;
-        }
-
-        .quick-add-btn {
-            margin-top: 10px;
-            background: rgba(255, 255, 255, 0.15);
-            border: none;
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-        }
-
-        .quick-add-btn:hover {
-            background: rgba(255, 255, 255, 0.25);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Formulário de Confirmação</title>
+
+  <style>
+    /* Estilo básico e moderno */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #333;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+      color: #444;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    .btn-confirmar {
+      background-color: #28a745;
+      color: #fff;
+    }
+
+    .btn-confirmar:hover {
+      background-color: #218838;
+    }
+
+    .btn-cancelar {
+      background-color: #dc3545;
+      color: #fff;
+    }
+
+    .btn-cancelar:hover {
+      background-color: #c82333;
+    }
+
+    .mensagem {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+
+    .mensagem.sucesso {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .mensagem.cancelado {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header class="fade-in">
-            <div class="logo">
-                <i class="fas fa-file-invoice-dollar"></i>
-                <div>
-                    <h1>BlueCred</h1>
-                    <div class="subtitle">Sistema de Gestão de Devedores</div>
-                </div>
-            </div>
-        </header>
+  <div class="container">
+    <h1>Confirmação de Cadastro</h1>
+    <form id="formulario">
+      <label for="nome">Nome:</label>
+      <input type="text" id="nome" name="nome" required />
 
-        <div class="app-container">
-            <!-- Seção de Cadastro -->
-            <div class="card">
-                <div class="card-title">
-                    <i class="fas fa-user-plus"></i>
-                    <h2>Cadastrar Devedor</h2>
-                </div>
-                <div class="form-group">
-                    <label for="debtorName">Nome Completo *</label>
-                    <input type="text" id="debtorName" placeholder="Digite o nome do devedor">
-                    <div class="error-message" id="nameError">Por favor, informe o nome</div>
-                </div>
-                <div class="form-group">
-                    <label for="debtorPhone">Telefone *</label>
-                    <input type="tel" id="debtorPhone" placeholder="(00) 00000-0000">
-                    <div class="error-message" id="phoneError">Por favor, informe um telefone válido</div>
-                </div>
-                <div class="form-group input-with-icon">
-                    <label for="debtAmount">Valor Devido *</label>
-                    <input type="text" id="debtAmount" placeholder="R$ 0,00" inputmode="numeric">
-                    <div class="input-icon">
-                        <i class="fas fa-money-bill-wave"></i>
-                    </div>
-                    <div class="error-message" id="amountError">Por favor, informe um valor válido</div>
-                </div>
-                <div class="form-group">
-                    <label for="debtNotes">Observações</label>
-                    <textarea id="debtNotes" rows="3" placeholder="Adicione informações relevantes..."></textarea>
-                </div>
-                <button class="btn btn-primary" id="addDebtorBtn">
-                    <i class="fas fa-plus-circle"></i> Adicionar Devedor
-                </button>
-            </div>
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required />
 
-            <!-- Seção de Pesquisa -->
-            <div class="card">
-                <div class="card-title">
-                    <i class="fas fa-search"></i>
-                    <h2>Pesquisar Cliente</h2>
-                </div>
-                <div class="form-group">
-                    <label for="searchInput">Nome ou Telefone</label>
-                    <input type="text" id="searchInput" placeholder="Digite para pesquisar...">
-                </div>
-                <div class="search-results" id="searchResults">
-                    <div class="empty-state">
-                        <i class="fas fa-search"></i>
-                        <div>Digite um nome ou telefone para pesquisar</div>
-                    </div>
-                </div>
-            </div>
+      <label for="mensagem">Mensagem:</label>
+      <textarea id="mensagem" name="mensagem" rows="4" required></textarea>
 
-            <!-- Seção de Histórico -->
-            <div class="card">
-                <div class="card-title">
-                    <i class="fas fa-history"></i>
-                    <h2>Histórico Completo</h2>
-                </div>
-                <div class="history-list" id="historyList">
-                    <div class="empty-state">
-                        <i class="fas fa-history"></i>
-                        <div>Nenhum registro encontrado</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+      <button type="submit" class="btn-confirmar">Confirmar</button>
+      <button type="button" class="btn-cancelar" onclick="cancelarFormulario()">Cancelar</button>
+    </form>
 
-    <!-- Notificação -->
-    <div class="notification" id="notification">
-        Operação realizada com sucesso!
-    </div>
+    <div id="resposta" class="mensagem" style="display: none;"></div>
+  </div>
 
-    <!-- Modal de Confirmação -->
-    <div class="confirmation-modal" id="confirmationModal">
-        <div class="modal-content">
-            <div class="modal-title">Confirmar Exclusão</div>
-            <div class="modal-message" id="modalMessage">
-                Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.
-            </div>
-            <div class="modal-actions">
-                <button class="modal-btn cancel-btn" id="cancelDeleteBtn">Cancelar</button>
-                <button class="modal-btn confirm-btn" id="confirmDeleteBtn">Excluir</button>
-            </div>
-        </div>
-    </div>
+  <script>
+    const formulario = document.getElementById('formulario');
+    const resposta = document.getElementById('resposta');
 
-    <footer>
-        BlueCred &copy; 2023 - Sistema de Gestão de Devedores
-    </footer>
+    formulario.addEventListener('submit', function(event) {
+      event.preventDefault();
 
-    <script>
-        // Armazenamento de dados
-        let debtors = JSON.parse(localStorage.getItem('debtors')) || [];
-        let history = JSON.parse(localStorage.getItem('history')) || [];
-        let selectedHistoryId = null;
+      const nome = document.getElementById('nome').value;
+      const email = document.getElementById('email').value;
+      const mensagem = document.getElementById('mensagem').value;
 
-        // Elementos DOM
-        const addDebtorBtn = document.getElementById('addDebtorBtn');
-        const searchInput = document.getElementById('searchInput');
-        const searchResults = document.getElementById('searchResults');
-        const historyList = document.getElementById('historyList');
-        const notification = document.getElementById('notification');
-        const confirmationModal = document.getElementById('confirmationModal');
-        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-        const modalMessage = document.getElementById('modalMessage');
-        
-        // Elementos de erro
-        const nameError = document.getElementById('nameError');
-        const phoneError = document.getElementById('phoneError');
-        const amountError = document.getElementById('amountError');
+      if (nome && email && mensagem) {
+        resposta.textContent = "Cadastro confirmado com sucesso!";
+        resposta.className = "mensagem sucesso";
+        resposta.style.display = "block";
+        formulario.reset();
+      }
+    });
 
-        // Função para mostrar notificação
-        function showNotification(message, isError = false) {
-            notification.textContent = message;
-            notification.style.background = isError 
-                ? 'rgba(244, 67, 54, 0.9)' 
-                : 'rgba(76, 175, 80, 0.9)';
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-
-        // Função para formatar telefone
-        function formatPhone(phone) {
-            // Remove tudo que não é dígito
-            phone = phone.replace(/\D/g, '');
-            
-            // Formata o telefone: (00) 00000-0000
-            if (phone.length > 2) {
-                phone = '(' + phone.substring(0, 2) + ') ' + phone.substring(2);
-            }
-            if (phone.length > 10) {
-                phone = phone.substring(0, 10) + '-' + phone.substring(10, 15);
-            }
-            
-            return phone;
-        }
-
-        // Função para formatar data
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleString('pt-BR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
-
-        // Função para formatar valor monetário
-        function formatCurrency(value) {
-            return new Intl.NumberFormat('pt-BR', {
-                style: 'currency',
-                currency: 'BRL'
-            }).format(value);
-        }
-
-        // Função para converter valor para número
-        function parseCurrency(value) {
-            // Remove caracteres não numéricos, exceto vírgula
-            value = value.replace(/[^\d,]/g, '');
-            // Substitui vírgula por ponto para conversão
-            value = value.replace(',', '.');
-            return parseFloat(value);
-        }
-
-        // Máscara de telefone enquanto digita
-        document.getElementById('debtorPhone').addEventListener('input', function(e) {
-            let value = e.target.value;
-            value = value.replace(/\D/g, ''); // Remove tudo que não é dígito
-            
-            // Aplica a máscara: (00) 00000-0000
-            if (value.length > 2) {
-                value = '(' + value.substring(0, 2) + ') ' + value.substring(2);
-            }
-            if (value.length > 10) {
-                value = value.substring(0, 10) + '-' + value.substring(10, 15);
-            }
-            
-            e.target.value = value;
-        });
-
-        // Aceitar apenas números no campo de valor
-        document.getElementById('debtAmount').addEventListener('input', function(e) {
-            // Remove tudo que não é número ou vírgula
-            this.value = this.value.replace(/[^\d,]/g, '');
-            
-            // Garante que só há uma vírgula
-            const commaCount = (this.value.match(/,/g) || []).length;
-            if (commaCount > 1) {
-                this.value = this.value.slice(0, -1);
-            }
-        });
-
-        // Adicionar novo devedor
-        addDebtorBtn.addEventListener('click', () => {
-            // Resetar mensagens de erro
-            nameError.style.display = 'none';
-            phoneError.style.display = 'none';
-            amountError.style.display = 'none';
-            
-            const name = document.getElementById('debtorName').value.trim();
-            let phone = document.getElementById('debtorPhone').value.trim();
-            const amountValue = document.getElementById('debtAmount').value.trim();
-            const notes = document.getElementById('debtNotes').value.trim();
-            
-            // Validar campos
-            let isValid = true;
-            
-            if (!name) {
-                nameError.style.display = 'block';
-                isValid = false;
-            }
-            
-            // Formatar e validar telefone
-            phone = formatPhone(phone);
-            const phoneDigits = phone.replace(/\D/g, '');
-            if (phoneDigits.length < 10) {
-                phoneError.style.display = 'block';
-                isValid = false;
-            }
-            
-            if (!amountValue) {
-                amountError.style.display = 'block';
-                isValid = false;
-            }
-            
-            const parsedAmount = parseCurrency(amountValue);
-            if (isNaN(parsedAmount) {
-                amountError.style.display = 'block';
-                isValid = false;
-            }
-            
-            if (!isValid) {
-                showNotification('Por favor, preencha os campos corretamente!', true);
-                return;
-            }
-            
-            // Criar registro de histórico
-            const historyEntry = {
-                id: Date.now().toString(),
-                name,
-                phone,
-                amount: parsedAmount,
-                notes,
-                date: new Date().toISOString()
-            };
-            
-            history.unshift(historyEntry);
-            localStorage.setItem('history', JSON.stringify(history));
-            
-            // Atualizar lista de devedores
-            const existingDebtorIndex = debtors.findIndex(d => d.phone === phone);
-            
-            if (existingDebtorIndex !== -1) {
-                // Atualizar devedor existente
-                debtors[existingDebtorIndex].total += parsedAmount;
-                debtors[existingDebtorIndex].lastUpdate = new Date().toISOString();
-            } else {
-                // Adicionar novo devedor
-                debtors.push({
-                    id: Date.now().toString(),
-                    name,
-                    phone,
-                    total: parsedAmount,
-                    firstAdded: new Date().toISOString(),
-                    lastUpdate: new Date().toISOString()
-                });
-            }
-            
-            localStorage.setItem('debtors', JSON.stringify(debtors));
-            
-            // Limpar formulário
-            document.getElementById('debtorName').value = '';
-            document.getElementById('debtorPhone').value = '';
-            document.getElementById('debtAmount').value = '';
-            document.getElementById('debtNotes').value = '';
-            
-            showNotification('Devedor cadastrado com sucesso!');
-            renderHistory();
-        });
-
-        // Pesquisar devedores
-        searchInput.addEventListener('input', () => {
-            const searchTerm = searchInput.value.toLowerCase().trim();
-            
-            if (searchTerm.length === 0) {
-                searchResults.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-search"></i>
-                        <div>Digite um nome ou telefone para pesquisar</div>
-                    </div>
-                `;
-                return;
-            }
-            
-            const results = debtors.filter(debtor => 
-                debtor.name.toLowerCase().includes(searchTerm) || 
-                debtor.phone.includes(searchTerm)
-            );
-            
-            if (results.length === 0) {
-                searchResults.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-search"></i>
-                        <div>Nenhum devedor encontrado</div>
-                    </div>
-                `;
-                return;
-            }
-            
-            let html = '';
-            
-            results.forEach(debtor => {
-                // Calcular o total de dívidas deste devedor
-                const debtorHistory = history.filter(entry => entry.phone === debtor.phone);
-                const totalAmount = debtorHistory.reduce((sum, entry) => sum + entry.amount, 0);
-                
-                html += `
-                    <div class="debtor-item">
-                        <div class="debtor-name">${debtor.name}</div>
-                        <div class="debtor-details">
-                            <div>${debtor.phone}</div>
-                            <div>${debtorHistory.length} registro(s)</div>
-                        </div>
-                        <div class="total-amount">${formatCurrency(totalAmount)}</div>
-                    </div>
-                `;
-            });
-            
-            searchResults.innerHTML = html;
-        });
-
-        // Renderizar histórico
-        function renderHistory() {
-            if (history.length === 0) {
-                historyList.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-history"></i>
-                        <div>Nenhum registro encontrado</div>
-                    </div>
-                `;
-                return;
-            }
-            
-            let html = '';
-            
-            history.forEach(entry => {
-                html += `
-                    <div class="history-item" data-id="${entry.id}">
-                        <div class="history-header">
-                            <div>${formatDate(entry.date)}</div>
-                            <div>${entry.phone}</div>
-                        </div>
-                        <div class="debtor-name">${entry.name}</div>
-                        <div class="amount">${formatCurrency(entry.amount)}</div>
-                        ${entry.notes ? `<div class="notes">${entry.notes}</div>` : ''}
-                        <div class="history-actions">
-                            <button class="action-btn edit-btn" onclick="editHistory('${entry.id}')">
-                                <i class="fas fa-edit"></i> Editar
-                            </button>
-                            <button class="action-btn delete-btn" onclick="confirmDelete('${entry.id}')">
-                                <i class="fas fa-trash-alt"></i> Excluir
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            historyList.innerHTML = html;
-        }
-
-        // Confirmar exclusão
-        window.confirmDelete = function(id) {
-            const entry = history.find(item => item.id === id);
-            if (!entry) return;
-            
-            modalMessage.innerHTML = `
-                Tem certeza que deseja excluir o registro de <strong>${entry.name}</strong> 
-                no valor de <strong>${formatCurrency(entry.amount)}</strong>? 
-                Esta ação não pode ser desfeita.
-            `;
-            
-            selectedHistoryId = id;
-            confirmationModal.classList.add('active');
-        };
-
-        // Cancelar exclusão
-        cancelDeleteBtn.addEventListener('click', () => {
-            confirmationModal.classList.remove('active');
-            selectedHistoryId = null;
-        });
-
-        // Confirmar exclusão
-        confirmDeleteBtn.addEventListener('click', () => {
-            if (!selectedHistoryId) return;
-            
-            // Remover do histórico
-            history = history.filter(item => item.id !== selectedHistoryId);
-            localStorage.setItem('history', JSON.stringify(history));
-            
-            // Atualizar lista de devedores
-            updateDebtorsFromHistory();
-            
-            confirmationModal.classList.remove('active');
-            showNotification('Registro excluído com sucesso!');
-            renderHistory();
-            selectedHistoryId = null;
-        });
-
-        // Editar histórico
-        window.editHistory = function(id) {
-            const entry = history.find(item => item.id === id);
-            if (!entry) return;
-            
-            // Preencher o formulário com os dados para edição
-            document.getElementById('debtorName').value = entry.name;
-            document.getElementById('debtorPhone').value = entry.phone;
-            document.getElementById('debtAmount').value = formatCurrency(entry.amount);
-            document.getElementById('debtNotes').value = entry.notes || '';
-            
-            // Remover o registro antigo
-            history = history.filter(item => item.id !== id);
-            localStorage.setItem('history', JSON.stringify(history));
-            
-            // Atualizar lista de devedores
-            updateDebtorsFromHistory();
-            
-            showNotification('Registro carregado para edição. Atualize os dados e clique em Adicionar.');
-            renderHistory();
-            
-            // Scroll para o formulário
-            document.querySelector('.card').scrollIntoView({ behavior: 'smooth' });
-        };
-
-        // Atualizar lista de devedores baseado no histórico
-        function updateDebtorsFromHistory() {
-            debtors = [];
-            
-            // Agrupar por telefone
-            const debtorsMap = new Map();
-            
-            history.forEach(entry => {
-                if (!debtorsMap.has(entry.phone)) {
-                    debtorsMap.set(entry.phone, {
-                        id: entry.phone,
-                        name: entry.name,
-                        phone: entry.phone,
-                        total: 0,
-                        firstAdded: entry.date,
-                        lastUpdate: entry.date
-                    });
-                }
-                
-                const debtor = debtorsMap.get(entry.phone);
-                debtor.total += entry.amount;
-                
-                // Manter a data mais antiga como firstAdded
-                if (new Date(entry.date) < new Date(debtor.firstAdded)) {
-                    debtor.firstAdded = entry.date;
-                }
-                
-                // Manter a data mais recente como lastUpdate
-                if (new Date(entry.date) > new Date(debtor.lastUpdate)) {
-                    debtor.lastUpdate = entry.date;
-                }
-            });
-            
-            // Converter map para array
-            debtors = Array.from(debtorsMap.values());
-            localStorage.setItem('debtors', JSON.stringify(debtors));
-        }
-
-        // Focar no campo de nome ao carregar a página
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('debtorName').focus();
-            renderHistory();
-        });
-    </script>
+    function cancelarFormulario() {
+      resposta.textContent = "Cadastro cancelado.";
+      resposta.className = "mensagem cancelado";
+      resposta.style.display = "block";
+      formulario.reset();
+    }
+  </script>
 </body>
 </html>
