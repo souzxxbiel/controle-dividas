@@ -212,3 +212,98 @@
   </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Gestão de Devedores</title>
+  <style>
+    :root {
+      --gradiente: linear-gradient(135deg,#4169E1,#87CEFA);
+      /* ... demais variáveis conforme antes ... */
+    }
+    /* Mesmos estilos design responsivo e gradiente */
+  </style>
+</head>
+<body>
+  <header><!-- igual anterior --></header>
+  <div class="container">
+    <div class="dashboard">
+      <div class="card"><h3>Total Devido</h3><p id="total">R$ 0,00</p></div>
+      <div class="card"><h3>Devedores Ativos</h3><p id="ativos">0</p></div>
+    </div>
+
+    <!-- Form cadastro, busca, lista como antes -->
+
+    <h2>Gráfico de Evolução</h2>
+    <canvas id="grafico" height="200"></canvas>
+
+    <button id="exportCsv">Exportar CSV</button>
+    <button id="exportPdf">Exportar PDF</button>
+  </div>
+
+  <!-- bibliotecas -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/2.3.5/jspdf.plugin.autotable.min.js"></script>
+
+  <script>
+    // Mesmas funções de armazenamento local, cadastro, renderizar lista, dashboard
+
+    // --- Função para gráfico de fluxo ---
+    const ctx = document.getElementById('grafico').getContext('2d');
+    let chart = new Chart(ctx, {
+      type: 'line',
+      data: { labels: [], datasets: [{ label: 'Valor Devido', data: [], backgroundColor: 'rgba(65,105,225,0.3)', borderColor: '#4169E1' }] },
+      options: { responsive: true, scales: { x: { type: 'time', time: { unit: 'day' } }, y: { beginAtZero: true } } }
+    );
+
+    function atualizarGrafico() {
+      const agrup = {};
+      devedores.forEach(d => {
+        const dia = new Date(d.data).toLocaleDateString();
+        agrup[dia] = (agrup[dia]||0) + parseFloat(d.valor);
+      });
+      const labels = Object.keys(agrup).sort();
+      const data = labels.map(l => agrup[l]);
+      chart.data.labels = labels;
+      chart.data.datasets[0].data = data;
+      chart.update();
+    }
+
+    // --- Export CSV ---
+    document.getElementById('exportCsv').addEventListener('click', () => {
+      let rows = [['Nome','Telefone','Valor','Data','Observações']];
+      devedores.forEach(d => rows.push([d.nome,d.telefone,d.valor,d.data,d.obs]));
+      const csvContent = 'data:text/csv;charset=utf-8,' + rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href',encodedUri);
+      link.setAttribute('download','devedores.csv');
+      document.body.appendChild(link); link.click(); link.remove();
+    });
+
+    // --- Export PDF via jsPDF + autotable ---
+    document.getElementById('exportPdf').addEventListener('click', () => {
+      const doc = new jsPDF();
+      doc.text('Lista de Devedores',14,20);
+      const col = ['Nome','Telefone','Valor','Data','Obs'];
+      const rows = devedores.map(d => [d.nome,d.telefone,formatarReal(parseFloat(d.valor)),d.data,d.obs]);
+      doc.autoTable({ head:[col], body:rows, startY:30 });
+      doc.save('devedores.pdf');
+    });
+
+    // Ao cadastrar: chamar também atualizarGrafico()
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      // ... adicionar devedor ...
+      salvar(); form.reset();
+      renderizarLista(); atualizarDashboard(); atualizarGrafico();
+    });
+
+    // Inicialização
+    renderizarLista(); atualizarDashboard(); atualizarGrafico();
+  </script>
+</body>
+</html>
