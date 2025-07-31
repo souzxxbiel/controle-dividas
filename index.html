@@ -3,628 +3,1019 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oliveira - Controle de Dívidas Sincronizado</title>
+    <title>BlueCred - Gestão de Devedores</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        :root {
+            --primary: #4169E1;
+            --secondary: #6A5ACD;
+            --accent: #00BFFF;
+            --success: #4CAF50;
+            --warning: #FFC107;
+            --danger: #F44336;
+            --light: #F8F9FA;
+            --dark: #343A40;
+            --gray: #6C757D;
+            --light-gray: #E9ECEF;
+            --gradient-start: #4169E1;
+            --gradient-end: #6A5ACD;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
-        :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --accent: #e74c3c;
-            --light: #ecf0f1;
-            --dark: #1a252f;
-            --success: #27ae60;
-            --warning: #f39c12;
-            --card-bg: #ffffff;
-        }
-        
+
         body {
-            background: #f5f7fa;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f4f8;
+            color: var(--dark);
+            height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            display: flex;
             min-height: 100vh;
-            padding: 20px;
-            color: #333;
         }
-        
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-        
-        header {
-            text-align: center;
-            padding: 20px 0;
-            margin-bottom: 30px;
-        }
-        
-        .logo {
-            display: inline-flex;
-            align-items: center;
-            background: var(--primary);
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(180deg, var(--gradient-start), var(--gradient-end));
             color: white;
-            padding: 10px 20px;
-            border-radius: 50px;
-            margin-bottom: 15px;
+            padding: 20px 0;
+            box-shadow: 3px 0 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            z-index: 100;
         }
-        
-        .logo-icon {
-            background: var(--accent);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+
+        .logo {
+            padding: 0 20px 20px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.5rem;
-            margin-right: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
-        header h1 {
-            font-size: 2rem;
-            color: var(--primary);
-            margin-bottom: 10px;
+
+        .logo i {
+            font-size: 28px;
+            margin-right: 12px;
+            color: var(--accent);
         }
-        
-        header p {
-            color: #7f8c8d;
-            max-width: 500px;
-            margin: 0 auto;
+
+        .logo h1 {
+            font-size: 22px;
+            font-weight: 600;
         }
-        
-        .card {
-            background: var(--card-bg);
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-            overflow: hidden;
+
+        .nav-links {
+            margin-top: 30px;
         }
-        
-        .card-header {
-            padding: 15px 20px;
-            background: var(--primary);
-            color: white;
+
+        .nav-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: white;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            margin-right: 12px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-item span {
+            font-size: 15px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            padding: 20px 30px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            z-index: 10;
         }
-        
-        .card-header h2 {
+
+        .search-bar {
+            position: relative;
+            width: 350px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border: none;
+            background: var(--light);
+            border-radius: 30px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(65, 105, 225, 0.2);
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .user-actions {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 1.2rem;
         }
-        
-        .total-container {
-            background: rgba(255,255,255,0.2);
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-weight: 600;
+
+        .notification {
+            position: relative;
+            margin-right: 20px;
+            cursor: pointer;
         }
-        
-        .card-body {
-            padding: 20px;
+
+        .notification i {
+            font-size: 20px;
+            color: var(--gray);
         }
-        
-        .form-row {
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            font-size: 10px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
             display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
+            align-items: center;
+            justify-content: center;
         }
-        
-        .input-group {
-            flex: 1;
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
         }
-        
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+
+        .user-name {
             font-weight: 500;
-            color: var(--primary);
-            font-size: 0.9rem;
+            font-size: 15px;
         }
-        
-        .input-group input {
-            width: 100%;
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
+
+        /* Page Content */
+        .page-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
         }
-        
-        .input-group input:focus {
-            outline: none;
-            border-color: var(--secondary);
-            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
         }
-        
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
         .btn {
             padding: 10px 20px;
+            border-radius: 30px;
             border: none;
-            border-radius: 5px;
-            font-size: 1rem;
             font-weight: 500;
+            font-size: 14px;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
             transition: all 0.3s;
         }
-        
+
+        .btn i {
+            margin-right: 8px;
+        }
+
         .btn-primary {
-            background: var(--secondary);
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             color: white;
+            box-shadow: 0 4px 10px rgba(65, 105, 225, 0.3);
         }
-        
+
         .btn-primary:hover {
-            background: #2980b9;
             transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(65, 105, 225, 0.4);
         }
-        
-        .btn-block {
-            display: block;
-            width: 100%;
+
+        /* Dashboard */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
         }
-        
-        .search-container {
-            margin-bottom: 20px;
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
             position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
         }
-        
-        .search-input {
-            width: 100%;
-            padding: 10px 15px 10px 40px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
-        
-        .search-icon {
+
+        .stat-card::after {
+            content: '';
             position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #95a5a6;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
         }
-        
-        .debtors-list {
-            border-radius: 5px;
+
+        .stat-card:nth-child(1)::after { background: var(--primary); }
+        .stat-card:nth-child(2)::after { background: var(--success); }
+        .stat-card:nth-child(3)::after { background: var(--warning); }
+        .stat-card:nth-child(4)::after { background: var(--accent); }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-title {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+
+        .stat-icon {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            opacity: 0.2;
+        }
+
+        .chart-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* Debtors Table */
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
             overflow: hidden;
         }
-        
-        .debtor-item {
+
+        .table-header {
             display: flex;
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            background: white;
-            transition: all 0.3s;
-        }
-        
-        .debtor-item:hover {
-            background: #f8f9fa;
-        }
-        
-        .debtor-info {
-            flex: 1;
-        }
-        
-        .debtor-name {
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 5px;
-            display: flex;
+            justify-content: space-between;
             align-items: center;
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .table-actions {
+            display: flex;
             gap: 10px;
         }
-        
-        .name-badge {
-            background: var(--secondary);
-            color: white;
-            width: 30px;
-            height: 30px;
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e6ea;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            text-align: left;
+            padding: 15px 25px;
+            font-weight: 600;
+            color: var(--gray);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: var(--light);
+        }
+
+        .table td {
+            padding: 15px 25px;
+            border-bottom: 1px solid var(--light-gray);
+            font-size: 14px;
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table tr:hover td {
+            background: rgba(65, 105, 225, 0.03);
+        }
+
+        .status {
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status.active {
+            background: rgba(76, 175, 80, 0.15);
+            color: var(--success);
+        }
+
+        .status.inactive {
+            background: rgba(244, 67, 54, 0.15);
+            color: var(--danger);
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
+            background: var(--light);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Add Debtor Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.4s;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .modal-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--light-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
             font-weight: 600;
         }
-        
-        .debtor-date {
-            font-size: 0.8rem;
-            color: #95a5a6;
-        }
-        
-        .debtor-amount {
-            font-weight: 700;
-            color: var(--accent);
-            min-width: 100px;
-            text-align: right;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 5px;
-        }
-        
-        .debtor-actions {
-            display: flex;
-            gap: 5px;
-            margin-left: 10px;
-        }
-        
-        .action-btn {
-            width: 30px;
-            height: 30px;
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            border: none;
-            background: #f1f1f1;
-            color: var(--primary);
-            cursor: pointer;
+            background: var(--light);
             display: flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #e2e6ea;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 15px;
             transition: all 0.3s;
         }
-        
-        .action-btn:hover {
-            transform: scale(1.1);
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(65, 105, 225, 0.2);
         }
-        
-        .action-btn.delete:hover {
-            background: var(--accent);
-            color: white;
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
-        
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #95a5a6;
-        }
-        
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            opacity: 0.3;
-        }
-        
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 10px 20px;
-            border-radius: 5px;
-            color: white;
-            font-weight: 500;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-            transform: translateX(120%);
-            transition: transform 0.3s ease-in-out;
-            z-index: 1000;
+
+        .modal-footer {
+            padding: 20px 30px;
+            border-top: 1px solid var(--light-gray);
             display: flex;
-            align-items: center;
-            gap: 8px;
+            justify-content: flex-end;
+            gap: 10px;
         }
-        
-        .notification.show {
-            transform: translateX(0);
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+            }
+            .logo h1, .nav-item span {
+                display: none;
+            }
+            .logo {
+                justify-content: center;
+                padding: 20px 0;
+            }
+            .logo i {
+                margin-right: 0;
+            }
+            .nav-item {
+                justify-content: center;
+            }
+            .nav-item i {
+                margin-right: 0;
+                font-size: 20px;
+            }
         }
-        
-        .notification.success {
-            background: var(--success);
-        }
-        
-        .notification.error {
-            background: var(--accent);
-        }
-        
-        .sync-status {
-            position: fixed;
-            bottom: 15px;
-            right: 15px;
-            background: var(--success);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        }
-        
+
         @media (max-width: 768px) {
+            .chart-row {
+                grid-template-columns: 1fr;
+            }
             .form-row {
-                flex-direction: column;
-                gap: 10px;
+                grid-template-columns: 1fr;
             }
-            
-            .debtor-item {
-                flex-direction: column;
-                gap: 10px;
+            .search-bar {
+                width: 200px;
             }
-            
-            .debtor-amount {
-                justify-content: flex-start;
-                text-align: left;
+        }
+
+        @media (max-width: 576px) {
+            .stats-container {
+                grid-template-columns: 1fr;
             }
-            
-            .debtor-actions {
-                justify-content: flex-end;
-                margin-left: 0;
+            .header {
+                padding: 15px;
+            }
+            .user-name {
+                display: none;
+            }
+            .search-bar {
+                width: 40px;
+            }
+            .search-bar input {
+                width: 40px;
+                padding-left: 40px;
+            }
+            .search-bar input:focus {
+                width: 200px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
             <div class="logo">
-                <div class="logo-icon">O</div>
-                <span>Oliveira</span>
+                <i class="fas fa-file-invoice-dollar"></i>
+                <h1>BlueCred</h1>
             </div>
-            <h1>Controle de Dívidas</h1>
-            <p>Sincronizado entre dispositivos em tempo real</p>
-        </header>
-        
-        <div class="card">
-            <div class="card-header">
-                <h2><i class="fas fa-plus-circle"></i> Adicionar Devedor</h2>
-            </div>
-            <div class="card-body">
-                <form id="debtor-form">
-                    <div class="form-row">
-                        <div class="input-group">
-                            <label for="name">Nome do Devedor</label>
-                            <input type="text" id="name" placeholder="Digite o nome" required>
-                        </div>
-                        <div class="input-group">
-                            <label for="amount">Valor (R$)</label>
-                            <input type="number" id="amount" placeholder="Digite o valor" min="0" step="0.01" required>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-block">
-                        <i class="fas fa-save"></i> Salvar
-                    </button>
-                </form>
-            </div>
-        </div>
-        
-        <div class="card">
-            <div class="card-header">
-                <h2><i class="fas fa-users"></i> Lista de Devedores</h2>
-                <div class="total-container">
-                    Total: R$ <span id="total-amount">0.00</span>
+            <div class="nav-links">
+                <div class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
                 </div>
-            </div>
-            <div class="card-body">
-                <div class="search-container">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" class="search-input" id="search-input" placeholder="Pesquisar devedores...">
+                <div class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Devedores</span>
                 </div>
-                
-                <div class="debtors-list" id="debtors-list">
-                    <div class="empty-state">
-                        <i class="fas fa-user-slash"></i>
-                        <h3>Nenhum devedor cadastrado</h3>
-                        <p>Adicione seu primeiro devedor</p>
-                    </div>
+                <div class="nav-item">
+                    <i class="fas fa-history"></i>
+                    <span>Histórico</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Relatórios</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-bell"></i>
+                    <span>Notificações</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Configurações</span>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <div class="notification" id="notification">
-        <i class="fas fa-check-circle"></i>
-        <span id="notification-text"></span>
-    </div>
-    
-    <div class="sync-status" id="sync-status">
-        <i class="fas fa-sync-alt"></i>
-        <span>Sincronizado</span>
-    </div>
-    
-    <script>
-        // Configuração do Firebase (pronta para uso)
-        const firebaseConfig = {
-            apiKey: "AIzaSyDcM1Q8R2c4rK-9t1kZvV5Wx7yY8zXwvBc",
-            authDomain: "oliveira-devedores.firebaseapp.com",
-            projectId: "oliveira-devedores",
-            storageBucket: "oliveira-devedores.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:abcdef1234567890"
-        };
 
-        // Inicializar Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            // Elementos DOM
-            const elements = {
-                debtorForm: document.getElementById('debtor-form'),
-                nameInput: document.getElementById('name'),
-                amountInput: document.getElementById('amount'),
-                debtorsList: document.getElementById('debtors-list'),
-                totalAmount: document.getElementById('total-amount'),
-                searchInput: document.getElementById('search-input'),
-                notification: document.getElementById('notification'),
-                notificationText: document.getElementById('notification-text'),
-                syncStatus: document.getElementById('sync-status')
-            };
-            
-            // Variáveis de estado
-            let debtors = [];
-            let currentSearchTerm = '';
-            
-            // Exibir notificação
-            function showNotification(message, type) {
-                elements.notificationText.textContent = message;
-                elements.notification.className = 'notification ' + type;
-                elements.notification.classList.add('show');
-                
-                setTimeout(() => {
-                    elements.notification.classList.remove('show');
-                }, 3000);
-            }
-            
-            // Formatar valor monetário
-            function formatCurrency(value) {
-                return value.toFixed(2).replace('.', ',');
-            }
-            
-            // Formatar data
-            function formatDate(dateString) {
-                const options = { 
-                    day: '2-digit', 
-                    month: '2-digit', 
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                };
-                return new Date(dateString).toLocaleDateString('pt-BR', options);
-            }
-            
-            // Calcular total devido
-            function calculateTotal() {
-                const total = debtors.reduce((sum, debtor) => sum + parseFloat(debtor.amount), 0);
-                elements.totalAmount.textContent = formatCurrency(total);
-            }
-            
-            // Renderizar lista de devedores
-            function renderDebtors() {
-                const filteredDebtors = currentSearchTerm 
-                    ? debtors.filter(debtor => 
-                        debtor.name.toLowerCase().includes(currentSearchTerm) || 
-                        debtor.amount.toString().includes(currentSearchTerm))
-                    : debtors;
-                
-                if (filteredDebtors.length === 0) {
-                    elements.debtorsList.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-user-slash"></i>
-                            <h3>${currentSearchTerm ? 'Nenhum resultado encontrado' : 'Nenhum devedor cadastrado'}</h3>
-                            <p>${currentSearchTerm ? 'Tente outra pesquisa' : 'Adicione seu primeiro devedor'}</p>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Pesquisar devedores...">
+                </div>
+                <div class="user-actions">
+                    <div class="notification">
+                        <i class="fas fa-bell"></i>
+                        <div class="notification-badge">3</div>
+                    </div>
+                    <div class="user-profile">
+                        <div class="user-avatar">AD</div>
+                        <div class="user-name">Admin</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page Content -->
+            <div class="page-content">
+                <div class="page-header">
+                    <h1 class="page-title">Dashboard</h1>
+                    <button class="btn btn-primary" id="addDebtorBtn">
+                        <i class="fas fa-plus"></i> Adicionar Devedor
+                    </button>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-value">R$ 82.450,00</div>
+                        <div class="stat-title">Total Devido</div>
+                        <div class="stat-icon">
+                            <i class="fas fa-wallet"></i>
                         </div>
-                    `;
-                    calculateTotal();
-                    return;
-                }
-                
-                elements.debtorsList.innerHTML = filteredDebtors.map(debtor => `
-                    <div class="debtor-item" data-id="${debtor.id}">
-                        <div class="debtor-info">
-                            <div class="debtor-name">
-                                <span class="name-badge">${debtor.name.charAt(0)}</span>
-                                ${debtor.name}
-                            </div>
-                            <div class="debtor-date">
-                                ${formatDate(debtor.date)}
-                            </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">24</div>
+                        <div class="stat-title">Devedores Ativos</div>
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
                         </div>
-                        <div class="debtor-amount">
-                            R$ ${formatCurrency(parseFloat(debtor.amount))}
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">8</div>
+                        <div class="stat-title">Pagamentos Pendentes</div>
+                        <div class="stat-icon">
+                            <i class="fas fa-exclamation-circle"></i>
                         </div>
-                        <div class="debtor-actions">
-                            <button class="action-btn delete" onclick="deleteDebtor('${debtor.id}')">
-                                <i class="fas fa-trash-alt"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">R$ 12.300,00</div>
+                        <div class="stat-title">Pago Este Mês</div>
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="chart-row">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Evolução de Dívidas (Últimos 6 meses)</div>
+                        </div>
+                        <canvas id="debtChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Distribuição por Status</div>
+                        </div>
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Debtors Table -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-title">Lista de Devedores</div>
+                        <div class="table-actions">
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-filter"></i> Filtrar
+                            </button>
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-download"></i> Exportar
                             </button>
                         </div>
                     </div>
-                `).join('');
-                
-                calculateTotal();
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Telefone</th>
+                                <th>Valor Devido</th>
+                                <th>Data</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Carlos Silva</td>
+                                <td>(11) 98765-4321</td>
+                                <td>R$ 5.200,00</td>
+                                <td>15/07/2023</td>
+                                <td><span class="status active">Ativo</span></td>
+                                <td>
+                                    <div class="action-btn"><i class="fas fa-eye"></i></div>
+                                    <div class="action-btn"><i class="fas fa-edit"></i></div>
+                                    <div class="action-btn"><i class="fas fa-trash"></i></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Ana Pereira</td>
+                                <td>(21) 99876-5432</td>
+                                <td>R$ 3.750,00</td>
+                                <td>20/06/2023</td>
+                                <td><span class="status active">Ativo</span></td>
+                                <td>
+                                    <div class="action-btn"><i class="fas fa-eye"></i></div>
+                                    <div class="action-btn"><i class="fas fa-edit"></i></div>
+                                    <div class="action-btn"><i class="fas fa-trash"></i></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Roberto Almeida</td>
+                                <td>(31) 99123-4567</td>
+                                <td>R$ 12.000,00</td>
+                                <td>05/05/2023</td>
+                                <td><span class="status inactive">Inativo</span></td>
+                                <td>
+                                    <div class="action-btn"><i class="fas fa-eye"></i></div>
+                                    <div class="action-btn"><i class="fas fa-edit"></i></div>
+                                    <div class="action-btn"><i class="fas fa-trash"></i></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Juliana Mendes</td>
+                                <td>(41) 99234-5678</td>
+                                <td>R$ 8.300,00</td>
+                                <td>10/07/2023</td>
+                                <td><span class="status active">Ativo</span></td>
+                                <td>
+                                    <div class="action-btn"><i class="fas fa-eye"></i></div>
+                                    <div class="action-btn"><i class="fas fa-edit"></i></div>
+                                    <div class="action-btn"><i class="fas fa-trash"></i></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Fernando Costa</td>
+                                <td>(51) 99345-6789</td>
+                                <td>R$ 6.500,00</td>
+                                <td>22/06/2023</td>
+                                <td><span class="status active">Ativo</span></td>
+                                <td>
+                                    <div class="action-btn"><i class="fas fa-eye"></i></div>
+                                    <div class="action-btn"><i class="fas fa-edit"></i></div>
+                                    <div class="action-btn"><i class="fas fa-trash"></i></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Debtor Modal -->
+    <div class="modal-overlay" id="addDebtorModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Adicionar Novo Devedor</div>
+                <div class="modal-close" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form id="debtorForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Nome Completo *</label>
+                            <input type="text" class="form-control" id="name" placeholder="Digite o nome completo" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Telefone *</label>
+                            <input type="tel" class="form-control" id="phone" placeholder="(00) 00000-0000" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Valor Devido *</label>
+                            <input type="text" class="form-control" id="amount" placeholder="R$ 0,00" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <select class="form-control" id="status">
+                                <option value="active">Ativo</option>
+                                <option value="inactive">Inativo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Observações</label>
+                        <textarea class="form-control" id="notes" rows="3" placeholder="Adicione informações relevantes..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelBtn">Cancelar</button>
+                <button class="btn btn-primary" id="saveDebtorBtn">Salvar Devedor</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const addDebtorBtn = document.getElementById('addDebtorBtn');
+        const addDebtorModal = document.getElementById('addDebtorModal');
+        const closeModal = document.getElementById('closeModal');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const saveDebtorBtn = document.getElementById('saveDebtorBtn');
+        
+        // Show modal
+        addDebtorBtn.addEventListener('click', () => {
+            addDebtorModal.classList.add('active');
+        });
+        
+        // Hide modal
+        function hideModal() {
+            addDebtorModal.classList.remove('active');
+        }
+        
+        closeModal.addEventListener('click', hideModal);
+        cancelBtn.addEventListener('click', hideModal);
+        
+        // Save debtor
+        saveDebtorBtn.addEventListener('click', () => {
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const amount = document.getElementById('amount').value;
+            
+            if(name && phone && amount) {
+                // Here would be the code to save to database
+                alert('Devedor cadastrado com sucesso!');
+                document.getElementById('debtorForm').reset();
+                hideModal();
+            } else {
+                alert('Por favor, preencha todos os campos obrigatórios.');
+            }
+        });
+        
+        // Phone mask
+        document.getElementById('phone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            if (value.length > 11) {
+                value = value.substring(0, 11);
             }
             
-            // Adicionar novo devedor
-            elements.debtorForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const name = elements.nameInput.value.trim();
-                const amount = parseFloat(elements.amountInput.value);
-                
-                if (!name || isNaN(amount)) {
-                    showNotification('Preencha nome e valor corretamente!', 'error');
-                    return;
-                }
-                
-                // Atualizar status de sincronização
-                elements.syncStatus.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Salvando...';
-                
-                const newDebtor = {
-                    id: Date.now().toString(),
-                    name: name,
-                    amount: amount,
-                    date: new Date().toISOString()
-                };
-                
-                // Adicionar ao Firestore
-                db.collection("debtors").doc(newDebtor.id).set(newDebtor)
-                    .then(() => {
-                        elements.nameInput.value = '';
-                        elements.amountInput.value = '';
-                        elements.nameInput.focus();
-                        
-                        elements.syncStatus.innerHTML = '<i class="fas fa-check-circle"></i> Sincronizado';
-                        showNotification('Devedor adicionado com sucesso!', 'success');
-                    })
-                    .catch(error => {
-                        elements.syncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Erro';
-                        showNotification('Erro ao salvar: ' + error.message, 'error');
-                    });
-            });
-            
-            // Pesquisar devedores
-            elements.searchInput.addEventListener('input', function() {
-                currentSearchTerm = this.value.toLowerCase();
-                renderDebtors();
-            });
-            
-            // Excluir devedor
-            window.deleteDebtor = function(id) {
-                if (confirm('Tem certeza que deseja excluir este devedor?')) {
-                    // Atualizar status de sincronização
-                    elements.syncStatus.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Excluindo...';
-                    
-                    db.collection("debtors").doc(id).delete()
-                        .then(() => {
-                            elements.syncStatus.innerHTML = '<i class="fas fa-check-circle"></i> Sincronizado';
-                            showNotification('Devedor excluído com sucesso!', 'success');
-                        })
-                        .catch(error => {
-                            elements.syncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Erro';
-                            showNotification('Erro ao excluir: ' + error.message, 'error');
-                        });
-                }
-            };
-            
-            // Sincronizar dados em tempo real
-            function setupRealtimeSync() {
-                db.collection("debtors").onSnapshot(snapshot => {
-                    debtors = [];
-                    snapshot.forEach(doc => {
-                        debtors.push(doc.data());
-                    });
-                    
-                    // Ordenar por data (mais recente primeiro)
-                    debtors.sort((a, b) => new Date(b.date) - new Date(a.date));
-                    
-                    renderDebtors();
-                }, error => {
-                    elements.syncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Erro de conexão';
-                    console.error("Erro na sincronização: ", error);
-                });
+            if (value.length > 0) {
+                value = '(' + value.substring(0, 2);
+            }
+            if (value.length > 3) {
+                value += ') ' + value.substring(3, 8);
+            }
+            if (value.length > 10) {
+                value += '-' + value.substring(10, 14);
             }
             
-            // Inicializar
-            setupRealtimeSync();
+            e.target.value = value;
+        });
+        
+        // Amount formatting
+        document.getElementById('amount').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            value = (value / 100).toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            });
+            e.target.value = value;
+        });
+        
+        // Charts
+        document.addEventListener('DOMContentLoaded', function() {
+            // Debt Evolution Chart
+            const debtCtx = document.getElementById('debtChart').getContext('2d');
+            const debtChart = new Chart(debtCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                    datasets: [{
+                        label: 'Total Devido',
+                        data: [45000, 52000, 61000, 72000, 79000, 82450],
+                        borderColor: '#4169E1',
+                        backgroundColor: 'rgba(65, 105, 225, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                drawBorder: false
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Status Distribution Chart
+            const statusCtx = document.getElementById('statusChart').getContext('2d');
+            const statusChart = new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Ativos', 'Inativos'],
+                    datasets: [{
+                        data: [76, 24],
+                        backgroundColor: [
+                            '#4CAF50',
+                            '#F44336'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        });
+        
+        // Responsive search bar
+        const searchInput = document.querySelector('.search-bar input');
+        searchInput.addEventListener('focus', function() {
+            if (window.innerWidth < 576) {
+                this.style.width = '200px';
+            }
+        });
+        
+        searchInput.addEventListener('blur', function() {
+            if (window.innerWidth < 576 && this.value === '') {
+                this.style.width = '40px';
+            }
         });
     </script>
 </body>
