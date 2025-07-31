@@ -107,6 +107,7 @@
 
         .form-group {
             margin-bottom: 20px;
+            position: relative;
         }
 
         label {
@@ -129,6 +130,7 @@
         input:focus, select:focus, textarea:focus {
             outline: none;
             background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
         }
 
         input::placeholder {
@@ -163,26 +165,6 @@
             width: auto;
             padding: 8px 15px;
             font-size: 0.9rem;
-        }
-
-        .quick-add {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 15px;
-            display: none;
-        }
-
-        .quick-add.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .quick-add-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
         }
 
         .search-results {
@@ -442,6 +424,28 @@
             opacity: 0.3;
         }
 
+        .input-icon {
+            position: absolute;
+            right: 15px;
+            top: 40px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon input {
+            padding-right: 40px;
+        }
+
         .quick-add-btn {
             margin-top: 10px;
             background: rgba(255, 255, 255, 0.15);
@@ -483,16 +487,22 @@
                     <h2>Cadastrar Devedor</h2>
                 </div>
                 <div class="form-group">
-                    <label for="debtorName">Nome Completo</label>
+                    <label for="debtorName">Nome Completo *</label>
                     <input type="text" id="debtorName" placeholder="Digite o nome do devedor">
+                    <div class="error-message" id="nameError">Por favor, informe o nome</div>
                 </div>
                 <div class="form-group">
-                    <label for="debtorPhone">Telefone</label>
+                    <label for="debtorPhone">Telefone *</label>
                     <input type="tel" id="debtorPhone" placeholder="(00) 00000-0000">
+                    <div class="error-message" id="phoneError">Por favor, informe um telefone válido</div>
                 </div>
-                <div class="form-group">
-                    <label for="debtAmount">Valor Devido</label>
-                    <input type="text" id="debtAmount" placeholder="R$ 0,00">
+                <div class="form-group input-with-icon">
+                    <label for="debtAmount">Valor Devido *</label>
+                    <input type="text" id="debtAmount" placeholder="R$ 0,00" inputmode="numeric">
+                    <div class="input-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="error-message" id="amountError">Por favor, informe um valor válido</div>
                 </div>
                 <div class="form-group">
                     <label for="debtNotes">Observações</label>
@@ -501,28 +511,6 @@
                 <button class="btn btn-primary" id="addDebtorBtn">
                     <i class="fas fa-plus-circle"></i> Adicionar Devedor
                 </button>
-                
-                <button class="quick-add-btn" id="showQuickAdd">
-                    <i class="fas fa-bolt"></i> Adicionar Rápido
-                </button>
-                
-                <div class="quick-add" id="quickAddPanel">
-                    <div class="quick-add-header">
-                        <h3>Adicionar Rápido</h3>
-                        <button class="btn btn-sm btn-primary" id="closeQuickAdd">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="form-group">
-                        <input type="text" id="quickName" placeholder="Nome do cliente">
-                    </div>
-                    <div class="form-group">
-                        <input type="text" id="quickAmount" placeholder="Valor (ex: 150,00)">
-                    </div>
-                    <button class="btn btn-primary" id="quickAddBtn">
-                        <i class="fas fa-bolt"></i> Adicionar
-                    </button>
-                </div>
             </div>
 
             <!-- Seção de Pesquisa -->
@@ -590,10 +578,6 @@
 
         // Elementos DOM
         const addDebtorBtn = document.getElementById('addDebtorBtn');
-        const showQuickAddBtn = document.getElementById('showQuickAdd');
-        const closeQuickAddBtn = document.getElementById('closeQuickAdd');
-        const quickAddBtn = document.getElementById('quickAddBtn');
-        const quickAddPanel = document.getElementById('quickAddPanel');
         const searchInput = document.getElementById('searchInput');
         const searchResults = document.getElementById('searchResults');
         const historyList = document.getElementById('historyList');
@@ -602,10 +586,18 @@
         const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
         const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
         const modalMessage = document.getElementById('modalMessage');
+        
+        // Elementos de erro
+        const nameError = document.getElementById('nameError');
+        const phoneError = document.getElementById('phoneError');
+        const amountError = document.getElementById('amountError');
 
         // Função para mostrar notificação
-        function showNotification(message) {
+        function showNotification(message, isError = false) {
             notification.textContent = message;
+            notification.style.background = isError 
+                ? 'rgba(244, 67, 54, 0.9)' 
+                : 'rgba(76, 175, 80, 0.9)';
             notification.classList.add('show');
             
             setTimeout(() => {
@@ -674,31 +666,59 @@
             e.target.value = value;
         });
 
-        // Máscara de valor monetário
-        document.getElementById('debtAmount').addEventListener('blur', function(e) {
-            let value = e.target.value;
-            if (value) {
-                const number = parseCurrency(value);
-                if (!isNaN(number)) {
-                    e.target.value = formatCurrency(number);
-                }
+        // Aceitar apenas números no campo de valor
+        document.getElementById('debtAmount').addEventListener('input', function(e) {
+            // Remove tudo que não é número ou vírgula
+            this.value = this.value.replace(/[^\d,]/g, '');
+            
+            // Garante que só há uma vírgula
+            const commaCount = (this.value.match(/,/g) || []).length;
+            if (commaCount > 1) {
+                this.value = this.value.slice(0, -1);
             }
         });
 
         // Adicionar novo devedor
         addDebtorBtn.addEventListener('click', () => {
+            // Resetar mensagens de erro
+            nameError.style.display = 'none';
+            phoneError.style.display = 'none';
+            amountError.style.display = 'none';
+            
             const name = document.getElementById('debtorName').value.trim();
             let phone = document.getElementById('debtorPhone').value.trim();
-            const amount = document.getElementById('debtAmount').value;
+            const amountValue = document.getElementById('debtAmount').value.trim();
             const notes = document.getElementById('debtNotes').value.trim();
             
-            // Formata o telefone corretamente
+            // Validar campos
+            let isValid = true;
+            
+            if (!name) {
+                nameError.style.display = 'block';
+                isValid = false;
+            }
+            
+            // Formatar e validar telefone
             phone = formatPhone(phone);
+            const phoneDigits = phone.replace(/\D/g, '');
+            if (phoneDigits.length < 10) {
+                phoneError.style.display = 'block';
+                isValid = false;
+            }
             
-            const parsedAmount = parseCurrency(amount);
+            if (!amountValue) {
+                amountError.style.display = 'block';
+                isValid = false;
+            }
             
-            if (!name || !phone || isNaN(parsedAmount) || parsedAmount <= 0) {
-                showNotification('Por favor, preencha todos os campos corretamente!');
+            const parsedAmount = parseCurrency(amountValue);
+            if (isNaN(parsedAmount) {
+                amountError.style.display = 'block';
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                showNotification('Por favor, preencha os campos corretamente!', true);
                 return;
             }
             
@@ -742,77 +762,7 @@
             document.getElementById('debtAmount').value = '';
             document.getElementById('debtNotes').value = '';
             
-            showNotification('Devedor adicionado com sucesso!');
-            renderHistory();
-        });
-
-        // Mostrar/ocultar painel de adição rápida
-        showQuickAddBtn.addEventListener('click', () => {
-            quickAddPanel.classList.add('active');
-            document.getElementById('quickName').focus();
-        });
-        
-        closeQuickAddBtn.addEventListener('click', () => {
-            quickAddPanel.classList.remove('active');
-        });
-
-        // Adicionar devedor rápido
-        quickAddBtn.addEventListener('click', () => {
-            const name = document.getElementById('quickName').value.trim();
-            const amount = document.getElementById('quickAmount').value;
-            
-            if (!name || !amount) {
-                showNotification('Preencha nome e valor!');
-                return;
-            }
-            
-            const parsedAmount = parseCurrency(amount);
-            
-            if (isNaN(parsedAmount) {
-                showNotification('Valor inválido!');
-                return;
-            }
-            
-            // Criar registro de histórico
-            const historyEntry = {
-                id: Date.now().toString(),
-                name,
-                phone: 'Não informado',
-                amount: parsedAmount,
-                notes: 'Adição rápida',
-                date: new Date().toISOString()
-            };
-            
-            history.unshift(historyEntry);
-            localStorage.setItem('history', JSON.stringify(history));
-            
-            // Atualizar lista de devedores
-            const existingDebtorIndex = debtors.findIndex(d => d.name === name);
-            
-            if (existingDebtorIndex !== -1) {
-                // Atualizar devedor existente
-                debtors[existingDebtorIndex].total += parsedAmount;
-                debtors[existingDebtorIndex].lastUpdate = new Date().toISOString();
-            } else {
-                // Adicionar novo devedor
-                debtors.push({
-                    id: Date.now().toString(),
-                    name,
-                    phone: 'Não informado',
-                    total: parsedAmount,
-                    firstAdded: new Date().toISOString(),
-                    lastUpdate: new Date().toISOString()
-                });
-            }
-            
-            localStorage.setItem('debtors', JSON.stringify(debtors));
-            
-            // Limpar formulário
-            document.getElementById('quickName').value = '';
-            document.getElementById('quickAmount').value = '';
-            quickAddPanel.classList.remove('active');
-            
-            showNotification('Devedor adicionado rapidamente!');
+            showNotification('Devedor cadastrado com sucesso!');
             renderHistory();
         });
 
@@ -1007,10 +957,10 @@
             localStorage.setItem('debtors', JSON.stringify(debtors));
         }
 
-        // Inicializar
+        // Focar no campo de nome ao carregar a página
         document.addEventListener('DOMContentLoaded', () => {
-            renderHistory();
             document.getElementById('debtorName').focus();
+            renderHistory();
         });
     </script>
 </body>
