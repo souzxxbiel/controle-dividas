@@ -197,6 +197,7 @@
     }
 
     function excluirCliente(i) {
+      if(!confirm("Tem certeza que deseja excluir este cadastro?")) return;
       const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
       dados.splice(i, 1);
       localStorage.setItem("clientes", JSON.stringify(dados));
@@ -291,3 +292,4 @@
   </script>
 </body>
 </html>
+
