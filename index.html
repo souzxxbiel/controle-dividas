@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestor de Devedores</title>
   <style>
     body {
@@ -15,7 +15,7 @@
     .container {
       padding: 20px;
     }
-    input, textarea, button {
+    input, textarea, button, select {
       width: 100%;
       margin-bottom: 10px;
       padding: 10px;
@@ -41,33 +41,47 @@
       display: block;
     }
     .card {
-      background: #ffffff10;
-      padding: 10px;
-      border-radius: 10px;
-      margin-bottom: 10px;
+      background: #ffffff15;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      box-shadow: 0 0 10px #00000030;
     }
     .actions {
       display: flex;
       gap: 10px;
-      margin-top: 5px;
+      margin-top: 10px;
     }
-    .notification {
-      position: fixed;
-      top: 10px;
-      right: 10px;
+    .actions button {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn-editar {
+      background-color: #ffc107;
+      color: #000;
+    }
+    .btn-excluir {
+      background-color: #dc3545;
+      color: white;
+    }
+    #btnRestaurar {
+      margin-bottom: 15px;
       background: #28a745;
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 8px;
-      display: none;
-      z-index: 1000;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="notification" id="notificacao">Salvo com sucesso.</div>
-
     <div class="tabs">
       <button onclick="showTab('cadastro')">Cadastro</button>
       <button onclick="showTab('historico')">Histórico</button>
@@ -75,17 +89,17 @@
     </div>
 
     <div id="cadastro" class="tab-content active">
-      <input type="text" id="nome" list="nomesSalvos" placeholder="Nome completo" />
-      <datalist id="nomesSalvos"></datalist>
+      <input type="text" id="nome" placeholder="Nome completo" list="nomesSalvos"/>
       <input type="text" id="telefone" placeholder="Telefone (opcional)" />
-      <input type="number" id="valor" list="valoresSalvos" placeholder="Valor (R$)" />
-      <datalist id="valoresSalvos"></datalist>
+      <input type="number" id="valor" placeholder="Valor (R$)" list="valoresSalvos"/>
       <textarea id="obs" placeholder="Observações (opcional)"></textarea>
       <button onclick="salvarCliente()">Salvar</button>
+      <datalist id="nomesSalvos"></datalist>
+      <datalist id="valoresSalvos"></datalist>
     </div>
 
     <div id="historico" class="tab-content">
-      <button onclick="restaurarBackup()">Restaurar Backup</button>
+      <button id="btnRestaurar" onclick="restaurarBackup()">Restaurar Backup</button>
       <input type="text" id="buscaHistorico" oninput="filtrarHistorico()" placeholder="Buscar por nome..." />
       <div id="listaHistorico"></div>
     </div>
@@ -107,30 +121,39 @@
     function salvarCliente() {
       const nome = document.getElementById('nome').value.trim();
       const telefone = document.getElementById('telefone').value.trim();
-      const valor = document.getElementById('valor').value;
-      const obs = document.getElementById('obs').value;
+      const valor = document.getElementById('valor').value.trim();
+      const obs = document.getElementById('obs').value.trim();
 
       if (!nome) return;
 
       const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
       dados.push({ nome, telefone, valor, obs, data: new Date().toLocaleString() });
       localStorage.setItem("clientes", JSON.stringify(dados));
-      atualizarAutoCompletar(nome, valor);
+
+      // Atualiza autocomplete
+      salvarSugestao("nomesSalvos", nome);
+      salvarSugestao("valoresSalvos", valor);
+
+      // Backup automático
+      baixarBackup();
 
       document.getElementById('nome').value = '';
       document.getElementById('telefone').value = '';
       document.getElementById('valor').value = '';
       document.getElementById('obs').value = '';
-      notificar("Salvo com sucesso.");
-
-      gerarBackup(dados);
+      
+      mostrarNotificacao("Cliente salvo com sucesso.");
     }
 
-    function notificar(msg) {
-      const el = document.getElementById("notificacao");
-      el.innerText = msg;
-      el.style.display = "block";
-      setTimeout(() => el.style.display = "none", 3000);
+    function salvarSugestao(datalistId, valor) {
+      if (!valor) return;
+      const datalist = document.getElementById(datalistId);
+      const options = Array.from(datalist.options).map(o => o.value);
+      if (!options.includes(valor)) {
+        const option = document.createElement("option");
+        option.value = valor;
+        datalist.appendChild(option);
+      }
     }
 
     function renderHistorico(filtro = "") {
@@ -139,9 +162,10 @@
       const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
 
       dados
+        .map((c, i) => ({ ...c, index: i }))
         .filter(c => c.nome.toLowerCase().includes(filtro.toLowerCase()))
         .reverse()
-        .forEach((c, i) => {
+        .forEach(c => {
           const div = document.createElement("div");
           div.className = "card";
           div.innerHTML = `
@@ -151,8 +175,8 @@
             Obs: ${c.obs || "-"}<br>
             Data: ${c.data}<br>
             <div class="actions">
-              <button onclick="editarCliente(${i})">Editar</button>
-              <button onclick="excluirCliente(${i})">Excluir</button>
+              <button class="btn-editar" onclick="editarCliente(${c.index})">Editar</button>
+              <button class="btn-excluir" onclick="excluirCliente(${c.index})">Excluir</button>
             </div>
           `;
           container.appendChild(div);
@@ -177,14 +201,82 @@
       Object.entries(resumo)
         .filter(([nome]) => nome.toLowerCase().includes(filtro.toLowerCase()))
         .forEach(([nome, total]) => {
+          const telefone = telefones[nome] || "";
           const div = document.createElement("div");
           div.className = "card";
-          const telefone = telefones[nome] || "";
           div.innerHTML = `
             <strong>${nome}</strong><br>Total: R$ ${total.toFixed(2)}
           `;
           container.appendChild(div);
         });
+    }
+
+    function excluirCliente(index) {
+      if (!confirm("Tem certeza que deseja excluir este registro?")) return;
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      dados.splice(index, 1);
+      localStorage.setItem("clientes", JSON.stringify(dados));
+      renderHistorico();
+    }
+
+    function editarCliente(index) {
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      const c = dados[index];
+      document.getElementById('nome').value = c.nome;
+      document.getElementById('telefone').value = c.telefone;
+      document.getElementById('valor').value = c.valor;
+      document.getElementById('obs').value = c.obs;
+      dados.splice(index, 1);
+      localStorage.setItem("clientes", JSON.stringify(dados));
+      showTab('cadastro');
+    }
+
+    function baixarBackup() {
+      const dados = localStorage.getItem("clientes");
+      const blob = new Blob([dados], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "backup_clientes.json";
+      a.click();
+    }
+
+    function restaurarBackup() {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".json";
+      input.onchange = function(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const dados = JSON.parse(e.target.result);
+            localStorage.setItem("clientes", JSON.stringify(dados));
+            renderHistorico();
+            renderSomas();
+            mostrarNotificacao("Backup restaurado com sucesso.");
+          } catch {
+            alert("Arquivo inválido.");
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+
+    function mostrarNotificacao(msg) {
+      const div = document.createElement("div");
+      div.textContent = msg;
+      div.style.position = "fixed";
+      div.style.bottom = "20px";
+      div.style.left = "50%";
+      div.style.transform = "translateX(-50%)";
+      div.style.background = "#28a745";
+      div.style.color = "#fff";
+      div.style.padding = "10px 20px";
+      div.style.borderRadius = "10px";
+      div.style.boxShadow = "0 0 10px #00000060";
+      document.body.appendChild(div);
+      setTimeout(() => div.remove(), 3000);
     }
 
     function filtrarHistorico() {
@@ -197,84 +289,9 @@
       renderSomas(termo);
     }
 
-    function excluirCliente(i) {
-      if (!confirm("Deseja realmente excluir este cliente?")) return;
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      dados.splice(i, 1);
-      localStorage.setItem("clientes", JSON.stringify(dados));
-      renderHistorico();
-      renderSomas();
-    }
-
-    function editarCliente(i) {
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      const c = dados[i];
-      document.getElementById("nome").value = c.nome;
-      document.getElementById("valor").value = c.valor;
-      document.getElementById("telefone").value = c.telefone;
-      document.getElementById("obs").value = c.obs;
-      dados.splice(i, 1);
-      localStorage.setItem("clientes", JSON.stringify(dados));
-      renderHistorico();
-      renderSomas();
-      showTab('cadastro');
-      notificar("Edite e salve novamente.");
-    }
-
-    function atualizarAutoCompletar(nome, valor) {
-      const nomesSalvos = new Set(JSON.parse(localStorage.getItem("nomesSalvos") || "[]"));
-      nomesSalvos.add(nome);
-      localStorage.setItem("nomesSalvos", JSON.stringify([...nomesSalvos]));
-
-      const valoresSalvos = new Set(JSON.parse(localStorage.getItem("valoresSalvos") || "[]"));
-      valoresSalvos.add(valor);
-      localStorage.setItem("valoresSalvos", JSON.stringify([...valoresSalvos]));
-
-      preencherAutoCompletar();
-    }
-
-    function preencherAutoCompletar() {
-      const nomes = JSON.parse(localStorage.getItem("nomesSalvos") || "[]");
-      const valores = JSON.parse(localStorage.getItem("valoresSalvos") || "[]");
-      const datalistNomes = document.getElementById("nomesSalvos");
-      const datalistValores = document.getElementById("valoresSalvos");
-
-      datalistNomes.innerHTML = nomes.map(n => `<option value="${n}">`).join("");
-      datalistValores.innerHTML = valores.map(v => `<option value="${v}">`).join("");
-    }
-
-    function gerarBackup(dados) {
-      const blob = new Blob([JSON.stringify(dados, null, 2)], { type: "application/json" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `backup_devedores_${new Date().toISOString().slice(0, 10)}.json`;
-      a.click();
-    }
-
-    function restaurarBackup() {
-      const input = document.createElement("input");
-      input.type = "file";
-      input.accept = "application/json";
-      input.onchange = function (e) {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onload = function (event) {
-          try {
-            const dados = JSON.parse(event.target.result);
-            localStorage.setItem("clientes", JSON.stringify(dados));
-            renderHistorico();
-            renderSomas();
-            notificar("Backup restaurado com sucesso.");
-          } catch (e) {
-            alert("Arquivo inválido.");
-          }
-        };
-        reader.readAsText(file);
-      };
-      input.click();
-    }
-
-    preencherAutoCompletar();
+    // Inicializar autocomplete
+    renderHistorico();
+    renderSomas();
   </script>
 </body>
 </html>
