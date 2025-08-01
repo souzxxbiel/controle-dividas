@@ -2,9 +2,8 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gestor de Devedores</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -16,11 +15,11 @@
     .container {
       padding: 20px;
     }
-    input, textarea, button {
+    input, textarea, select, button {
       width: 100%;
       margin-bottom: 10px;
-      padding: 12px;
-      border-radius: 10px;
+      padding: 10px;
+      border-radius: 8px;
       border: none;
       font-size: 1em;
     }
@@ -34,7 +33,6 @@
       background: #007bff;
       color: white;
       cursor: pointer;
-      font-weight: bold;
     }
     .tab-content {
       display: none;
@@ -43,30 +41,22 @@
       display: block;
     }
     .card {
-      background: #ffffff1a;
-      padding: 15px;
-      border-radius: 12px;
-      margin-bottom: 12px;
-      box-shadow: 0 0 6px #00000050;
+      background: #ffffff10;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 10px;
     }
     .actions {
       display: flex;
-      gap: 10px;
-      margin-top: 10px;
       flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 5px;
     }
-    .actions button {
-      flex: 1;
-      background: #333;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 10px;
-      font-size: 0.9em;
-      cursor: pointer;
-    }
-    .actions button:hover {
-      background: #555;
+    .backup {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
     }
   </style>
 </head>
@@ -89,7 +79,9 @@
     <div id="historico" class="tab-content">
       <input type="text" id="buscaHistorico" oninput="filtrarHistorico()" placeholder="Buscar por nome..." />
       <div class="actions">
-        <button onclick="exportarHistoricoPDF()">Exportar Histórico (PDF)</button>
+        <button onclick="exportarHistoricoPDF()">📄 Exportar PDF</button>
+        <button onclick="fazerBackup()">📁 Exportar Backup JSON</button>
+        <input type="file" onchange="importarBackup(event)" accept=".json" />
       </div>
       <div id="listaHistorico"></div>
     </div>
@@ -133,7 +125,7 @@
       const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
 
       dados
-        .map((c, i) => ({ ...c, index: i }))
+        .map((c, i) => ({...c, id: i}))
         .filter(c => c.nome.toLowerCase().includes(filtro.toLowerCase()))
         .reverse()
         .forEach(c => {
@@ -146,12 +138,32 @@
             Obs: ${c.obs || "-"}<br>
             Data: ${c.data}<br>
             <div class="actions">
-              <button onclick="editarCliente(${c.index})">Editar</button>
-              <button onclick="excluirCliente(${c.index})">Excluir</button>
+              <button onclick="editarCliente(${c.id})">✏️ Editar</button>
+              <button onclick="excluirCliente(${c.id})">🗑️ Excluir</button>
             </div>
           `;
           container.appendChild(div);
         });
+    }
+
+    function editarCliente(id) {
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      const c = dados[id];
+      document.getElementById('nome').value = c.nome;
+      document.getElementById('telefone').value = c.telefone;
+      document.getElementById('valor').value = c.valor;
+      document.getElementById('obs').value = c.obs;
+      dados.splice(id, 1);
+      localStorage.setItem("clientes", JSON.stringify(dados));
+      showTab('cadastro');
+    }
+
+    function excluirCliente(id) {
+      if (!confirm("Tem certeza que deseja excluir este cliente?")) return;
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      dados.splice(id, 1);
+      localStorage.setItem("clientes", JSON.stringify(dados));
+      renderHistorico();
     }
 
     function renderSomas(filtro = "") {
@@ -172,9 +184,9 @@
       Object.entries(resumo)
         .filter(([nome]) => nome.toLowerCase().includes(filtro.toLowerCase()))
         .forEach(([nome, total]) => {
-          const telefone = telefones[nome] || "";
           const div = document.createElement("div");
           div.className = "card";
+          const telefone = telefones[nome] || "";
           div.innerHTML = `
             <strong>${nome}</strong><br>Total: R$ ${total.toFixed(2)}
             <div class="actions">
@@ -197,61 +209,53 @@
       renderSomas(termo);
     }
 
-    function editarCliente(i) {
+    function exportarHistoricoPDF() {
       const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      const c = dados[i];
-      document.getElementById('nome').value = c.nome;
-      document.getElementById('telefone').value = c.telefone;
-      document.getElementById('valor').value = c.valor;
-      document.getElementById('obs').value = c.obs;
-      showTab('cadastro');
-      dados.splice(i, 1);
-      localStorage.setItem("clientes", JSON.stringify(dados));
+      let texto = "Histórico de Clientes\n\n";
+      dados.forEach(c => {
+        texto += `Nome: ${c.nome}\nTelefone: ${c.telefone}\nValor: R$ ${c.valor}\nObs: ${c.obs}\nData: ${c.data}\n\n`;
+      });
+
+      const blob = new Blob([texto], { type: "application/pdf" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "historico.pdf";
+      a.click();
     }
 
-    function excluirCliente(i) {
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      if (confirm("Deseja excluir este registro?")) {
-        dados.splice(i, 1);
-        localStorage.setItem("clientes", JSON.stringify(dados));
-        renderHistorico();
-      }
+    function fazerBackup() {
+      const dados = localStorage.getItem("clientes") || "[]";
+      const blob = new Blob([dados], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "backup_clientes.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importarBackup(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const json = JSON.parse(e.target.result);
+          localStorage.setItem("clientes", JSON.stringify(json));
+          alert("Backup importado com sucesso!");
+          location.reload();
+        } catch (err) {
+          alert("Erro ao importar o backup.");
+        }
+      };
+      reader.readAsText(file);
     }
 
     function gerarLinkWhatsApp(nome, telefone, valor) {
       const pix = "054.167.380-73";
       const msg = `Olá ${nome}, você possui um valor pendente de R$ ${valor.toFixed(2)}.\nChave PIX para pagamento:\n${pix}`;
       return "https://wa.me/" + telefone.replace(/\D/g, "") + "?text=" + encodeURIComponent(msg);
-    }
-
-    async function exportarHistoricoPDF() {
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      let y = 10;
-
-      doc.setFontSize(14);
-      doc.text("Histórico de Clientes", 10, y);
-      y += 10;
-
-      dados.forEach((c, idx) => {
-        doc.setFontSize(11);
-        doc.text(`Cliente: ${c.nome}`, 10, y);
-        y += 6;
-        doc.text(`Valor: R$ ${c.valor || "0,00"} | Tel: ${c.telefone || "Não informado"}`, 10, y);
-        y += 6;
-        doc.text(`Obs: ${c.obs || "-"}`, 10, y);
-        y += 6;
-        doc.text(`Data: ${c.data}`, 10, y);
-        y += 10;
-
-        if (y > 270) {
-          doc.addPage();
-          y = 10;
-        }
-      });
-
-      doc.save("historico_clientes.pdf");
     }
   </script>
 </body>
