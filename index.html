@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestor de Devedores</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -87,6 +88,9 @@
 
     <div id="historico" class="tab-content">
       <input type="text" id="buscaHistorico" oninput="filtrarHistorico()" placeholder="Buscar por nome..." />
+      <div class="actions">
+        <button onclick="exportarHistoricoPDF()">Exportar Histórico (PDF)</button>
+      </div>
       <div id="listaHistorico"></div>
     </div>
 
@@ -142,7 +146,6 @@
             Obs: ${c.obs || "-"}<br>
             Data: ${c.data}<br>
             <div class="actions">
-              <button onclick="exportarCliente(${c.index})">Exportar</button>
               <button onclick="editarCliente(${c.index})">Editar</button>
               <button onclick="excluirCliente(${c.index})">Excluir</button>
             </div>
@@ -194,16 +197,6 @@
       renderSomas(termo);
     }
 
-    function exportarCliente(i) {
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      const c = dados[i];
-      const blob = new Blob([`Nome: ${c.nome}\nTelefone: ${c.telefone}\nValor: R$ ${c.valor}\nObs: ${c.obs}\nData: ${c.data}`], { type: "text/plain" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `cliente_${c.nome.replace(/\s+/g, "_")}.txt`;
-      a.click();
-    }
-
     function editarCliente(i) {
       const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
       const c = dados[i];
@@ -229,6 +222,36 @@
       const pix = "054.167.380-73";
       const msg = `Olá ${nome}, você possui um valor pendente de R$ ${valor.toFixed(2)}.\nChave PIX para pagamento:\n${pix}`;
       return "https://wa.me/" + telefone.replace(/\D/g, "") + "?text=" + encodeURIComponent(msg);
+    }
+
+    async function exportarHistoricoPDF() {
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      let y = 10;
+
+      doc.setFontSize(14);
+      doc.text("Histórico de Clientes", 10, y);
+      y += 10;
+
+      dados.forEach((c, idx) => {
+        doc.setFontSize(11);
+        doc.text(`Cliente: ${c.nome}`, 10, y);
+        y += 6;
+        doc.text(`Valor: R$ ${c.valor || "0,00"} | Tel: ${c.telefone || "Não informado"}`, 10, y);
+        y += 6;
+        doc.text(`Obs: ${c.obs || "-"}`, 10, y);
+        y += 6;
+        doc.text(`Data: ${c.data}`, 10, y);
+        y += 10;
+
+        if (y > 270) {
+          doc.addPage();
+          y = 10;
+        }
+      });
+
+      doc.save("historico_clientes.pdf");
     }
   </script>
 </body>
