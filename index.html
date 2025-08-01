@@ -126,9 +126,6 @@
             Data: ${c.data}<br>
             <div class="actions">
               <button onclick="exportarCliente(${i})">Exportar</button>
-              <a href="${gerarLinkWhatsApp(c.nome, c.telefone, c.valor)}" target="_blank">
-                <button>WhatsApp</button>
-              </a>
             </div>
           `;
           container.appendChild(div);
@@ -140,9 +137,13 @@
       container.innerHTML = "";
       const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
       const resumo = {};
+      const telefones = {};
 
       dados.forEach(c => {
-        if (!resumo[c.nome]) resumo[c.nome] = 0;
+        if (!resumo[c.nome]) {
+          resumo[c.nome] = 0;
+          telefones[c.nome] = c.telefone;
+        }
         resumo[c.nome] += parseFloat(c.valor || 0);
       });
 
@@ -151,7 +152,15 @@
         .forEach(([nome, total]) => {
           const div = document.createElement("div");
           div.className = "card";
-          div.innerHTML = `<strong>${nome}</strong><br>Total: R$ ${total.toFixed(2)}`;
+          const telefone = telefones[nome] || "";
+          div.innerHTML = `
+            <strong>${nome}</strong><br>Total: R$ ${total.toFixed(2)}
+            <div class="actions">
+              <a href="${gerarLinkWhatsApp(nome, telefone, total)}" target="_blank">
+                <button>WhatsApp</button>
+              </a>
+            </div>
+          `;
           container.appendChild(div);
         });
     }
@@ -169,18 +178,19 @@
     function exportarCliente(i) {
       const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
       const c = dados[i];
-      const blob = new Blob([`Nome: ${c.nome}\\nTelefone: ${c.telefone}\\nValor: R$ ${c.valor}\\nObs: ${c.obs}\\nData: ${c.data}`], { type: "text/plain" });
+      const blob = new Blob([`Nome: ${c.nome}\nTelefone: ${c.telefone}\nValor: R$ ${c.valor}\nObs: ${c.obs}\nData: ${c.data}`], { type: "text/plain" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = `cliente_${c.nome.replace(/\\s+/g, "_")}.txt`;
+      a.download = `cliente_${c.nome.replace(/\s+/g, "_")}.txt`;
       a.click();
     }
 
     function gerarLinkWhatsApp(nome, telefone, valor) {
-      const pix = "00020126360014BR.GOV.BCB.PIX0111SEU_PIX_AQUI5204000053039865405" + valor.replace(",", ".") + "5802BR5920NOME_RECEBEDOR6009CIDADE62070503***6304ABCD";
-      const msg = `Olá ${nome}, você possui um valor pendente de R$ ${valor}.\\nPIX para pagamento:\\n${pix}`;
-      return "https://wa.me/" + telefone.replace(/\\D/g, "") + "?text=" + encodeURIComponent(msg);
+      const pix = "054.167.380-73";
+      const msg = `Olá ${nome}, você possui um valor pendente de R$ ${valor.toFixed(2)}.\nChave PIX para pagamento:\n${pix}`;
+      return "https://wa.me/" + telefone.replace(/\D/g, "") + "?text=" + encodeURIComponent(msg);
     }
   </script>
 </body>
 </html>
+
