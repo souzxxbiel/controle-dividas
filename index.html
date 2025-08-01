@@ -1,3 +1,4 @@
+<!-- CÓDIGO COMPLETO -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -114,8 +115,6 @@
       if (!nome) return alert("Nome é obrigatório.");
 
       const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-
-      // Verifica se o cliente já existe
       const jaExiste = dados.find(c => c.nome.toLowerCase() === nome.toLowerCase() && c.telefone);
       if (jaExiste && !telefone) {
         telefone = jaExiste.telefone;
@@ -129,6 +128,8 @@
       document.getElementById('valor').value = '';
       document.getElementById('obs').value = '';
       alert("Salvo com sucesso.");
+
+      fazerBackup(); // Backup automático após salvar
     }
 
     function renderHistorico(filtro = "") {
