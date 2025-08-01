@@ -2,34 +2,27 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestão de Devedores</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet"/>
-  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.2/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet" />
   <style>
     * {
       box-sizing: border-box;
     }
     body {
-      font-family: 'Poppins', sans-serif;
       margin: 0;
-      background: linear-gradient(135deg, #000428, #004e92);
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #002f6c, #7f00ff);
       color: white;
       padding: 10px;
-      transition: background 0.4s, color 0.4s;
-    }
-    .dark-mode {
-      background: linear-gradient(135deg, #1c1c1c, #383838);
-      color: #fff;
     }
     h2 {
       text-align: center;
-      margin-bottom: 10px;
     }
     .tabs {
       display: flex;
       justify-content: space-around;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
     .tab {
       flex: 1;
@@ -38,8 +31,7 @@
       background: rgba(255,255,255,0.1);
       cursor: pointer;
       border-radius: 8px;
-      margin: 0 2px;
-      transition: background 0.3s;
+      margin: 2px;
     }
     .tab:hover {
       background: rgba(255,255,255,0.2);
@@ -52,11 +44,6 @@
     }
     .show {
       display: block;
-      animation: fadeIn 0.3s ease-in-out;
-    }
-    @keyframes fadeIn {
-      from {opacity: 0;}
-      to {opacity: 1;}
     }
     input, textarea {
       width: 100%;
@@ -67,32 +54,23 @@
       background: rgba(255,255,255,0.1);
       color: white;
     }
-    input:focus, textarea:focus {
-      outline: 2px solid #00ffff;
-    }
     button {
       padding: 10px 15px;
-      margin: 5px 3px 5px 0;
+      margin: 5px 0;
       border: none;
       border-radius: 8px;
-      background: rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.2);
       color: white;
       cursor: pointer;
-      transition: background 0.3s;
     }
     button:hover {
       background: rgba(255,255,255,0.3);
     }
     .card {
-      background: rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.2);
       padding: 10px;
-      border-radius: 12px;
+      border-radius: 10px;
       margin-bottom: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      transition: transform 0.2s;
-    }
-    .card:hover {
-      transform: scale(1.02);
     }
     .card small {
       color: #ccc;
@@ -100,26 +78,10 @@
     .actions {
       margin-top: 5px;
     }
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .toggle-dark {
-      background: transparent;
-      font-size: 18px;
-      padding: 6px;
-    }
   </style>
 </head>
 <body>
-  <div class="top-bar">
-    <h2>Gestão de Devedores</h2>
-    <button onclick="toggleDark()" class="toggle-dark" title="Modo Claro/Escuro">
-      <i class="fas fa-moon"></i>
-    </button>
-  </div>
-
+  <h2>Gestão de Devedores</h2>
   <div class="tabs">
     <div class="tab active" onclick="mostrarAba('cadastro')">Cadastro</div>
     <div class="tab" onclick="mostrarAba('historico')">Histórico</div>
@@ -131,7 +93,7 @@
     <input id="telefone" placeholder="Telefone (opcional)" />
     <input id="valor" type="number" placeholder="Valor (R$)" />
     <textarea id="obs" placeholder="Observações (opcional)"></textarea>
-    <button onclick="salvar()"><i class="fas fa-save"></i> Salvar</button>
+    <button onclick="salvar()">Salvar</button>
   </div>
 
   <div id="historico" class="content">
@@ -185,8 +147,8 @@
           <small>${c.data}</small><br>
           ${c.obs ? `<i>${c.obs}</i><br>` : ""}
           <div class="actions">
-            <button onclick="editar(${i})"><i class="fas fa-edit"></i> Editar</button>
-            <button onclick="excluir(${i})"><i class="fas fa-trash"></i> Excluir</button>
+            <button onclick="editar(${i})">Editar</button>
+            <button onclick="excluir(${i})">Excluir</button>
           </div>`;
         lista.appendChild(div);
       });
@@ -231,13 +193,9 @@
         const div = document.createElement("div");
         div.className = "card";
         div.innerHTML = `<b>${nome}</b><br>Total: R$ ${total.toFixed(2)}<br>
-          <a href="${link}" target="_blank"><button><i class="fab fa-whatsapp"></i> WhatsApp</button></a>`;
+          <a href="${link}" target="_blank"><button>WhatsApp</button></a>`;
         lista.appendChild(div);
       });
-    }
-
-    function toggleDark() {
-      document.body.classList.toggle("dark-mode");
     }
   </script>
 </body>
