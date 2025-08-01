@@ -51,6 +51,23 @@
       gap: 10px;
       margin-top: 5px;
     }
+    #notificacao {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #28a745;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 10px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+      z-index: 9999;
+    }
+    #notificacao.mostrar {
+      opacity: 1;
+      pointer-events: auto;
+    }
   </style>
 </head>
 <body>
@@ -62,7 +79,8 @@
     </div>
 
     <div id="cadastro" class="tab-content active">
-      <input type="text" id="nome" placeholder="Nome completo" />
+      <input type="text" id="nome" placeholder="Nome completo" list="nomesSalvos"/>
+      <datalist id="nomesSalvos"></datalist>
       <input type="text" id="telefone" placeholder="Telefone (apenas na 1ª vez)" />
       <input type="number" id="valor" placeholder="Valor (R$)" />
       <textarea id="obs" placeholder="Observações (opcional)"></textarea>
@@ -83,6 +101,8 @@
     </div>
   </div>
 
+  <div id="notificacao">Cliente salvo com sucesso!</div>
+
   <script>
     function showTab(id) {
       document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
@@ -97,7 +117,7 @@
       const valor = document.getElementById('valor').value;
       const obs = document.getElementById('obs').value;
 
-      if (!nome) return alert("Nome é obrigatório.");
+      if (!nome) return;
 
       let telefonesSalvos = JSON.parse(localStorage.getItem("telefones") || "{}");
       if (!telefonesSalvos[nome] && telefone) {
@@ -110,7 +130,14 @@
       dados.push({ nome, telefone, valor, obs, data: new Date().toLocaleString() });
       localStorage.setItem("clientes", JSON.stringify(dados));
 
-      const numeroBackup = "55996275431";
+      let nomes = JSON.parse(localStorage.getItem("nomesSalvos") || "[]");
+      if (!nomes.includes(nome)) {
+        nomes.push(nome);
+        localStorage.setItem("nomesSalvos", JSON.stringify(nomes));
+        preencherAutoComplete();
+      }
+
+      const numeroBackup = "5599892514";
       const msgBackup = `Novo cliente salvo:\nNome: ${nome}\nTelefone: ${telefone || "Não informado"}\nValor: R$ ${valor}\nObs: ${obs || "-"}`;
       window.open(`https://wa.me/${numeroBackup}?text=${encodeURIComponent(msgBackup)}`, "_blank");
 
@@ -118,7 +145,14 @@
       document.getElementById('telefone').value = '';
       document.getElementById('valor').value = '';
       document.getElementById('obs').value = '';
-      alert("Salvo com sucesso.");
+
+      mostrarNotificacao();
+    }
+
+    function mostrarNotificacao() {
+      const el = document.getElementById("notificacao");
+      el.classList.add("mostrar");
+      setTimeout(() => el.classList.remove("mostrar"), 3000);
     }
 
     function renderHistorico(filtro = "") {
@@ -205,6 +239,19 @@
       const termo = document.getElementById("buscaSomas").value;
       renderSomas(termo);
     }
+
+    function preencherAutoComplete() {
+      const nomes = JSON.parse(localStorage.getItem("nomesSalvos") || "[]");
+      const lista = document.getElementById("nomesSalvos");
+      lista.innerHTML = "";
+      nomes.forEach(nome => {
+        const option = document.createElement("option");
+        option.value = nome;
+        lista.appendChild(option);
+      });
+    }
+
+    preencherAutoComplete();
   </script>
 </body>
 </html>
