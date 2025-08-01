@@ -1,308 +1,165 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestor de Clientes</title>
   <style>
-    :root {
-      --cor-primaria: #0f0c29;
-      --cor-secundaria: #302b63;
-      --cor-destaque: #e94057;
-      --texto-claro: #fff;
-      --texto-escuro: #111;
-      --bg-gradiente: linear-gradient(135deg, #0f0c29, #302b63, #e94057);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
+    /* Estilos visuais (tema Xenon azul + vermelho degradê) */
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: var(--bg-gradiente);
-      color: var(--texto-claro);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
+      background: linear-gradient(to bottom right, #0f0c29, #302b63, #24243e);
+      color: #fff;
     }
-
     header {
-      background: rgba(0,0,0,0.6);
       padding: 1rem;
       text-align: center;
-      font-size: 1.8rem;
-      font-weight: bold;
-      backdrop-filter: blur(4px);
+      background: linear-gradient(45deg, #0081cf, #ff2a68);
+      box-shadow: 0 0 15px #000;
     }
-
+    header h1 {
+      margin: 0;
+    }
     nav {
       display: flex;
-      justify-content: space-around;
-      background: rgba(0,0,0,0.3);
-      padding: 0.5rem;
+      justify-content: center;
+      gap: 1rem;
+      padding: 1rem;
     }
-
     nav button {
-      background: var(--cor-destaque);
-      color: var(--texto-claro);
+      background: #444;
+      color: white;
       border: none;
-      padding: 0.7rem 1.2rem;
+      padding: 10px 20px;
       border-radius: 8px;
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: 0.3s;
     }
-
     nav button:hover {
-      transform: scale(1.05);
+      background: #ff2a68;
     }
-
-    main {
-      flex: 1;
+    .tab {
+      display: none;
       padding: 1rem;
     }
-
-    .aba {
-      display: none;
-    }
-
-    .ativa {
+    .active {
       display: block;
     }
-
-    label {
-      display: block;
-      margin-top: 1rem;
+    .input-group {
+      margin: 1rem 0;
     }
-
-    input, textarea {
+    input, textarea, select {
       width: 100%;
-      padding: 0.6rem;
-      margin-top: 0.2rem;
-      border-radius: 6px;
+      padding: 0.8rem;
       border: none;
+      border-radius: 8px;
+      font-size: 1rem;
     }
-
-    button.salvar {
-      background: #38b6ff;
+    label {
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .btn {
+      background: #ff2a68;
       color: white;
+      border: none;
+      padding: 0.8rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
       margin-top: 1rem;
+      transition: background 0.3s;
     }
-
-    .card {
-      background: rgba(255,255,255,0.1);
+    .btn:hover {
+      background: #c2174f;
+    }
+    .cliente-item {
+      background: #ffffff11;
       padding: 1rem;
       margin: 0.5rem 0;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      border-radius: 12px;
+      box-shadow: 0 0 10px #00000033;
+      position: relative;
     }
-
-    .card button {
-      margin: 0.2rem;
-    }
-
-    .top-bar {
+    .actions {
+      margin-top: 0.5rem;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
+      gap: 0.5rem;
     }
-
-    .top-bar input {
-      flex: 1;
-      margin-left: 1rem;
+    .badge {
+      background: #0081cf;
+      padding: 2px 8px;
+      border-radius: 6px;
     }
-
-    footer {
-      text-align: center;
+    .dashboard {
+      margin-top: 2rem;
+      background: #00000033;
       padding: 1rem;
-      background: rgba(0,0,0,0.4);
+      border-radius: 12px;
+    }
+    .dashboard div {
+      margin-bottom: 0.5rem;
+    }
+    .log {
+      max-height: 200px;
+      overflow-y: auto;
+      background: #00000055;
+      padding: 0.5rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+    .tema {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #444;
+      border: none;
+      padding: 0.8rem;
+      border-radius: 50%;
+      color: white;
+      font-size: 1.2rem;
     }
   </style>
 </head>
 <body>
-  <header>Gestor de Clientes</header>
-
+  <header>
+    <h1>Gestor de Clientes</h1>
+  </header>
   <nav>
-    <button onclick="mostrarAba('cadastro')">Cadastro</button>
-    <button onclick="mostrarAba('historico')">Histórico</button>
-    <button onclick="mostrarAba('somas')">Somas</button>
+    <button onclick="showTab('cadastro')">Cadastro</button>
+    <button onclick="showTab('historico')">Histórico</button>
+    <button onclick="showTab('somas')">Somas</button>
+    <button onclick="showTab('dashboard')">Dashboard</button>
   </nav>
-
   <main>
-    <section id="cadastro" class="aba ativa">
-      <label>Nome:</label>
-      <input id="nome" list="nomes" autocomplete="off">
-      <datalist id="nomes"></datalist>
-
-      <label>Valor:</label>
-      <input id="valor" type="number" step="0.01" autocomplete="off">
-
-      <label>Telefone:</label>
-      <input id="telefone" type="tel" autocomplete="off">
-
-      <label>Observação:</label>
-      <textarea id="obs"></textarea>
-
-      <button class="salvar" onclick="salvarCliente()">Salvar Cliente</button>
-    </section>
-
-    <section id="historico" class="aba">
-      <div class="top-bar">
-        <button onclick="restaurarBackup()">Restaurar Backup</button>
-        <input id="pesquisaHistorico" placeholder="Pesquisar..." oninput="renderHistorico(this.value)">
+    <div id="cadastro" class="tab active">
+      <!-- Formulário de Cadastro -->
+    </div>
+    <div id="historico" class="tab">
+      <!-- Histórico de Clientes -->
+    </div>
+    <div id="somas" class="tab">
+      <!-- Somas por Cliente -->
+    </div>
+    <div id="dashboard" class="tab">
+      <h2>Estatísticas</h2>
+      <div class="dashboard">
+        <div>Total de clientes: <span id="dash-total"></span></div>
+        <div>Valor total: R$ <span id="dash-totalvalor"></span></div>
+        <div>Maior débito: <span id="dash-maior"></span></div>
+        <div>Último cliente: <span id="dash-ultimo"></span></div>
       </div>
-      <div id="listaHistorico"></div>
-    </section>
-
-    <section id="somas" class="aba">
-      <input id="pesquisaSomas" placeholder="Pesquisar..." oninput="renderSomas(this.value)">
-      <div id="listaSomas"></div>
-    </section>
+      <h3>Notas Rápidas</h3>
+      <textarea id="notas" placeholder="Escreva lembretes..."></textarea>
+      <h3>Log de ações</h3>
+      <div class="log" id="log-acoes"></div>
+    </div>
   </main>
 
-  <footer>© 2025</footer>
+  <button class="tema" onclick="alternarTema()">🌓</button>
 
   <script>
-    const chavePix = "054.167.380-73";
-
-    function mostrarAba(id) {
-      document.querySelectorAll('.aba').forEach(el => el.classList.remove('ativa'));
-      document.getElementById(id).classList.add('ativa');
-    }
-
-    function salvarCliente() {
-      const nome = document.getElementById("nome").value.trim();
-      const valor = document.getElementById("valor").value.trim();
-      const telefone = document.getElementById("telefone").value.trim();
-      const obs = document.getElementById("obs").value.trim();
-      if (!nome || !valor) return;
-
-      const clientes = JSON.parse(localStorage.getItem("clientes") || "[]");
-      clientes.unshift({ nome, valor, telefone, obs, data: new Date().toLocaleString() });
-      localStorage.setItem("clientes", JSON.stringify(clientes));
-
-      const nomes = new Set(clientes.map(c => c.nome));
-      document.getElementById("nomes").innerHTML = [...nomes].map(n => `<option value="${n}">`).join("");
-
-      baixarBackup();
-      renderHistorico();
-      renderSomas();
-      document.getElementById("nome").value = "";
-      document.getElementById("valor").value = "";
-      document.getElementById("telefone").value = "";
-      document.getElementById("obs").value = "";
-    }
-
-    function renderHistorico(filtro = "") {
-      const container = document.getElementById("listaHistorico");
-      container.innerHTML = "";
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      dados.filter(c => c.nome.toLowerCase().includes(filtro.toLowerCase()))
-        .forEach((c, i) => {
-          const div = document.createElement("div");
-          div.className = "card";
-          div.innerHTML = `
-            <strong>${c.nome}</strong> - R$ ${c.valor}<br>
-            ${c.telefone ? `Tel: ${c.telefone}<br>` : ""}
-            ${c.obs ? `Obs: ${c.obs}<br>` : ""}
-            <small>${c.data}</small><br>
-            <button onclick="editarCliente(${i})">Editar</button>
-            <button onclick="excluirCliente(${i})">Excluir</button>
-          `;
-          container.appendChild(div);
-        });
-    }
-
-    function renderSomas(filtro = "") {
-      const container = document.getElementById("listaSomas");
-      container.innerHTML = "";
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      const resumo = {};
-      const telefones = {};
-      dados.forEach(c => {
-        if (!resumo[c.nome]) {
-          resumo[c.nome] = 0;
-          telefones[c.nome] = c.telefone || "";
-        }
-        resumo[c.nome] += parseFloat(c.valor || 0);
-      });
-      Object.entries(resumo)
-        .filter(([nome]) => nome.toLowerCase().includes(filtro.toLowerCase()))
-        .forEach(([nome, total]) => {
-          const telefone = telefones[nome].replace(/\D/g, "");
-          const mensagem = encodeURIComponent(
-            `Olá ${nome}, você possui um débito no valor de R$ ${total.toFixed(2)}.\n\nSegue os dados para pagamento via PIX:\nChave PIX: ${chavePix}`
-          );
-          const linkWhatsApp = telefone ? `https://wa.me/55${telefone}?text=${mensagem}` : "#";
-          const div = document.createElement("div");
-          div.className = "card";
-          div.innerHTML = `
-            <strong>${nome}</strong><br>
-            Total: R$ ${total.toFixed(2)}<br>
-            <a href="${linkWhatsApp}" target="_blank">
-              <button style="background:#25D366;color:#fff;margin-top:10px">Cobrar via WhatsApp</button>
-            </a>
-          `;
-          container.appendChild(div);
-        });
-    }
-
-    function editarCliente(i) {
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      const c = dados[i];
-      document.getElementById("nome").value = c.nome;
-      document.getElementById("valor").value = c.valor;
-      document.getElementById("telefone").value = c.telefone;
-      document.getElementById("obs").value = c.obs;
-      dados.splice(i, 1);
-      localStorage.setItem("clientes", JSON.stringify(dados));
-      renderHistorico();
-      renderSomas();
-      mostrarAba('cadastro');
-    }
-
-    function excluirCliente(i) {
-      if (!confirm("Deseja realmente excluir este cliente?")) return;
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      dados.splice(i, 1);
-      localStorage.setItem("clientes", JSON.stringify(dados));
-      renderHistorico();
-      renderSomas();
-    }
-
-    function baixarBackup() {
-      const blob = new Blob([localStorage.getItem("clientes") || "[]"], { type: "application/json" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "backup_clientes.json";
-      a.click();
-    }
-
-    function restaurarBackup() {
-      const input = document.createElement("input");
-      input.type = "file";
-      input.accept = ".json";
-      input.onchange = e => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onload = () => {
-          try {
-            localStorage.setItem("clientes", reader.result);
-            renderHistorico();
-            renderSomas();
-          } catch {}
-        };
-        reader.readAsText(file);
-      };
-      input.click();
-    }
-
-    window.onload = () => {
-      renderHistorico();
-      renderSomas();
-    };
+    // Script principal com melhorias será adicionado em seguida
   </script>
 </body>
 </html>
