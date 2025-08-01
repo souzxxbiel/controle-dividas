@@ -107,13 +107,20 @@
 
     function salvarCliente() {
       const nome = document.getElementById('nome').value.trim();
-      const telefone = document.getElementById('telefone').value;
+      let telefone = document.getElementById('telefone').value.trim();
       const valor = document.getElementById('valor').value;
       const obs = document.getElementById('obs').value;
 
       if (!nome) return alert("Nome é obrigatório.");
 
       const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+
+      // Verifica se o cliente já existe
+      const jaExiste = dados.find(c => c.nome.toLowerCase() === nome.toLowerCase() && c.telefone);
+      if (jaExiste && !telefone) {
+        telefone = jaExiste.telefone;
+      }
+
       dados.push({ nome, telefone, valor, obs, data: new Date().toLocaleString() });
       localStorage.setItem("clientes", JSON.stringify(dados));
 
@@ -154,25 +161,27 @@
       const telefones = {};
 
       dados.forEach(c => {
-        if (!resumo[c.nome]) {
-          resumo[c.nome] = 0;
-          telefones[c.nome] = c.telefone;
+        const nomeKey = c.nome.toLowerCase();
+        if (!resumo[nomeKey]) {
+          resumo[nomeKey] = { nome: c.nome, total: 0 };
+          telefones[nomeKey] = c.telefone;
         }
-        resumo[c.nome] += parseFloat(c.valor || 0);
+        resumo[nomeKey].total += parseFloat(c.valor || 0);
+        if (!telefones[nomeKey] && c.telefone) telefones[nomeKey] = c.telefone;
       });
 
-      Object.entries(resumo)
-        .filter(([nome]) => nome.toLowerCase().includes(filtro.toLowerCase()))
-        .forEach(([nome, total]) => {
+      Object.values(resumo)
+        .filter(obj => obj.nome.toLowerCase().includes(filtro.toLowerCase()))
+        .forEach(obj => {
+          const telefone = telefones[obj.nome.toLowerCase()] || "";
           const div = document.createElement("div");
           div.className = "card";
-          const telefone = telefones[nome] || "";
           div.innerHTML = `
-            <strong>${nome}</strong><br>Total: R$ ${total.toFixed(2)}
+            <strong>${obj.nome}</strong><br>Total: R$ ${obj.total.toFixed(2)}
             <div class="actions">
-              <a href="${gerarLinkWhatsApp(nome, telefone, total)}" target="_blank">
+              ${telefone ? `<a href="${gerarLinkWhatsApp(obj.nome, telefone, obj.total)}" target="_blank">
                 <button>WhatsApp</button>
-              </a>
+              </a>` : `<em>Sem telefone cadastrado</em>`}
             </div>
           `;
           container.appendChild(div);
