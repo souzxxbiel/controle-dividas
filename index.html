@@ -2,235 +2,239 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Gestão de Clientes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestor de Devedores</title>
   <style>
     * {
       box-sizing: border-box;
     }
     body {
+      font-family: 'Segoe UI', sans-serif;
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f5f7fa;
-      color: #333;
+      padding: 0;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: #fff;
+      min-height: 100vh;
+    }
+    .container {
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+      backdrop-filter: blur(10px);
+    }
+    input, textarea, button, select {
+      width: 100%;
+      margin-bottom: 12px;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1em;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      transition: 0.3s;
+    }
+    input::placeholder, textarea::placeholder {
+      color: #ccc;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      background: rgba(255,255,255,0.2);
+    }
+    button {
+      cursor: pointer;
+      background: linear-gradient(45deg, #00c6ff, #0072ff);
+      color: white;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: linear-gradient(45deg, #0072ff, #ff416c);
     }
     .tabs {
       display: flex;
-      justify-content: center;
-      gap: 20px;
-      background-color: #292D3E;
-      padding: 15px 0;
+      gap: 10px;
+      margin-bottom: 20px;
     }
     .tabs button {
-      background: none;
-      border: none;
-      color: #ccc;
-      font-size: 18px;
-      cursor: pointer;
-      padding: 8px 16px;
-      transition: all 0.3s ease;
+      flex: 1;
+      background: linear-gradient(90deg, #3f5efb, #fc466b);
     }
-    .tabs button.active {
-      color: #fff;
-      border-bottom: 3px solid #00BCD4;
-      font-weight: bold;
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.5s ease-in-out;
     }
-    .container {
-      max-width: 800px;
-      margin: 30px auto;
-      padding: 20px;
-    }
-    input, textarea {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      font-size: 16px;
-      transition: 0.2s ease;
-    }
-    input:focus, textarea:focus {
-      border-color: #00BCD4;
-      outline: none;
-      background-color: #eef9fb;
-    }
-    button {
-      padding: 12px 20px;
-      border: none;
-      border-radius: 10px;
-      background-color: #00BCD4;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.2s ease;
-    }
-    button:hover {
-      background-color: #0198a4;
-    }
-    #restaurarBtn {
-      background-color: #FFC107;
-      color: #222;
+    .tab-content.active {
+      display: block;
     }
     .card {
-      background: white;
-      border: 1px solid #ddd;
-      border-left: 6px solid #00BCD4;
-      border-radius: 10px;
-      padding: 15px 20px;
+      background: linear-gradient(120deg, #1e1e2f, #2a2a3f);
+      padding: 15px;
+      border-radius: 15px;
       margin-bottom: 15px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
     }
     .card strong {
-      color: #00BCD4;
-      font-size: 18px;
-    }
-    .card small {
-      color: #666;
+      font-size: 1.1em;
+      color: #66ffff;
     }
     .actions {
-      margin-top: 10px;
       display: flex;
       gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
     }
     .actions button {
       flex: 1;
-      background-color: #ECEFF1;
-      color: #333;
-      border: 1px solid #ccc;
+      min-width: 100px;
     }
-    .actions button:hover {
-      background-color: #CFD8DC;
+    #restoreBtn {
+      background: linear-gradient(90deg, #ee0979, #ff6a00);
+      margin-bottom: 20px;
     }
-    a button {
-      background-color: #25D366;
-      color: #fff;
-    }
-    a button:hover {
-      background-color: #1ebf56;
-    }
-    .hidden {
-      display: none;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
-  <div class="tabs">
-    <button onclick="showTab('cadastro')" id="tabCadastro" class="active">Cadastro</button>
-    <button onclick="showTab('historico')" id="tabHistorico">Histórico</button>
-    <button onclick="showTab('somas')" id="tabSomas">Somas</button>
-  </div>
-
   <div class="container">
-    <div id="cadastro">
-      <input id="nome" placeholder="Nome do cliente" list="nomesSalvos" />
-      <datalist id="nomesSalvos"></datalist>
-      <input id="telefone" placeholder="Telefone (opcional)" list="telefonesSalvos" />
-      <datalist id="telefonesSalvos"></datalist>
-      <input id="valor" placeholder="Valor (R$)" type="number" list="valoresSalvos"/>
-      <datalist id="valoresSalvos"></datalist>
+    <button id="restoreBtn" onclick="restaurarBackup()">Restaurar Backup</button>
+    <div class="tabs">
+      <button onclick="showTab('cadastro')">Cadastro</button>
+      <button onclick="showTab('historico')">Histórico</button>
+      <button onclick="showTab('somas')">Somas</button>
+    </div>
+
+    <div id="cadastro" class="tab-content active">
+      <input list="nomes" type="text" id="nome" placeholder="Nome completo" />
+      <datalist id="nomes"></datalist>
+      <input type="text" id="telefone" placeholder="Telefone (opcional)" />
+      <input list="valores" type="number" id="valor" placeholder="Valor (R$)" />
+      <datalist id="valores"></datalist>
       <textarea id="obs" placeholder="Observações (opcional)"></textarea>
       <button onclick="salvarCliente()">Salvar</button>
     </div>
 
-    <div id="historico" class="hidden">
-      <button id="restaurarBtn" onclick="restaurarBackup()">Restaurar Backup</button>
-      <input oninput="renderHistorico(this.value)" placeholder="Pesquisar histórico" />
+    <div id="historico" class="tab-content">
+      <input type="text" id="buscaHistorico" oninput="filtrarHistorico()" placeholder="Buscar por nome..." />
       <div id="listaHistorico"></div>
     </div>
 
-    <div id="somas" class="hidden">
-      <input oninput="renderSomas(this.value)" placeholder="Pesquisar somas" />
+    <div id="somas" class="tab-content">
+      <input type="text" id="buscaSomas" oninput="filtrarSomas()" placeholder="Buscar por nome..." />
       <div id="listaSomas"></div>
     </div>
   </div>
 
   <script>
-    function showTab(tab) {
-      document.getElementById("cadastro").classList.add("hidden");
-      document.getElementById("historico").classList.add("hidden");
-      document.getElementById("somas").classList.add("hidden");
-      document.getElementById("tabCadastro").classList.remove("active");
-      document.getElementById("tabHistorico").classList.remove("active");
-      document.getElementById("tabSomas").classList.remove("active");
-      document.getElementById(tab).classList.remove("hidden");
-      document.getElementById("tab" + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add("active");
+    let editando = null;
+
+    function showTab(id) {
+      document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+      if (id === 'historico') renderHistorico();
+      if (id === 'somas') renderSomas();
     }
 
     function salvarCliente() {
-      const nome = document.getElementById("nome").value.trim();
-      const telefone = document.getElementById("telefone").value.trim();
-      const valor = document.getElementById("valor").value.trim();
-      const obs = document.getElementById("obs").value.trim();
-      if (!nome || !valor) return;
-      const cliente = { nome, telefone, valor, obs, data: new Date().toLocaleString() };
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      dados.push(cliente);
-      localStorage.setItem("clientes", JSON.stringify(dados));
-      salvarDatalist("nomesSalvos", nome);
-      if (telefone) salvarDatalist("telefonesSalvos", telefone);
-      salvarDatalist("valoresSalvos", valor);
-      document.getElementById("nome").value = "";
-      document.getElementById("telefone").value = "";
-      document.getElementById("valor").value = "";
-      document.getElementById("obs").value = "";
-      renderHistorico();
-      renderSomas();
-    }
+      const nome = document.getElementById('nome').value.trim();
+      const telefone = document.getElementById('telefone').value.trim();
+      const valor = document.getElementById('valor').value.trim();
+      const obs = document.getElementById('obs').value.trim();
+      if (!nome) return;
 
-    function salvarDatalist(chave, valor) {
-      let lista = JSON.parse(localStorage.getItem(chave) || "[]");
-      if (!lista.includes(valor)) {
-        lista.push(valor);
-        localStorage.setItem(chave, JSON.stringify(lista));
-        atualizarDatalist(chave);
+      const clientes = JSON.parse(localStorage.getItem("clientes") || "[]");
+      if (editando !== null) {
+        clientes[editando] = { nome, telefone, valor, obs, data: new Date().toLocaleString() };
+        editando = null;
+      } else {
+        clientes.push({ nome, telefone, valor, obs, data: new Date().toLocaleString() });
       }
-    }
-
-    function atualizarDatalist(chave) {
-      const lista = JSON.parse(localStorage.getItem(chave) || "[]");
-      const datalist = document.getElementById(chave);
-      datalist.innerHTML = "";
-      lista.forEach(v => {
-        const option = document.createElement("option");
-        option.value = v;
-        datalist.appendChild(option);
-      });
+      localStorage.setItem("clientes", JSON.stringify(clientes));
+      salvarBackup();
+      preencherAutoComplete();
+      document.getElementById('nome').value = '';
+      document.getElementById('telefone').value = '';
+      document.getElementById('valor').value = '';
+      document.getElementById('obs').value = '';
+      const nota = document.createElement("div");
+      nota.textContent = "Cliente salvo!";
+      nota.style.position = "fixed";
+      nota.style.top = "10px";
+      nota.style.left = "50%";
+      nota.style.transform = "translateX(-50%)";
+      nota.style.background = "#28a745";
+      nota.style.color = "white";
+      nota.style.padding = "10px 20px";
+      nota.style.borderRadius = "10px";
+      document.body.appendChild(nota);
+      setTimeout(() => nota.remove(), 2000);
     }
 
     function renderHistorico(filtro = "") {
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
       const container = document.getElementById("listaHistorico");
       container.innerHTML = "";
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]").reverse();
-      dados.forEach((c, i) => {
-        if (!c.nome.toLowerCase().includes(filtro.toLowerCase())) return;
-        const div = document.createElement("div");
-        div.className = "card";
-        div.innerHTML = `
-          <strong>${c.nome}</strong> - R$ ${c.valor}<br>
-          ${c.telefone ? "Telefone: " + c.telefone + "<br>" : ""}
-          ${c.obs ? "Obs: " + c.obs + "<br>" : ""}
-          <small>${c.data}</small>
-          <div class="actions">
-            <button onclick="editarCliente(${dados.length - 1 - i})">Editar</button>
-            <button onclick="confirmarExcluir(${dados.length - 1 - i})">Excluir</button>
-          </div>
-        `;
-        container.appendChild(div);
-      });
+      dados
+        .map((c, i) => ({ ...c, index: i }))
+        .filter(c => c.nome.toLowerCase().includes(filtro.toLowerCase()))
+        .reverse()
+        .forEach(c => {
+          const div = document.createElement("div");
+          div.className = "card";
+          div.innerHTML = `
+            <strong>${c.nome}</strong><br>
+            Valor: R$ ${c.valor || "0,00"}<br>
+            Telefone: ${c.telefone || "Não informado"}<br>
+            Obs: ${c.obs || "-"}<br>
+            Data: ${c.data}<br>
+            <div class="actions">
+              <button onclick="editarCliente(${c.index})">Editar</button>
+              <button onclick="excluirCliente(${c.index})">Excluir</button>
+            </div>
+          `;
+          container.appendChild(div);
+        });
     }
 
-    function confirmarExcluir(i) {
-      if (confirm("Deseja realmente excluir este registro?")) {
-        excluirCliente(i);
-      }
+    function renderSomas(filtro = "") {
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      const container = document.getElementById("listaSomas");
+      container.innerHTML = "";
+      const resumo = {};
+      const telefones = {};
+      dados.forEach(c => {
+        if (!resumo[c.nome]) {
+          resumo[c.nome] = 0;
+          telefones[c.nome] = c.telefone;
+        }
+        resumo[c.nome] += parseFloat(c.valor || 0);
+      });
+      Object.entries(resumo)
+        .filter(([nome]) => nome.toLowerCase().includes(filtro.toLowerCase()))
+        .forEach(([nome, total]) => {
+          const telefone = telefones[nome];
+          const div = document.createElement("div");
+          div.className = "card";
+          div.innerHTML = `
+            <strong>${nome}</strong><br>Total: R$ ${total.toFixed(2)}
+            <div class="actions">
+              <a href="${gerarLinkWhatsApp(nome, telefone, total)}" target="_blank">
+                <button>WhatsApp</button>
+              </a>
+            </div>
+          `;
+          container.appendChild(div);
+        });
     }
 
     function excluirCliente(i) {
+      if (!confirm("Tem certeza que deseja excluir?")) return;
       const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
       dados.splice(i, 1);
       localStorage.setItem("clientes", JSON.stringify(dados));
       renderHistorico();
-      renderSomas();
     }
 
     function editarCliente(i) {
@@ -240,69 +244,67 @@
       document.getElementById("telefone").value = c.telefone;
       document.getElementById("valor").value = c.valor;
       document.getElementById("obs").value = c.obs;
-      dados.splice(i, 1);
-      localStorage.setItem("clientes", JSON.stringify(dados));
-      renderHistorico();
-      renderSomas();
+      editando = i;
       showTab("cadastro");
     }
 
-    function renderSomas(filtro = "") {
-      const container = document.getElementById("listaSomas");
-      container.innerHTML = "";
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      const resumo = {};
-      const telefones = {};
-      dados.forEach(c => {
-        if (!resumo[c.nome]) {
-          resumo[c.nome] = 0;
-          telefones[c.nome] = c.telefone || "";
-        }
-        resumo[c.nome] += parseFloat(c.valor || 0);
-      });
-      Object.entries(resumo)
-        .filter(([nome]) => nome.toLowerCase().includes(filtro.toLowerCase()))
-        .forEach(([nome, total]) => {
-          const telefone = telefones[nome].replace(/\D/g, "");
-          const pix = "054.167.380-73";
-          const mensagem = encodeURIComponent(`Olá ${nome}, você possui um débito no valor de R$ ${total.toFixed(2)}.\n\nSegue os dados para pagamento via PIX:\nChave PIX: ${pix}`);
-          const linkWhatsApp = telefone ? `https://wa.me/55${telefone}?text=${mensagem}` : "#";
-          const div = document.createElement("div");
-          div.className = "card";
-          div.innerHTML = `
-            <strong>${nome}</strong><br>
-            Total: R$ ${total.toFixed(2)}<br>
-            <a href="${linkWhatsApp}" target="_blank">
-              <button>Cobrar via WhatsApp</button>
-            </a>
-          `;
-          container.appendChild(div);
-        });
+    function gerarLinkWhatsApp(nome, telefone, valor) {
+      const pix = "054.167.380-73";
+      const msg = `Olá ${nome}, você possui um valor pendente de R$ ${valor.toFixed(2)}.\nChave PIX para pagamento:\n${pix}`;
+      return "https://wa.me/" + telefone.replace(/\D/g, "") + "?text=" + encodeURIComponent(msg);
+    }
+
+    function salvarBackup() {
+      const dados = localStorage.getItem("clientes");
+      const blob = new Blob([dados], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "backup_clientes.json";
+      a.click();
     }
 
     function restaurarBackup() {
       const input = document.createElement("input");
       input.type = "file";
       input.accept = ".json";
-      input.onchange = e => {
-        const file = e.target.files[0];
+      input.onchange = () => {
+        const file = input.files[0];
         const reader = new FileReader();
-        reader.onload = event => {
-          const dados = JSON.parse(event.target.result);
-          localStorage.setItem("clientes", JSON.stringify(dados));
-          renderHistorico();
-          renderSomas();
+        reader.onload = e => {
+          try {
+            const dados = JSON.parse(e.target.result);
+            localStorage.setItem("clientes", JSON.stringify(dados));
+            alert("Backup restaurado com sucesso.");
+            renderHistorico();
+          } catch {
+            alert("Erro ao restaurar backup.");
+          }
         };
         reader.readAsText(file);
       };
       input.click();
     }
 
-    window.onload = () => {
-      ["nomesSalvos", "telefonesSalvos", "valoresSalvos"].forEach(atualizarDatalist);
-      renderHistorico();
-      renderSomas();
-    };
+    function filtrarHistorico() {
+      renderHistorico(document.getElementById("buscaHistorico").value);
+    }
+
+    function filtrarSomas() {
+      renderSomas(document.getElementById("buscaSomas").value);
+    }
+
+    function preencherAutoComplete() {
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      const nomes = [...new Set(dados.map(d => d.nome))];
+      const valores = [...new Set(dados.map(d => d.valor))];
+      document.getElementById("nomes").innerHTML = nomes.map(n => `<option value="${n}">`).join("");
+      document.getElementById("valores").innerHTML = valores.map(v => `<option value="${v}">`).join("");
+    }
+
+    preencherAutoComplete();
+    renderHistorico();
   </script>
 </body>
 </html>
+
