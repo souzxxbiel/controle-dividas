@@ -1,151 +1,327 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gestor de Clientes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gestão de Clientes</title>
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to bottom right, #0f0c29, #302b63, #24243e);
+      background: linear-gradient(to bottom right, #2E3192, #ED1C24);
       color: #fff;
-    }
-    header {
-      padding: 1rem;
-      text-align: center;
-      background: linear-gradient(45deg, #0081cf, #ff2a68);
-      box-shadow: 0 0 15px #000;
-    }
-    header h1 {
-      margin: 0;
-    }
-    nav {
       display: flex;
-      justify-content: center;
-      gap: 1rem;
-      padding: 1rem;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    header, section, footer {
+      width: 100%;
+      max-width: 500px;
+      padding: 1em;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      padding: 0.5em;
+      margin: 0.5em 0;
+      border: none;
+      border-radius: 10px;
+      font-size: 1em;
+    }
+    button {
+      background: #fff;
+      color: #2E3192;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #ddd;
+    }
+    .aba {
+      display: none;
+    }
+    .ativa {
+      display: block;
     }
     nav button {
-      background: #444;
-      color: white;
-      border: none;
-      padding: 10px 20px;
+      background: rgba(255,255,255,0.1);
+      margin: 0 0.2em;
+      padding: 0.5em 1em;
       border-radius: 8px;
+      border: none;
+      color: white;
       cursor: pointer;
-      transition: 0.3s;
+      font-weight: 600;
+      transition: background-color 0.3s;
     }
     nav button:hover {
-      background: #ff2a68;
+      background: rgba(255,255,255,0.3);
     }
-    .tab {
-      display: none;
-      padding: 1rem;
-    }
-    .active {
-      display: block;
-    }
-    .input-group {
-      margin: 1rem 0;
-    }
-    input, textarea, select {
-      width: 100%;
-      padding: 0.8rem;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-    }
-    label {
-      margin-bottom: 0.5rem;
-      display: block;
-    }
-    .btn {
-      background: #ff2a68;
-      color: white;
-      border: none;
-      padding: 0.8rem 1.2rem;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 1rem;
-      transition: background 0.3s;
-    }
-    .btn:hover {
-      background: #c2174f;
-    }
-    .cliente-item {
-      background: #ffffff11;
-      padding: 1rem;
-      margin: 0.5rem 0;
-      border-radius: 12px;
-      box-shadow: 0 0 10px #00000033;
+    .cliente-card {
+      background: rgba(255,255,255,0.1);
+      margin: 0.5em 0;
+      padding: 1em;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
       position: relative;
     }
-    .actions {
-      margin-top: 0.5rem;
-      display: flex;
-      gap: 0.5rem;
+    .cliente-card button {
+      width: auto;
+      margin-right: 0.5em;
     }
-    .badge {
-      background: #0081cf;
-      padding: 2px 8px;
-      border-radius: 6px;
+    canvas {
+      background: #fff;
+      margin: 1em 0;
+      width: 100%;
+      height: 250px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
-    .dashboard {
-      margin-top: 2rem;
-      background: #00000033;
-      padding: 1rem;
-      border-radius: 12px;
-    }
-    .dashboard div {
-      margin-bottom: 0.5rem;
-    }
-    .log {
-      max-height: 200px;
-      overflow-y: auto;
-      background: #00000055;
-      padding: 0.5rem;
-      border-radius: 8px;
-      font-size: 0.9rem;
+    #ultimaAtualizacao {
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Gestor de Clientes</h1>
+    <h1>Gestão de Clientes</h1>
+    <nav>
+      <button onclick="trocarAba('cadastro')">Cadastro</button>
+      <button onclick="trocarAba('historico')">Histórico</button>
+      <button onclick="trocarAba('somas')">Somas</button>
+      <button onclick="trocarAba('graficos')">Gráficos</button>
+    </nav>
   </header>
-  <nav>
-    <button onclick="showTab('cadastro')">Cadastro</button>
-    <button onclick="showTab('historico')">Histórico</button>
-    <button onclick="showTab('somas')">Somas</button>
-    <button onclick="showTab('dashboard')">Dashboard</button>
-  </nav>
-  <main>
-    <div id="cadastro" class="tab active">
-      <!-- Formulário de Cadastro -->
-    </div>
-    <div id="historico" class="tab">
-      <!-- Histórico de Clientes -->
-    </div>
-    <div id="somas" class="tab">
-      <!-- Somas por Cliente -->
-    </div>
-    <div id="dashboard" class="tab">
-      <h2>Estatísticas</h2>
-      <div class="dashboard">
-        <div>Total de clientes: <span id="dash-total"></span></div>
-        <div>Valor total: R$ <span id="dash-totalvalor"></span></div>
-        <div>Maior débito: <span id="dash-maior"></span></div>
-        <div>Último cliente: <span id="dash-ultimo"></span></div>
-      </div>
-      <h3>Notas Rápidas</h3>
-      <textarea id="notas" placeholder="Escreva lembretes..."></textarea>
-      <h3>Log de ações</h3>
-      <div class="log" id="log-acoes"></div>
-    </div>
-  </main>
+
+  <section id="cadastro" class="aba ativa">
+    <input type="text" id="nome" placeholder="Nome do cliente" list="lista-nomes" />
+    <datalist id="lista-nomes"></datalist>
+    <input type="text" id="telefone" placeholder="Telefone (opcional)" list="lista-telefones" />
+    <datalist id="lista-telefones"></datalist>
+    <input type="number" id="valor" placeholder="Valor" list="lista-valores" />
+    <datalist id="lista-valores"></datalist>
+    <textarea id="obs" placeholder="Observação (opcional)"></textarea>
+    <button onclick="salvarCliente()">Salvar</button>
+  </section>
+
+  <section id="historico" class="aba">
+    <h2>Histórico</h2>
+    <input type="text" id="buscaHistorico" placeholder="Buscar..." oninput="filtrarHistorico()" />
+    <button onclick="restaurarBackup()">Restaurar Backup</button>
+    <div id="listaHistorico"></div>
+  </section>
+
+  <section id="somas" class="aba">
+    <h2>Somas</h2>
+    <input type="text" id="buscaSomas" placeholder="Buscar..." oninput="filtrarSomas()" />
+    <div id="listaSomas"></div>
+  </section>
+
+  <section id="graficos" class="aba">
+    <h2>Gráficos</h2>
+    <canvas id="graficoClientes"></canvas>
+  </section>
+
+  <footer>
+    <small>Backup salvo automaticamente. Última atualização: <span id="ultimaAtualizacao"></span></small>
+  </footer>
 
   <script>
-    // Script principal com melhorias será adicionado em seguida
+    let historico = JSON.parse(localStorage.getItem("historico") || "[]");
+    let clientes = JSON.parse(localStorage.getItem("clientes") || "{}");
+
+    function trocarAba(id) {
+      document.querySelectorAll('.aba').forEach(el => el.classList.remove('ativa'));
+      document.getElementById(id).classList.add('ativa');
+      if (id === 'graficos') gerarGrafico();
+      if (id === 'historico') gerarHistorico();
+      if (id === 'somas') gerarSomas();
+      if (id === 'cadastro') atualizarSugestoes();
+    }
+
+    function salvarCliente() {
+      const nome = document.getElementById('nome').value.trim();
+      const telefone = document.getElementById('telefone').value.trim();
+      const valor = document.getElementById('valor').value;
+      const obs = document.getElementById('obs').value.trim();
+      if (!nome || !valor) return;
+
+      if (!clientes[nome]) clientes[nome] = { telefone };
+      else if (telefone) clientes[nome].telefone = telefone;
+
+      const registro = { nome, telefone: clientes[nome].telefone, valor: parseFloat(valor), obs, data: new Date().toLocaleString() };
+
+      historico.unshift(registro);
+
+      localStorage.setItem("historico", JSON.stringify(historico));
+      localStorage.setItem("clientes", JSON.stringify(clientes));
+
+      gerarHistorico();
+      gerarSomas();
+      atualizarSugestoes();
+      document.getElementById("ultimaAtualizacao").textContent = new Date().toLocaleString();
+
+      // Download backup JSON
+      const blob = new Blob([JSON.stringify(historico, null, 2)], { type: "application/json" });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = "backup.json";
+      a.click();
+
+      // Limpar campos após salvar
+      document.getElementById('nome').value = '';
+      document.getElementById('telefone').value = '';
+      document.getElementById('valor').value = '';
+      document.getElementById('obs').value = '';
+    }
+
+    function gerarHistorico(filtro = "") {
+      const lista = document.getElementById('listaHistorico');
+      lista.innerHTML = "";
+      const filtroMinusculo = filtro.toLowerCase();
+
+      historico.forEach((item, i) => {
+        if (!item.nome.toLowerCase().includes(filtroMinusculo)) return;
+
+        const div = document.createElement('div');
+        div.className = "cliente-card";
+        div.innerHTML = `
+          <strong>${item.nome}</strong> - R$${item.valor.toFixed(2)}<br>${item.obs || ''}<br><small>${item.data}</small><br>
+          <button onclick="editar(${i})">Editar</button>
+          <button onclick="confirmarExcluir(${i})">Excluir</button>
+        `;
+        lista.appendChild(div);
+      });
+    }
+
+    function editar(index) {
+      const item = historico[index];
+      document.getElementById('nome').value = item.nome;
+      document.getElementById('telefone').value = item.telefone || '';
+      document.getElementById('valor').value = item.valor;
+      document.getElementById('obs').value = item.obs || '';
+      trocarAba('cadastro');
+
+      // Remove o registro antigo para evitar duplicidade após salvar edição
+      historico.splice(index, 1);
+      localStorage.setItem("historico", JSON.stringify(historico));
+      gerarHistorico();
+      gerarSomas();
+    }
+
+    function confirmarExcluir(index) {
+      if (confirm("Tem certeza que deseja excluir este registro?")) {
+        historico.splice(index, 1);
+        localStorage.setItem("historico", JSON.stringify(historico));
+        gerarHistorico();
+        gerarSomas();
+      }
+    }
+
+    function gerarSomas(filtro = "") {
+      const lista = document.getElementById('listaSomas');
+      lista.innerHTML = "";
+      const filtroMinusculo = filtro.toLowerCase();
+
+      // Somar valores por cliente (filtro aplicado nos nomes)
+      const somas = {};
+      historico.forEach(item => {
+        if (!item.nome.toLowerCase().includes(filtroMinusculo)) return;
+        somas[item.nome] = (somas[item.nome] || 0) + item.valor;
+      });
+
+      Object.keys(somas).forEach(nome => {
+        const valor = somas[nome];
+        const telefone = clientes[nome]?.telefone || "";
+        const div = document.createElement('div');
+        div.className = "cliente-card";
+        div.innerHTML = `
+          <strong>${nome}</strong>: R$${valor.toFixed(2)}<br>
+          <a target="_blank" href="https://wa.me/55${telefone.replace(/\D/g,'')}?text=Olá%20${encodeURIComponent(nome)},%20você%20tem%20um%20valor%20pendente%20de%20R$${valor.toFixed(2)}.%20Favor%20realizar%20o%20pagamento%20via%20PIX%20para%20054.167.380-73.">Cobrar via WhatsApp</a>
+        `;
+        lista.appendChild(div);
+      });
+    }
+
+    function atualizarSugestoes() {
+      const nomes = Object.keys(clientes);
+      document.getElementById('lista-nomes').innerHTML = nomes.map(n => `<option value="${n}">`).join('');
+      const telefones = [...new Set(historico.map(h => h.telefone).filter(t => t))];
+      document.getElementById('lista-telefones').innerHTML = telefones.map(t => `<option value="${t}">`).join('');
+      const valores = [...new Set(historico.map(h => h.valor).filter(v => v))];
+      document.getElementById('lista-valores').innerHTML = valores.map(v => `<option value="${v}">`).join('');
+    }
+
+    function restaurarBackup() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = e => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = ev => {
+          try {
+            const dados = JSON.parse(ev.target.result);
+            if (!Array.isArray(dados)) throw new Error("Backup inválido");
+            historico = dados;
+            localStorage.setItem("historico", JSON.stringify(historico));
+            gerarHistorico();
+            gerarSomas();
+            alert("Backup restaurado com sucesso!");
+          } catch {
+            alert("Erro ao restaurar backup");
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+
+    function gerarGrafico() {
+      const canvas = document.getElementById('graficoClientes');
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = canvas.clientWidth * dpr;
+      canvas.height = canvas.clientHeight * dpr;
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+
+      const dados = {};
+      historico.forEach(h => dados[h.nome] = (dados[h.nome] || 0) + h.valor);
+
+      const nomes = Object.keys(dados);
+      const max = Math.max(...Object.values(dados), 1);
+      const alturaBarra = 30;
+      const gap = 15;
+      const margemEsq = 100;
+
+      ctx.font = '14px Segoe UI';
+      ctx.fillStyle = '#fff';
+
+      nomes.forEach((nome, i) => {
+        const valor = dados[nome];
+        const y = i * (alturaBarra + gap) + 20;
+
+        ctx.fillStyle = '#fff';
+        ctx.fillText(`${nome}`, 5, y + alturaBarra / 1.5);
+
+        const barraWidth = ((canvas.clientWidth - margemEsq - 20) * valor) / max;
+
+        // Barra azul
+        ctx.fillStyle = '#2E3192';
+        ctx.fillRect(margemEsq, y, barraWidth, alturaBarra);
+
+        ctx.fillStyle = '#000';
+        ctx.fillText(`R$${valor.toFixed(2)}`, margemEsq + barraWidth + 5, y + alturaBarra / 1.5);
+      });
+    }
+
+    // Inicializar
+    gerarHistorico();
+    gerarSomas();
+    atualizarSugestoes();
+    document.getElementById("ultimaAtualizacao").textContent = new Date().toLocaleString();
   </script>
 </body>
 </html>
