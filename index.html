@@ -18,8 +18,8 @@
     input, textarea, button {
       width: 100%;
       margin-bottom: 10px;
-      padding: 10px;
-      border-radius: 8px;
+      padding: 12px;
+      border-radius: 10px;
       border: none;
       font-size: 1em;
     }
@@ -30,9 +30,10 @@
     }
     .tabs button {
       flex: 1;
-      background: #ffffff20;
+      background: #007bff;
       color: white;
       cursor: pointer;
+      font-weight: bold;
     }
     .tab-content {
       display: none;
@@ -41,28 +42,30 @@
       display: block;
     }
     .card {
-      background: #ffffff10;
-      padding: 10px;
-      border-radius: 10px;
-      margin-bottom: 10px;
+      background: #ffffff1a;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      box-shadow: 0 0 6px #00000050;
     }
     .actions {
       display: flex;
-      flex-wrap: wrap;
       gap: 10px;
       margin-top: 10px;
+      flex-wrap: wrap;
     }
     .actions button {
       flex: 1;
-      background: #ffffff20;
+      background: #333;
       color: white;
       border: none;
-      padding: 8px;
-      border-radius: 6px;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 0.9em;
       cursor: pointer;
     }
     .actions button:hover {
-      background: #ffffff40;
+      background: #555;
     }
   </style>
 </head>
@@ -94,8 +97,6 @@
   </div>
 
   <script>
-    let clienteEditando = null;
-
     function showTab(id) {
       document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
       document.getElementById(id).classList.add("active");
@@ -108,21 +109,17 @@
       const telefone = document.getElementById('telefone').value;
       const valor = document.getElementById('valor').value;
       const obs = document.getElementById('obs').value;
+
       if (!nome) return alert("Nome é obrigatório.");
+
       const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      if (clienteEditando !== null) {
-        dados[clienteEditando] = { nome, telefone, valor, obs, data: new Date().toLocaleString() };
-        clienteEditando = null;
-      } else {
-        dados.push({ nome, telefone, valor, obs, data: new Date().toLocaleString() });
-      }
+      dados.push({ nome, telefone, valor, obs, data: new Date().toLocaleString() });
       localStorage.setItem("clientes", JSON.stringify(dados));
+
       document.getElementById('nome').value = '';
       document.getElementById('telefone').value = '';
       document.getElementById('valor').value = '';
       document.getElementById('obs').value = '';
-      renderHistorico();
-      renderSomas();
       alert("Salvo com sucesso.");
     }
 
@@ -130,10 +127,12 @@
       const container = document.getElementById("listaHistorico");
       container.innerHTML = "";
       const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+
       dados
+        .map((c, i) => ({ ...c, index: i }))
         .filter(c => c.nome.toLowerCase().includes(filtro.toLowerCase()))
         .reverse()
-        .forEach((c, i) => {
+        .forEach(c => {
           const div = document.createElement("div");
           div.className = "card";
           div.innerHTML = `
@@ -143,9 +142,9 @@
             Obs: ${c.obs || "-"}<br>
             Data: ${c.data}<br>
             <div class="actions">
-              <button onclick="editarCliente(${i})">Editar</button>
-              <button onclick="excluirCliente(${i})">Excluir</button>
-              <button onclick="exportarPDF(${i})">PDF</button>
+              <button onclick="exportarCliente(${c.index})">Exportar</button>
+              <button onclick="editarCliente(${c.index})">Editar</button>
+              <button onclick="excluirCliente(${c.index})">Excluir</button>
             </div>
           `;
           container.appendChild(div);
@@ -158,6 +157,7 @@
       const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
       const resumo = {};
       const telefones = {};
+
       dados.forEach(c => {
         if (!resumo[c.nome]) {
           resumo[c.nome] = 0;
@@ -165,12 +165,13 @@
         }
         resumo[c.nome] += parseFloat(c.valor || 0);
       });
+
       Object.entries(resumo)
         .filter(([nome]) => nome.toLowerCase().includes(filtro.toLowerCase()))
         .forEach(([nome, total]) => {
+          const telefone = telefones[nome] || "";
           const div = document.createElement("div");
           div.className = "card";
-          const telefone = telefones[nome] || "";
           div.innerHTML = `
             <strong>${nome}</strong><br>Total: R$ ${total.toFixed(2)}
             <div class="actions">
@@ -183,44 +184,6 @@
         });
     }
 
-    function editarCliente(i) {
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      const c = dados[i];
-      document.getElementById('nome').value = c.nome;
-      document.getElementById('telefone').value = c.telefone;
-      document.getElementById('valor').value = c.valor;
-      document.getElementById('obs').value = c.obs;
-      clienteEditando = i;
-      showTab('cadastro');
-    }
-
-    function excluirCliente(i) {
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      if (confirm("Tem certeza que deseja excluir este registro?")) {
-        dados.splice(i, 1);
-        localStorage.setItem("clientes", JSON.stringify(dados));
-        renderHistorico();
-        renderSomas();
-      }
-    }
-
-    function exportarPDF(i) {
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      const c = dados[i];
-      const conteudo = `Nome: ${c.nome}\nTelefone: ${c.telefone}\nValor: R$ ${c.valor}\nObs: ${c.obs}\nData: ${c.data}`;
-      const blob = new Blob([conteudo], { type: "application/pdf" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `cliente_${c.nome.replace(/\s+/g, "_")}.pdf`;
-      a.click();
-    }
-
-    function gerarLinkWhatsApp(nome, telefone, valor) {
-      const pix = "054.167.380-73";
-      const msg = `Olá ${nome}, você possui um valor pendente de R$ ${valor.toFixed(2)}.\nChave PIX para pagamento:\n${pix}`;
-      return "https://wa.me/" + telefone.replace(/\D/g, "") + "?text=" + encodeURIComponent(msg);
-    }
-
     function filtrarHistorico() {
       const termo = document.getElementById("buscaHistorico").value;
       renderHistorico(termo);
@@ -229,6 +192,43 @@
     function filtrarSomas() {
       const termo = document.getElementById("buscaSomas").value;
       renderSomas(termo);
+    }
+
+    function exportarCliente(i) {
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      const c = dados[i];
+      const blob = new Blob([`Nome: ${c.nome}\nTelefone: ${c.telefone}\nValor: R$ ${c.valor}\nObs: ${c.obs}\nData: ${c.data}`], { type: "text/plain" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `cliente_${c.nome.replace(/\s+/g, "_")}.txt`;
+      a.click();
+    }
+
+    function editarCliente(i) {
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      const c = dados[i];
+      document.getElementById('nome').value = c.nome;
+      document.getElementById('telefone').value = c.telefone;
+      document.getElementById('valor').value = c.valor;
+      document.getElementById('obs').value = c.obs;
+      showTab('cadastro');
+      dados.splice(i, 1);
+      localStorage.setItem("clientes", JSON.stringify(dados));
+    }
+
+    function excluirCliente(i) {
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      if (confirm("Deseja excluir este registro?")) {
+        dados.splice(i, 1);
+        localStorage.setItem("clientes", JSON.stringify(dados));
+        renderHistorico();
+      }
+    }
+
+    function gerarLinkWhatsApp(nome, telefone, valor) {
+      const pix = "054.167.380-73";
+      const msg = `Olá ${nome}, você possui um valor pendente de R$ ${valor.toFixed(2)}.\nChave PIX para pagamento:\n${pix}`;
+      return "https://wa.me/" + telefone.replace(/\D/g, "") + "?text=" + encodeURIComponent(msg);
     }
   </script>
 </body>
