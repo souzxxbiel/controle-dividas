@@ -1,9 +1,8 @@
-<!-- CÓDIGO COMPLETO -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gestor de Devedores</title>
   <style>
     body {
@@ -16,7 +15,7 @@
     .container {
       padding: 20px;
     }
-    input, textarea, button {
+    input, textarea, select, button {
       width: 100%;
       margin-bottom: 10px;
       padding: 10px;
@@ -31,7 +30,7 @@
     }
     .tabs button {
       flex: 1;
-      background: #0058a3;
+      background: #007bff;
       color: white;
       cursor: pointer;
     }
@@ -50,20 +49,7 @@
     .actions {
       display: flex;
       gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-    .actions button, .actions input[type="file"] {
-      flex: 1;
-      background: #ffffff20;
-      color: white;
-      border: 1px solid #ffffff30;
-      border-radius: 8px;
-      padding: 8px;
-      cursor: pointer;
-    }
-    .actions button:hover {
-      background: #ffffff30;
+      margin-top: 5px;
     }
   </style>
 </head>
@@ -77,8 +63,8 @@
 
     <div id="cadastro" class="tab-content active">
       <input type="text" id="nome" placeholder="Nome completo" />
-      <input type="text" id="telefone" placeholder="Telefone (opcional)" inputmode="numeric" />
-      <input type="number" id="valor" placeholder="Valor (R$)" inputmode="numeric" />
+      <input type="text" id="telefone" placeholder="Telefone (apenas na 1ª vez)" />
+      <input type="number" id="valor" placeholder="Valor (R$)" />
       <textarea id="obs" placeholder="Observações (opcional)"></textarea>
       <button onclick="salvarCliente()">Salvar</button>
     </div>
@@ -86,8 +72,7 @@
     <div id="historico" class="tab-content">
       <input type="text" id="buscaHistorico" oninput="filtrarHistorico()" placeholder="Buscar por nome..." />
       <div class="actions">
-        <button onclick="fazerBackup()">📁 Exportar Backup JSON</button>
-        <input type="file" onchange="importarBackup(event)" accept=".json" />
+        <button onclick="exportarHistorico()">Exportar Histórico</button>
       </div>
       <div id="listaHistorico"></div>
     </div>
@@ -114,22 +99,26 @@
 
       if (!nome) return alert("Nome é obrigatório.");
 
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      const jaExiste = dados.find(c => c.nome.toLowerCase() === nome.toLowerCase() && c.telefone);
-      if (jaExiste && !telefone) {
-        telefone = jaExiste.telefone;
+      let telefonesSalvos = JSON.parse(localStorage.getItem("telefones") || "{}");
+      if (!telefonesSalvos[nome] && telefone) {
+        telefonesSalvos[nome] = telefone;
+        localStorage.setItem("telefones", JSON.stringify(telefonesSalvos));
       }
+      telefone = telefonesSalvos[nome] || "";
 
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
       dados.push({ nome, telefone, valor, obs, data: new Date().toLocaleString() });
       localStorage.setItem("clientes", JSON.stringify(dados));
+
+      const numeroBackup = "55996275431";
+      const msgBackup = `Novo cliente salvo:\nNome: ${nome}\nTelefone: ${telefone || "Não informado"}\nValor: R$ ${valor}\nObs: ${obs || "-"}`;
+      window.open(`https://wa.me/${numeroBackup}?text=${encodeURIComponent(msgBackup)}`, "_blank");
 
       document.getElementById('nome').value = '';
       document.getElementById('telefone').value = '';
       document.getElementById('valor').value = '';
       document.getElementById('obs').value = '';
       alert("Salvo com sucesso.");
-
-      fazerBackup(); // Backup automático após salvar
     }
 
     function renderHistorico(filtro = "") {
@@ -138,9 +127,9 @@
       const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
 
       dados
-        .slice().reverse()
         .filter(c => c.nome.toLowerCase().includes(filtro.toLowerCase()))
-        .forEach((c, i) => {
+        .reverse()
+        .forEach(c => {
           const div = document.createElement("div");
           div.className = "card";
           div.innerHTML = `
@@ -162,31 +151,49 @@
       const telefones = {};
 
       dados.forEach(c => {
-        const nomeKey = c.nome.toLowerCase();
-        if (!resumo[nomeKey]) {
-          resumo[nomeKey] = { nome: c.nome, total: 0 };
-          telefones[nomeKey] = c.telefone;
+        if (!resumo[c.nome]) {
+          resumo[c.nome] = 0;
+          telefones[c.nome] = c.telefone;
         }
-        resumo[nomeKey].total += parseFloat(c.valor || 0);
-        if (!telefones[nomeKey] && c.telefone) telefones[nomeKey] = c.telefone;
+        resumo[c.nome] += parseFloat(c.valor || 0);
       });
 
-      Object.values(resumo)
-        .filter(obj => obj.nome.toLowerCase().includes(filtro.toLowerCase()))
-        .forEach(obj => {
-          const telefone = telefones[obj.nome.toLowerCase()] || "";
+      Object.entries(resumo)
+        .filter(([nome]) => nome.toLowerCase().includes(filtro.toLowerCase()))
+        .forEach(([nome, total]) => {
           const div = document.createElement("div");
           div.className = "card";
+          const telefone = telefones[nome] || "";
           div.innerHTML = `
-            <strong>${obj.nome}</strong><br>Total: R$ ${obj.total.toFixed(2)}
+            <strong>${nome}</strong><br>Total: R$ ${total.toFixed(2)}
             <div class="actions">
-              ${telefone ? `<a href="${gerarLinkWhatsApp(obj.nome, telefone, obj.total)}" target="_blank">
+              <a href="${gerarLinkWhatsApp(nome, telefone, total)}" target="_blank">
                 <button>WhatsApp</button>
-              </a>` : `<em>Sem telefone cadastrado</em>`}
+              </a>
             </div>
           `;
           container.appendChild(div);
         });
+    }
+
+    function gerarLinkWhatsApp(nome, telefone, valor) {
+      const pix = "054.167.380-73";
+      const msg = `Olá ${nome}, você possui um valor pendente de R$ ${valor.toFixed(2)}.\nChave PIX para pagamento:\n${pix}`;
+      return "https://wa.me/" + telefone.replace(/\D/g, "") + "?text=" + encodeURIComponent(msg);
+    }
+
+    function exportarHistorico() {
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      let conteudo = "Histórico de Clientes:\n\n";
+      dados.forEach(c => {
+        conteudo += `Nome: ${c.nome}\nTelefone: ${c.telefone}\nValor: R$ ${c.valor}\nObs: ${c.obs}\nData: ${c.data}\n\n`;
+      });
+
+      const blob = new Blob([conteudo], { type: "text/plain" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `historico_clientes.txt`;
+      a.click();
     }
 
     function filtrarHistorico() {
@@ -197,40 +204,6 @@
     function filtrarSomas() {
       const termo = document.getElementById("buscaSomas").value;
       renderSomas(termo);
-    }
-
-    function fazerBackup() {
-      const dados = localStorage.getItem("clientes");
-      const blob = new Blob([dados], { type: "application/json" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "backup_clientes.json";
-      a.click();
-    }
-
-    function importarBackup(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const conteudo = JSON.parse(e.target.result);
-          if (!Array.isArray(conteudo)) return alert("Arquivo inválido.");
-          localStorage.setItem("clientes", JSON.stringify(conteudo));
-          alert("Backup importado com sucesso.");
-          renderHistorico();
-          renderSomas();
-        } catch {
-          alert("Erro ao importar o backup.");
-        }
-      };
-      reader.readAsText(file);
-    }
-
-    function gerarLinkWhatsApp(nome, telefone, valor) {
-      const pix = "054.167.380-73";
-      const msg = `Olá ${nome}, você possui um valor pendente de R$ ${valor.toFixed(2)}.\nChave PIX para pagamento:\n${pix}`;
-      return "https://wa.me/" + telefone.replace(/\D/g, "") + "?text=" + encodeURIComponent(msg);
     }
   </script>
 </body>
