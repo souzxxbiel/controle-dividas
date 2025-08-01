@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gestor de Devedores</title>
   <style>
     body {
@@ -15,7 +15,7 @@
     .container {
       padding: 20px;
     }
-    input, textarea, button, datalist {
+    input, textarea, button {
       width: 100%;
       margin-bottom: 10px;
       padding: 10px;
@@ -50,46 +50,42 @@
       display: flex;
       gap: 10px;
       margin-top: 5px;
-      flex-wrap: wrap;
     }
-    #restore-container {
-      margin-bottom: 15px;
-    }
-    .notif {
-      background: #0f0;
-      color: #000;
-      padding: 8px 12px;
-      border-radius: 6px;
-      margin-bottom: 10px;
-      display: inline-block;
+    .notification {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: #28a745;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      display: none;
+      z-index: 1000;
     }
   </style>
 </head>
 <body>
   <div class="container">
+    <div class="notification" id="notificacao">Salvo com sucesso.</div>
+
     <div class="tabs">
       <button onclick="showTab('cadastro')">Cadastro</button>
       <button onclick="showTab('historico')">Histórico</button>
       <button onclick="showTab('somas')">Somas</button>
     </div>
 
-    <div id="notif"></div>
-
     <div id="cadastro" class="tab-content active">
-      <input list="nomes" type="text" id="nome" placeholder="Nome completo" />
-      <datalist id="nomes"></datalist>
-      <input list="valores" type="text" id="valor" placeholder="Valor (R$)" />
-      <datalist id="valores"></datalist>
+      <input type="text" id="nome" list="nomesSalvos" placeholder="Nome completo" />
+      <datalist id="nomesSalvos"></datalist>
       <input type="text" id="telefone" placeholder="Telefone (opcional)" />
+      <input type="number" id="valor" list="valoresSalvos" placeholder="Valor (R$)" />
+      <datalist id="valoresSalvos"></datalist>
       <textarea id="obs" placeholder="Observações (opcional)"></textarea>
       <button onclick="salvarCliente()">Salvar</button>
     </div>
 
     <div id="historico" class="tab-content">
-      <div id="restore-container">
-        <button onclick="restaurarBackup()">Restaurar Backup</button>
-        <input type="file" id="backupFile" accept=".json" style="display:none" onchange="lerBackup(event)" />
-      </div>
+      <button onclick="restaurarBackup()">Restaurar Backup</button>
       <input type="text" id="buscaHistorico" oninput="filtrarHistorico()" placeholder="Buscar por nome..." />
       <div id="listaHistorico"></div>
     </div>
@@ -111,51 +107,30 @@
     function salvarCliente() {
       const nome = document.getElementById('nome').value.trim();
       const telefone = document.getElementById('telefone').value.trim();
-      const valor = document.getElementById('valor').value.trim();
-      const obs = document.getElementById('obs').value.trim();
+      const valor = document.getElementById('valor').value;
+      const obs = document.getElementById('obs').value;
 
-      if (!nome || !valor) return;
+      if (!nome) return;
 
       const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
       dados.push({ nome, telefone, valor, obs, data: new Date().toLocaleString() });
       localStorage.setItem("clientes", JSON.stringify(dados));
-      salvarDadosList(nome, valor);
-      renderDatalists();
+      atualizarAutoCompletar(nome, valor);
 
       document.getElementById('nome').value = '';
       document.getElementById('telefone').value = '';
       document.getElementById('valor').value = '';
       document.getElementById('obs').value = '';
-      notificar("Cliente salvo!");
-      baixarBackup();
+      notificar("Salvo com sucesso.");
+
+      gerarBackup(dados);
     }
 
-    function baixarBackup() {
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      const jsonStr = JSON.stringify(dados, null, 2);
-      const blob = new Blob([jsonStr], { type: "application/json" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `backup_clientes_${new Date().toISOString().slice(0,10)}.json`;
-      a.click();
-      URL.revokeObjectURL(a.href);
-    }
-
-    function renderDatalists() {
-      const nomes = JSON.parse(localStorage.getItem("nomes") || "[]");
-      const valores = JSON.parse(localStorage.getItem("valores") || "[]");
-
-      document.getElementById("nomes").innerHTML = nomes.map(n => `<option value="${n}">`).join("");
-      document.getElementById("valores").innerHTML = valores.map(v => `<option value="${v}">`).join("");
-    }
-
-    function salvarDadosList(nome, valor) {
-      let nomes = JSON.parse(localStorage.getItem("nomes") || "[]");
-      let valores = JSON.parse(localStorage.getItem("valores") || "[]");
-      if (!nomes.includes(nome)) nomes.push(nome);
-      if (!valores.includes(valor)) valores.push(valor);
-      localStorage.setItem("nomes", JSON.stringify(nomes));
-      localStorage.setItem("valores", JSON.stringify(valores));
+    function notificar(msg) {
+      const el = document.getElementById("notificacao");
+      el.innerText = msg;
+      el.style.display = "block";
+      setTimeout(() => el.style.display = "none", 3000);
     }
 
     function renderHistorico(filtro = "") {
@@ -171,8 +146,8 @@
           div.className = "card";
           div.innerHTML = `
             <strong>${c.nome}</strong><br>
-            Valor: R$ ${c.valor}<br>
-            Telefone: ${c.telefone || "-"}<br>
+            Valor: R$ ${c.valor || "0,00"}<br>
+            Telefone: ${c.telefone || "Não informado"}<br>
             Obs: ${c.obs || "-"}<br>
             Data: ${c.data}<br>
             <div class="actions">
@@ -182,6 +157,53 @@
           `;
           container.appendChild(div);
         });
+    }
+
+    function renderSomas(filtro = "") {
+      const container = document.getElementById("listaSomas");
+      container.innerHTML = "";
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      const resumo = {};
+      const telefones = {};
+
+      dados.forEach(c => {
+        if (!resumo[c.nome]) {
+          resumo[c.nome] = 0;
+          telefones[c.nome] = c.telefone;
+        }
+        resumo[c.nome] += parseFloat(c.valor || 0);
+      });
+
+      Object.entries(resumo)
+        .filter(([nome]) => nome.toLowerCase().includes(filtro.toLowerCase()))
+        .forEach(([nome, total]) => {
+          const div = document.createElement("div");
+          div.className = "card";
+          const telefone = telefones[nome] || "";
+          div.innerHTML = `
+            <strong>${nome}</strong><br>Total: R$ ${total.toFixed(2)}
+          `;
+          container.appendChild(div);
+        });
+    }
+
+    function filtrarHistorico() {
+      const termo = document.getElementById("buscaHistorico").value;
+      renderHistorico(termo);
+    }
+
+    function filtrarSomas() {
+      const termo = document.getElementById("buscaSomas").value;
+      renderSomas(termo);
+    }
+
+    function excluirCliente(i) {
+      if (!confirm("Deseja realmente excluir este cliente?")) return;
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      dados.splice(i, 1);
+      localStorage.setItem("clientes", JSON.stringify(dados));
+      renderHistorico();
+      renderSomas();
     }
 
     function editarCliente(i) {
@@ -195,102 +217,64 @@
       localStorage.setItem("clientes", JSON.stringify(dados));
       renderHistorico();
       renderSomas();
+      showTab('cadastro');
       notificar("Edite e salve novamente.");
     }
 
-    function excluirCliente(i) {
-      if(!confirm("Tem certeza que deseja excluir este cadastro?")) return;
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      dados.splice(i, 1);
-      localStorage.setItem("clientes", JSON.stringify(dados));
-      renderHistorico();
-      renderSomas();
-      notificar("Excluído.");
+    function atualizarAutoCompletar(nome, valor) {
+      const nomesSalvos = new Set(JSON.parse(localStorage.getItem("nomesSalvos") || "[]"));
+      nomesSalvos.add(nome);
+      localStorage.setItem("nomesSalvos", JSON.stringify([...nomesSalvos]));
+
+      const valoresSalvos = new Set(JSON.parse(localStorage.getItem("valoresSalvos") || "[]"));
+      valoresSalvos.add(valor);
+      localStorage.setItem("valoresSalvos", JSON.stringify([...valoresSalvos]));
+
+      preencherAutoCompletar();
     }
 
-    function renderSomas(filtro = "") {
-      const container = document.getElementById("listaSomas");
-      container.innerHTML = "";
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      const resumo = {}, telefones = {};
+    function preencherAutoCompletar() {
+      const nomes = JSON.parse(localStorage.getItem("nomesSalvos") || "[]");
+      const valores = JSON.parse(localStorage.getItem("valoresSalvos") || "[]");
+      const datalistNomes = document.getElementById("nomesSalvos");
+      const datalistValores = document.getElementById("valoresSalvos");
 
-      dados.forEach(c => {
-        if (!resumo[c.nome]) {
-          resumo[c.nome] = 0;
-          telefones[c.nome] = c.telefone;
-        }
-        resumo[c.nome] += parseFloat(c.valor || 0);
-      });
-
-      Object.entries(resumo)
-        .filter(([nome]) => nome.toLowerCase().includes(filtro.toLowerCase()))
-        .forEach(([nome, total]) => {
-          const telefone = telefones[nome] || "";
-          const div = document.createElement("div");
-          div.className = "card";
-          div.innerHTML = `
-            <strong>${nome}</strong><br>
-            Total: R$ ${total.toFixed(2)}<br>
-            <div class="actions">
-              <a href="${gerarLinkWhatsApp(nome, telefone, total)}" target="_blank">
-                <button>WhatsApp</button>
-              </a>
-            </div>
-          `;
-          container.appendChild(div);
-        });
+      datalistNomes.innerHTML = nomes.map(n => `<option value="${n}">`).join("");
+      datalistValores.innerHTML = valores.map(v => `<option value="${v}">`).join("");
     }
 
-    function gerarLinkWhatsApp(nome, telefone, valor) {
-      const pix = "054.167.380-73";
-      const msg = `Olá ${nome}, você possui um valor pendente de R$ ${valor.toFixed(2)}.\nChave PIX para pagamento:\n${pix}`;
-      return "https://wa.me/" + telefone.replace(/\D/g, "") + "?text=" + encodeURIComponent(msg);
-    }
-
-    function filtrarHistorico() {
-      const termo = document.getElementById("buscaHistorico").value;
-      renderHistorico(termo);
-    }
-
-    function filtrarSomas() {
-      const termo = document.getElementById("buscaSomas").value;
-      renderSomas(termo);
-    }
-
-    function notificar(msg) {
-      const notif = document.getElementById("notif");
-      notif.textContent = msg;
-      setTimeout(() => notif.textContent = "", 3000);
+    function gerarBackup(dados) {
+      const blob = new Blob([JSON.stringify(dados, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `backup_devedores_${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
     }
 
     function restaurarBackup() {
-      document.getElementById('backupFile').click();
-    }
-
-    function lerBackup(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => {
-        try {
-          const dados = JSON.parse(e.target.result);
-          if (Array.isArray(dados)) {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "application/json";
+      input.onchange = function (e) {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          try {
+            const dados = JSON.parse(event.target.result);
             localStorage.setItem("clientes", JSON.stringify(dados));
             renderHistorico();
             renderSomas();
             notificar("Backup restaurado com sucesso.");
-          } else {
+          } catch (e) {
             alert("Arquivo inválido.");
           }
-        } catch {
-          alert("Erro ao ler arquivo.");
-        }
+        };
+        reader.readAsText(file);
       };
-      reader.readAsText(file);
-      event.target.value = "";
+      input.click();
     }
 
-    renderDatalists();
+    preencherAutoCompletar();
   </script>
 </body>
 </html>
