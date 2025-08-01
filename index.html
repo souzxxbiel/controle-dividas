@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestor de Devedores</title>
   <style>
     body {
@@ -51,22 +51,18 @@
       gap: 10px;
       margin-top: 5px;
     }
-    #notificacao {
+    #toast {
       position: fixed;
-      top: 20px;
-      right: 20px;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
       background: #28a745;
+      padding: 12px 20px;
+      border-radius: 8px;
       color: white;
-      padding: 10px 20px;
-      border-radius: 10px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.5s ease;
+      font-weight: bold;
+      display: none;
       z-index: 9999;
-    }
-    #notificacao.mostrar {
-      opacity: 1;
-      pointer-events: auto;
     }
   </style>
 </head>
@@ -79,9 +75,9 @@
     </div>
 
     <div id="cadastro" class="tab-content active">
-      <input type="text" id="nome" placeholder="Nome completo" list="nomesSalvos"/>
+      <input type="text" id="nome" placeholder="Nome completo" list="nomesSalvos" />
       <datalist id="nomesSalvos"></datalist>
-      <input type="text" id="telefone" placeholder="Telefone (apenas na 1ª vez)" />
+      <input type="text" id="telefone" placeholder="Telefone (com DDD, sem +)" />
       <input type="number" id="valor" placeholder="Valor (R$)" />
       <textarea id="obs" placeholder="Observações (opcional)"></textarea>
       <button onclick="salvarCliente()">Salvar</button>
@@ -89,9 +85,7 @@
 
     <div id="historico" class="tab-content">
       <input type="text" id="buscaHistorico" oninput="filtrarHistorico()" placeholder="Buscar por nome..." />
-      <div class="actions">
-        <button onclick="exportarHistorico()">Exportar Histórico</button>
-      </div>
+      <button onclick="exportarHistorico()">Exportar Histórico</button>
       <div id="listaHistorico"></div>
     </div>
 
@@ -101,9 +95,11 @@
     </div>
   </div>
 
-  <div id="notificacao">Cliente salvo com sucesso!</div>
+  <div id="toast">Cliente salvo com sucesso!</div>
 
   <script>
+    let telefoneGlobal = "";
+
     function showTab(id) {
       document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
       document.getElementById(id).classList.add("active");
@@ -118,63 +114,72 @@
       const obs = document.getElementById('obs').value;
 
       if (!nome) return;
-
-      let telefonesSalvos = JSON.parse(localStorage.getItem("telefones") || "{}");
-      if (!telefonesSalvos[nome] && telefone) {
-        telefonesSalvos[nome] = telefone;
-        localStorage.setItem("telefones", JSON.stringify(telefonesSalvos));
-      }
-      telefone = telefonesSalvos[nome] || "";
+      if (!telefoneGlobal && telefone) telefoneGlobal = telefone;
+      if (!telefone) telefone = telefoneGlobal;
 
       const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
       dados.push({ nome, telefone, valor, obs, data: new Date().toLocaleString() });
       localStorage.setItem("clientes", JSON.stringify(dados));
 
-      let nomes = JSON.parse(localStorage.getItem("nomesSalvos") || "[]");
-      if (!nomes.includes(nome)) {
-        nomes.push(nome);
-        localStorage.setItem("nomesSalvos", JSON.stringify(nomes));
-        preencherAutoComplete();
+      // Salvar nome em histórico
+      let nomesSalvos = JSON.parse(localStorage.getItem("nomesSalvos") || "[]");
+      if (!nomesSalvos.includes(nome)) {
+        nomesSalvos.push(nome);
+        localStorage.setItem("nomesSalvos", JSON.stringify(nomesSalvos));
+        atualizarDatalist();
       }
 
-      const numeroBackup = "5599892514";
-      const msgBackup = `Novo cliente salvo:\nNome: ${nome}\nTelefone: ${telefone || "Não informado"}\nValor: R$ ${valor}\nObs: ${obs || "-"}`;
-      window.open(`https://wa.me/${numeroBackup}?text=${encodeURIComponent(msgBackup)}`, "_blank");
-
       document.getElementById('nome').value = '';
-      document.getElementById('telefone').value = '';
       document.getElementById('valor').value = '';
       document.getElementById('obs').value = '';
-
-      mostrarNotificacao();
+      exibirToast();
+      renderHistorico();
+      renderSomas();
     }
 
-    function mostrarNotificacao() {
-      const el = document.getElementById("notificacao");
-      el.classList.add("mostrar");
-      setTimeout(() => el.classList.remove("mostrar"), 3000);
+    function exibirToast() {
+      const toast = document.getElementById("toast");
+      toast.style.display = "block";
+      setTimeout(() => { toast.style.display = "none"; }, 2000);
+    }
+
+    function atualizarDatalist() {
+      const nomes = JSON.parse(localStorage.getItem("nomesSalvos") || "[]");
+      const datalist = document.getElementById("nomesSalvos");
+      datalist.innerHTML = "";
+      nomes.forEach(nome => {
+        const option = document.createElement("option");
+        option.value = nome;
+        datalist.appendChild(option);
+      });
     }
 
     function renderHistorico(filtro = "") {
       const container = document.getElementById("listaHistorico");
       container.innerHTML = "";
       const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-
-      dados
+      const dadosFiltrados = dados
+        .map((c, i) => ({ ...c, index: i }))
         .filter(c => c.nome.toLowerCase().includes(filtro.toLowerCase()))
-        .reverse()
-        .forEach(c => {
-          const div = document.createElement("div");
-          div.className = "card";
-          div.innerHTML = `
-            <strong>${c.nome}</strong><br>
-            Valor: R$ ${c.valor || "0,00"}<br>
-            Telefone: ${c.telefone || "Não informado"}<br>
-            Obs: ${c.obs || "-"}<br>
-            Data: ${c.data}<br>
-          `;
-          container.appendChild(div);
-        });
+        .reverse();
+
+      const total = dados.length;
+      dadosFiltrados.forEach((c, i) => {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `
+          <strong>${c.nome}</strong><br>
+          Valor: R$ ${c.valor || "0,00"}<br>
+          Telefone: ${c.telefone || "Não informado"}<br>
+          Obs: ${c.obs || "-"}<br>
+          Data: ${c.data}<br>
+          <div class="actions">
+            <button onclick="editarCliente(${total - i - 1})">Editar</button>
+            <button onclick="excluirCliente(${total - i - 1})">Excluir</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
     }
 
     function renderSomas(filtro = "") {
@@ -210,26 +215,6 @@
         });
     }
 
-    function gerarLinkWhatsApp(nome, telefone, valor) {
-      const pix = "054.167.380-73";
-      const msg = `Olá ${nome}, você possui um valor pendente de R$ ${valor.toFixed(2)}.\nChave PIX para pagamento:\n${pix}`;
-      return "https://wa.me/" + telefone.replace(/\D/g, "") + "?text=" + encodeURIComponent(msg);
-    }
-
-    function exportarHistorico() {
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      let conteudo = "Histórico de Clientes:\n\n";
-      dados.forEach(c => {
-        conteudo += `Nome: ${c.nome}\nTelefone: ${c.telefone}\nValor: R$ ${c.valor}\nObs: ${c.obs}\nData: ${c.data}\n\n`;
-      });
-
-      const blob = new Blob([conteudo], { type: "text/plain" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `historico_clientes.txt`;
-      a.click();
-    }
-
     function filtrarHistorico() {
       const termo = document.getElementById("buscaHistorico").value;
       renderHistorico(termo);
@@ -240,18 +225,50 @@
       renderSomas(termo);
     }
 
-    function preencherAutoComplete() {
-      const nomes = JSON.parse(localStorage.getItem("nomesSalvos") || "[]");
-      const lista = document.getElementById("nomesSalvos");
-      lista.innerHTML = "";
-      nomes.forEach(nome => {
-        const option = document.createElement("option");
-        option.value = nome;
-        lista.appendChild(option);
-      });
+    function editarCliente(index) {
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      const cliente = dados[index];
+      document.getElementById('nome').value = cliente.nome;
+      document.getElementById('telefone').value = cliente.telefone;
+      document.getElementById('valor').value = cliente.valor;
+      document.getElementById('obs').value = cliente.obs;
+      dados.splice(index, 1);
+      localStorage.setItem("clientes", JSON.stringify(dados));
+      showTab('cadastro');
+      renderHistorico();
+      renderSomas();
     }
 
-    preencherAutoComplete();
+    function excluirCliente(index) {
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      if (confirm("Deseja excluir este cliente?")) {
+        dados.splice(index, 1);
+        localStorage.setItem("clientes", JSON.stringify(dados));
+        renderHistorico();
+        renderSomas();
+      }
+    }
+
+    function gerarLinkWhatsApp(nome, telefone, valor) {
+      const pix = "054.167.380-73";
+      const msg = `Olá ${nome}, você possui um valor pendente de R$ ${valor.toFixed(2)}.\nChave PIX para pagamento:\n${pix}`;
+      return "https://wa.me/" + telefone.replace(/\D/g, "") + "?text=" + encodeURIComponent(msg);
+    }
+
+    function exportarHistorico() {
+      const dados = localStorage.getItem("clientes") || "[]";
+      const blob = new Blob([dados], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "backup_clientes.json";
+      a.click();
+    }
+
+    window.onload = () => {
+      atualizarDatalist();
+      renderHistorico();
+      renderSomas();
+    }
   </script>
 </body>
 </html>
