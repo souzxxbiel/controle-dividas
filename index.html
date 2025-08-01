@@ -2,275 +2,294 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Gestão de Clientes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestor de Devedores - Oliveira</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
-      margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to bottom right, #2E3192, #ED1C24);
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
       color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       min-height: 100vh;
     }
-    header, section, footer {
-      width: 100%;
-      max-width: 500px;
-      padding: 1em;
+    .container {
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+      backdrop-filter: blur(10px);
     }
-    input, select, textarea, button {
+    input, textarea, button, select {
       width: 100%;
-      padding: 0.5em;
-      margin: 0.5em 0;
+      margin-bottom: 12px;
+      padding: 12px;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       font-size: 1em;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      transition: 0.3s;
+    }
+    input::placeholder, textarea::placeholder {
+      color: #ccc;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      background: rgba(255,255,255,0.2);
     }
     button {
-      background: #fff;
-      color: #2E3192;
-      font-weight: bold;
       cursor: pointer;
-      transition: background-color 0.3s;
+      background: linear-gradient(45deg, #00c6ff, #0072ff);
+      color: white;
+      font-weight: bold;
+      transition: background 0.3s;
     }
     button:hover {
-      background-color: #ddd;
+      background: linear-gradient(45deg, #0072ff, #ff416c);
     }
-    .aba {
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .tabs button {
+      flex: 1;
+      background: linear-gradient(90deg, #3f5efb, #fc466b);
+    }
+    .tab-content {
       display: none;
+      animation: fadeIn 0.5s ease-in-out;
     }
-    .ativa {
+    .tab-content.active {
       display: block;
     }
-    nav button {
-      background: rgba(255,255,255,0.1);
-      margin: 0 0.2em;
-      padding: 0.5em 1em;
-      border-radius: 8px;
-      border: none;
-      color: white;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background-color 0.3s;
+    .card {
+      background: linear-gradient(120deg, #1e1e2f, #2a2a3f);
+      padding: 15px;
+      border-radius: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
     }
-    nav button:hover {
-      background: rgba(255,255,255,0.3);
+    .card strong {
+      font-size: 1.1em;
+      color: #66ffff;
     }
-    .cliente-card {
-      background: rgba(255,255,255,0.1);
-      margin: 0.5em 0;
-      padding: 1em;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      position: relative;
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
     }
-    .cliente-card button {
-      width: auto;
-      margin-right: 0.5em;
+    .actions button {
+      flex: 1;
+      min-width: 100px;
     }
-    canvas {
-      background: #fff;
-      margin: 1em 0;
-      width: 100%;
-      height: 250px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    #restoreBtn {
+      background: linear-gradient(90deg, #ee0979, #ff6a00);
+      margin-bottom: 20px;
     }
-    #ultimaAtualizacao {
-      font-weight: bold;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 2em;
+      font-weight: 700;
+      color: #66ffff;
+      text-shadow: 0 0 8px #00c6ff;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Gestão de Clientes</h1>
-    <nav>
-      <button onclick="trocarAba('cadastro')">Cadastro</button>
-      <button onclick="trocarAba('historico')">Histórico</button>
-      <button onclick="trocarAba('somas')">Somas</button>
-      <button onclick="trocarAba('graficos')">Gráficos</button>
-    </nav>
-  </header>
+  <div class="container">
+    <header>Gestor de Devedores Oliveira</header>
+    <button id="restoreBtn" onclick="restaurarBackup()">Restaurar Backup</button>
+    <div class="tabs">
+      <button onclick="showTab('cadastro')">Cadastro</button>
+      <button onclick="showTab('historico')">Histórico</button>
+      <button onclick="showTab('somas')">Somas</button>
+    </div>
 
-  <section id="cadastro" class="aba ativa">
-    <input type="text" id="nome" placeholder="Nome do cliente" list="lista-nomes" />
-    <datalist id="lista-nomes"></datalist>
-    <input type="text" id="telefone" placeholder="Telefone (opcional)" list="lista-telefones" />
-    <datalist id="lista-telefones"></datalist>
-    <input type="number" id="valor" placeholder="Valor" list="lista-valores" />
-    <datalist id="lista-valores"></datalist>
-    <textarea id="obs" placeholder="Observação (opcional)"></textarea>
-    <button onclick="salvarCliente()">Salvar</button>
-  </section>
+    <div id="cadastro" class="tab-content active">
+      <input list="nomes" type="text" id="nome" placeholder="Nome completo" />
+      <datalist id="nomes"></datalist>
+      <input type="text" id="telefone" placeholder="Telefone (opcional)" />
+      <input list="valores" type="number" id="valor" placeholder="Valor (R$)" />
+      <datalist id="valores"></datalist>
+      <textarea id="obs" placeholder="Observações (opcional)"></textarea>
+      <button onclick="salvarCliente()">Salvar</button>
+    </div>
 
-  <section id="historico" class="aba">
-    <h2>Histórico</h2>
-    <input type="text" id="buscaHistorico" placeholder="Buscar..." oninput="filtrarHistorico()" />
-    <button onclick="restaurarBackup()">Restaurar Backup</button>
-    <div id="listaHistorico"></div>
-  </section>
+    <div id="historico" class="tab-content">
+      <input type="text" id="buscaHistorico" oninput="filtrarHistorico()" placeholder="Buscar por nome..." />
+      <div id="listaHistorico"></div>
+    </div>
 
-  <section id="somas" class="aba">
-    <h2>Somas</h2>
-    <input type="text" id="buscaSomas" placeholder="Buscar..." oninput="filtrarSomas()" />
-    <div id="listaSomas"></div>
-  </section>
-
-  <section id="graficos" class="aba">
-    <h2>Gráficos</h2>
-    <canvas id="graficoClientes"></canvas>
-  </section>
-
-  <footer>
-    <small>Backup salvo automaticamente. Última atualização: <span id="ultimaAtualizacao"></span></small>
-  </footer>
+    <div id="somas" class="tab-content">
+      <input type="text" id="buscaSomas" oninput="filtrarSomas()" placeholder="Buscar por nome..." />
+      <div id="listaSomas"></div>
+    </div>
+  </div>
 
   <script>
-    let historico = JSON.parse(localStorage.getItem("historico") || "[]");
-    let clientes = JSON.parse(localStorage.getItem("clientes") || "{}");
+    let editando = null;
 
-    function trocarAba(id) {
-      document.querySelectorAll('.aba').forEach(el => el.classList.remove('ativa'));
-      document.getElementById(id).classList.add('ativa');
-      if (id === 'graficos') gerarGrafico();
-      if (id === 'historico') gerarHistorico();
-      if (id === 'somas') gerarSomas();
-      if (id === 'cadastro') atualizarSugestoes();
+    function showTab(id) {
+      document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+      if (id === 'historico') renderHistorico();
+      if (id === 'somas') renderSomas();
     }
 
     function salvarCliente() {
       const nome = document.getElementById('nome').value.trim();
       const telefone = document.getElementById('telefone').value.trim();
-      const valor = document.getElementById('valor').value;
+      const valor = document.getElementById('valor').value.trim();
       const obs = document.getElementById('obs').value.trim();
-      if (!nome || !valor) return;
+      if (!nome) return;
 
-      if (!clientes[nome]) clientes[nome] = { telefone };
-      else if (telefone) clientes[nome].telefone = telefone;
-
-      const registro = { nome, telefone: clientes[nome].telefone, valor: parseFloat(valor), obs, data: new Date().toLocaleString() };
-
-      historico.unshift(registro);
-
-      localStorage.setItem("historico", JSON.stringify(historico));
+      const clientes = JSON.parse(localStorage.getItem("clientes") || "[]");
+      if (editando !== null) {
+        clientes[editando] = { nome, telefone, valor, obs, data: new Date().toLocaleString() };
+        editando = null;
+      } else {
+        clientes.push({ nome, telefone, valor, obs, data: new Date().toLocaleString() });
+      }
       localStorage.setItem("clientes", JSON.stringify(clientes));
-
-      gerarHistorico();
-      gerarSomas();
-      atualizarSugestoes();
-      document.getElementById("ultimaAtualizacao").textContent = new Date().toLocaleString();
-
-      // Download backup JSON
-      const blob = new Blob([JSON.stringify(historico, null, 2)], { type: "application/json" });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = "backup.json";
-      a.click();
-
-      // Limpar campos após salvar
+      salvarBackup();
+      preencherAutoComplete();
       document.getElementById('nome').value = '';
       document.getElementById('telefone').value = '';
       document.getElementById('valor').value = '';
       document.getElementById('obs').value = '';
+      const nota = document.createElement("div");
+      nota.textContent = "Cliente salvo!";
+      nota.style.position = "fixed";
+      nota.style.top = "10px";
+      nota.style.left = "50%";
+      nota.style.transform = "translateX(-50%)";
+      nota.style.background = "#28a745";
+      nota.style.color = "white";
+      nota.style.padding = "10px 20px";
+      nota.style.borderRadius = "10px";
+      document.body.appendChild(nota);
+      setTimeout(() => nota.remove(), 2000);
     }
 
-    function gerarHistorico(filtro = "") {
-      const lista = document.getElementById('listaHistorico');
-      lista.innerHTML = "";
-      const filtroMinusculo = filtro.toLowerCase();
+    function renderHistorico(filtro = "") {
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      const container = document.getElementById("listaHistorico");
+      container.innerHTML = "";
+      dados
+        .map((c, i) => ({ ...c, index: i }))
+        .filter(c => c.nome.toLowerCase().includes(filtro.toLowerCase()))
+        .reverse()
+        .forEach(c => {
+          const div = document.createElement("div");
+          div.className = "card";
+          div.innerHTML = `
+            <strong>${c.nome}</strong><br>
+            Valor: R$ ${c.valor || "0,00"}<br>
+            Telefone: ${c.telefone || "Não informado"}<br>
+            Obs: ${c.obs || "-"}<br>
+            Data: ${c.data}<br>
+            <div class="actions">
+              <button onclick="editarCliente(${c.index})">Editar</button>
+              <button onclick="excluirCliente(${c.index})">Excluir</button>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+    }
 
-      historico.forEach((item, i) => {
-        if (!item.nome.toLowerCase().includes(filtroMinusculo)) return;
-
-        const div = document.createElement('div');
-        div.className = "cliente-card";
-        div.innerHTML = `
-          <strong>${item.nome}</strong> - R$${item.valor.toFixed(2)}<br>${item.obs || ''}<br><small>${item.data}</small><br>
-          <button onclick="editar(${i})">Editar</button>
-          <button onclick="confirmarExcluir(${i})">Excluir</button>
-        `;
-        lista.appendChild(div);
+    function renderSomas(filtro = "") {
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      const container = document.getElementById("listaSomas");
+      container.innerHTML = "";
+      const resumo = {};
+      const telefones = {};
+      dados.forEach(c => {
+        if (!resumo[c.nome]) {
+          resumo[c.nome] = 0;
+          telefones[c.nome] = c.telefone;
+        }
+        resumo[c.nome] += parseFloat(c.valor || 0);
       });
+      Object.entries(resumo)
+        .filter(([nome]) => nome.toLowerCase().includes(filtro.toLowerCase()))
+        .forEach(([nome, total]) => {
+          const telefone = telefones[nome];
+          const div = document.createElement("div");
+          div.className = "card";
+          div.innerHTML = `
+            <strong>${nome}</strong><br>Total: R$ ${total.toFixed(2)}
+            <div class="actions">
+              <a href="${gerarLinkWhatsApp(nome, telefone, total)}" target="_blank">
+                <button>WhatsApp</button>
+              </a>
+            </div>
+          `;
+          container.appendChild(div);
+        });
     }
 
-    function editar(index) {
-      const item = historico[index];
-      document.getElementById('nome').value = item.nome;
-      document.getElementById('telefone').value = item.telefone || '';
-      document.getElementById('valor').value = item.valor;
-      document.getElementById('obs').value = item.obs || '';
-      trocarAba('cadastro');
-
-      // Remove o registro antigo para evitar duplicidade após salvar edição
-      historico.splice(index, 1);
-      localStorage.setItem("historico", JSON.stringify(historico));
-      gerarHistorico();
-      gerarSomas();
+    function excluirCliente(i) {
+      if (!confirm("Tem certeza que deseja excluir?")) return;
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      dados.splice(i, 1);
+      localStorage.setItem("clientes", JSON.stringify(dados));
+      renderHistorico();
     }
 
-    function confirmarExcluir(index) {
-      if (confirm("Tem certeza que deseja excluir este registro?")) {
-        historico.splice(index, 1);
-        localStorage.setItem("historico", JSON.stringify(historico));
-        gerarHistorico();
-        gerarSomas();
-      }
+    function editarCliente(i) {
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      const c = dados[i];
+      document.getElementById("nome").value = c.nome;
+      document.getElementById("telefone").value = c.telefone;
+      document.getElementById("valor").value = c.valor;
+      document.getElementById("obs").value = c.obs;
+      editando = i;
+      showTab("cadastro");
     }
 
-    function gerarSomas(filtro = "") {
-      const lista = document.getElementById('listaSomas');
-      lista.innerHTML = "";
-      const filtroMinusculo = filtro.toLowerCase();
+    function gerarLinkWhatsApp(nome, telefone, valor) {
+      const pix = "054.167.380-73";
+      const msg = `Olá ${nome}, você possui um valor pendente de R$ ${valor.toFixed(2)}.\n
 
-      // Somar valores por cliente (filtro aplicado nos nomes)
-      const somas = {};
-      historico.forEach(item => {
-        if (!item.nome.toLowerCase().includes(filtroMinusculo)) return;
-        somas[item.nome] = (somas[item.nome] || 0) + item.valor;
-      });
-
-      Object.keys(somas).forEach(nome => {
-        const valor = somas[nome];
-        const telefone = clientes[nome]?.telefone || "";
-        const div = document.createElement('div');
-        div.className = "cliente-card";
-        div.innerHTML = `
-          <strong>${nome}</strong>: R$${valor.toFixed(2)}<br>
-          <a target="_blank" href="https://wa.me/55${telefone.replace(/\D/g,'')}?text=Olá%20${encodeURIComponent(nome)},%20você%20tem%20um%20valor%20pendente%20de%20R$${valor.toFixed(2)}.%20Favor%20realizar%20o%20pagamento%20via%20PIX%20para%20054.167.380-73.">Cobrar via WhatsApp</a>
-        `;
-        lista.appendChild(div);
-      });
+Segue a chave PIX para pagamento:\n${pix}`;
+      return "https://wa.me/" + telefone.replace(/\D/g, "") + "?text=" + encodeURIComponent(msg);
     }
 
-    function atualizarSugestoes() {
-      const nomes = Object.keys(clientes);
-      document.getElementById('lista-nomes').innerHTML = nomes.map(n => `<option value="${n}">`).join('');
-      const telefones = [...new Set(historico.map(h => h.telefone).filter(t => t))];
-      document.getElementById('lista-telefones').innerHTML = telefones.map(t => `<option value="${t}">`).join('');
-      const valores = [...new Set(historico.map(h => h.valor).filter(v => v))];
-      document.getElementById('lista-valores').innerHTML = valores.map(v => `<option value="${v}">`).join('');
+    function salvarBackup() {
+      const dados = localStorage.getItem("clientes");
+      const blob = new Blob([dados], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "backup_clientes.json";
+      a.click();
     }
 
     function restaurarBackup() {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = '.json';
-      input.onchange = e => {
-        const file = e.target.files[0];
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".json";
+      input.onchange = () => {
+        const file = input.files[0];
         const reader = new FileReader();
-        reader.onload = ev => {
+        reader.onload = e => {
           try {
-            const dados = JSON.parse(ev.target.result);
-            if (!Array.isArray(dados)) throw new Error("Backup inválido");
-            historico = dados;
-            localStorage.setItem("historico", JSON.stringify(historico));
-            gerarHistorico();
-            gerarSomas();
-            alert("Backup restaurado com sucesso!");
+            const dados = JSON.parse(e.target.result);
+            localStorage.setItem("clientes", JSON.stringify(dados));
+            alert("Backup restaurado com sucesso.");
+            renderHistorico();
           } catch {
-            alert("Erro ao restaurar backup");
+            alert("Erro ao restaurar backup.");
           }
         };
         reader.readAsText(file);
@@ -278,50 +297,24 @@
       input.click();
     }
 
-    function gerarGrafico() {
-      const canvas = document.getElementById('graficoClientes');
-      const ctx = canvas.getContext('2d');
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = canvas.clientWidth * dpr;
-      canvas.height = canvas.clientHeight * dpr;
-      ctx.scale(dpr, dpr);
-      ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
-
-      const dados = {};
-      historico.forEach(h => dados[h.nome] = (dados[h.nome] || 0) + h.valor);
-
-      const nomes = Object.keys(dados);
-      const max = Math.max(...Object.values(dados), 1);
-      const alturaBarra = 30;
-      const gap = 15;
-      const margemEsq = 100;
-
-      ctx.font = '14px Segoe UI';
-      ctx.fillStyle = '#fff';
-
-      nomes.forEach((nome, i) => {
-        const valor = dados[nome];
-        const y = i * (alturaBarra + gap) + 20;
-
-        ctx.fillStyle = '#fff';
-        ctx.fillText(`${nome}`, 5, y + alturaBarra / 1.5);
-
-        const barraWidth = ((canvas.clientWidth - margemEsq - 20) * valor) / max;
-
-        // Barra azul
-        ctx.fillStyle = '#2E3192';
-        ctx.fillRect(margemEsq, y, barraWidth, alturaBarra);
-
-        ctx.fillStyle = '#000';
-        ctx.fillText(`R$${valor.toFixed(2)}`, margemEsq + barraWidth + 5, y + alturaBarra / 1.5);
-      });
+    function filtrarHistorico() {
+      renderHistorico(document.getElementById("buscaHistorico").value);
     }
 
-    // Inicializar
-    gerarHistorico();
-    gerarSomas();
-    atualizarSugestoes();
-    document.getElementById("ultimaAtualizacao").textContent = new Date().toLocaleString();
+    function filtrarSomas() {
+      renderSomas(document.getElementById("buscaSomas").value);
+    }
+
+    function preencherAutoComplete() {
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      const nomes = [...new Set(dados.map(d => d.nome))];
+      const valores = [...new Set(dados.map(d => d.valor))];
+      document.getElementById("nomes").innerHTML = nomes.map(n => `<option value="${n}">`).join("");
+      document.getElementById("valores").innerHTML = valores.map(v => `<option value="${v}">`).join("");
+    }
+
+    preencherAutoComplete();
+    renderHistorico();
   </script>
 </body>
 </html>
