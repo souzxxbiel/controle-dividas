@@ -252,7 +252,7 @@
       const pix = "054.167.380-73";
       const msg = `Olá ${nome}, você possui um valor pendente de R$ ${valor.toFixed(2)}.\n
 
- Segue a chave PIX para pagamento:\n${pix}`;
+Segue a chave PIX para pagamento:\n${pix}`;
       return "https://wa.me/" + telefone.replace(/\D/g, "") + "?text=" + encodeURIComponent(msg);
     }
 
