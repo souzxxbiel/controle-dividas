@@ -123,6 +123,18 @@
       document.getElementById('obs').value = '';
       notificar("Cliente salvo!");
       salvarBackup();
+      baixarBackup();  // <-- chama o download automático do backup JSON
+    }
+
+    function baixarBackup() {
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      const jsonStr = JSON.stringify(dados, null, 2);
+      const blob = new Blob([jsonStr], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `backup_clientes_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(a.href);
     }
 
     function renderDatalists() {
@@ -239,6 +251,7 @@
     }
 
     function salvarBackup() {
+      // Abre link WhatsApp com backup (opcional, pode comentar se quiser)
       const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
       const json = JSON.stringify(dados, null, 2);
       const numero = "55996275431";
@@ -283,4 +296,3 @@
   </script>
 </body>
 </html>
-
