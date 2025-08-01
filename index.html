@@ -1,309 +1,235 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Gestão de Devedores</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet"/>
-  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.2/css/all.min.css" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestor de Devedores</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
     body {
-      font-family: 'Poppins', sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       margin: 0;
-      background: linear-gradient(135deg, #000428, #004e92);
-      color: white;
-      padding: 10px;
-      transition: background 0.4s, color 0.4s;
-    }
-    .dark-mode {
-      background: linear-gradient(135deg, #1c1c1c, #383838);
+      padding: 0;
+      background: linear-gradient(to right, #002f6c, #6e00a3);
       color: #fff;
     }
-    h2 {
-      text-align: center;
+    .container {
+      padding: 20px;
+    }
+    input, textarea, button {
+      width: 100%;
       margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      font-size: 1em;
     }
     .tabs {
       display: flex;
-      justify-content: space-around;
-      margin-bottom: 15px;
+      gap: 10px;
+      margin-bottom: 20px;
     }
-    .tab {
+    .tabs button {
       flex: 1;
-      text-align: center;
-      padding: 10px;
-      background: rgba(255,255,255,0.1);
+      background: #ffffff20;
+      color: white;
       cursor: pointer;
-      border-radius: 8px;
-      margin: 0 2px;
-      transition: background 0.3s;
-      user-select: none;
     }
-    .tab:hover {
-      background: rgba(255,255,255,0.2);
-    }
-    .active {
-      background: rgba(255,255,255,0.3);
-      font-weight: 700;
-    }
-    .content {
+    .tab-content {
       display: none;
     }
-    .show {
+    .tab-content.active {
       display: block;
-      animation: fadeIn 0.3s ease-in-out;
-    }
-    @keyframes fadeIn {
-      from {opacity: 0;}
-      to {opacity: 1;}
-    }
-    input, textarea {
-      width: 100%;
-      padding: 10px;
-      margin: 6px 0;
-      border: none;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.1);
-      color: white;
-      font-size: 1em;
-      resize: vertical;
-    }
-    input:focus, textarea:focus {
-      outline: 2px solid #00ffff;
-      background: rgba(255,255,255,0.15);
-    }
-    button {
-      padding: 10px 15px;
-      margin: 5px 3px 5px 0;
-      border: none;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.15);
-      color: white;
-      cursor: pointer;
-      transition: background 0.3s;
-      font-size: 1em;
-      user-select: none;
-    }
-    button:hover {
-      background: rgba(255,255,255,0.3);
     }
     .card {
-      background: rgba(255,255,255,0.08);
+      background: #ffffff10;
       padding: 10px;
-      border-radius: 12px;
+      border-radius: 10px;
       margin-bottom: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      transition: transform 0.2s;
-      word-break: break-word;
-    }
-    .card:hover {
-      transform: scale(1.02);
-    }
-    .card small {
-      color: #ccc;
     }
     .actions {
-      margin-top: 8px;
       display: flex;
-      gap: 8px;
       flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
     }
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .toggle-dark {
-      background: transparent;
-      font-size: 20px;
-      padding: 6px;
+    .actions button {
+      flex: 1;
+      background: #ffffff20;
       color: white;
       border: none;
+      padding: 8px;
+      border-radius: 6px;
       cursor: pointer;
-      transition: color 0.3s;
-      user-select: none;
     }
-    .toggle-dark:hover {
-      color: #00ffff;
-    }
-    a button {
-      margin: 0;
+    .actions button:hover {
+      background: #ffffff40;
     }
   </style>
 </head>
 <body>
-  <div class="top-bar">
-    <h2>Gestão de Devedores</h2>
-    <button onclick="toggleDark()" class="toggle-dark" title="Modo Claro/Escuro">
-      <i class="fas fa-moon"></i>
-    </button>
+  <div class="container">
+    <div class="tabs">
+      <button onclick="showTab('cadastro')">Cadastro</button>
+      <button onclick="showTab('historico')">Histórico</button>
+      <button onclick="showTab('somas')">Somas</button>
+    </div>
+
+    <div id="cadastro" class="tab-content active">
+      <input type="text" id="nome" placeholder="Nome completo" />
+      <input type="text" id="telefone" placeholder="Telefone (opcional)" />
+      <input type="number" id="valor" placeholder="Valor (R$)" />
+      <textarea id="obs" placeholder="Observações (opcional)"></textarea>
+      <button onclick="salvarCliente()">Salvar</button>
+    </div>
+
+    <div id="historico" class="tab-content">
+      <input type="text" id="buscaHistorico" oninput="filtrarHistorico()" placeholder="Buscar por nome..." />
+      <div id="listaHistorico"></div>
+    </div>
+
+    <div id="somas" class="tab-content">
+      <input type="text" id="buscaSomas" oninput="filtrarSomas()" placeholder="Buscar por nome..." />
+      <div id="listaSomas"></div>
+    </div>
   </div>
-
-  <div class="tabs" role="tablist">
-    <div class="tab active" role="tab" tabindex="0" aria-selected="true" aria-controls="cadastro" onclick="mostrarAba('cadastro')" onkeypress="if(event.key==='Enter'){mostrarAba('cadastro')}">Cadastro</div>
-    <div class="tab" role="tab" tabindex="0" aria-selected="false" aria-controls="historico" onclick="mostrarAba('historico')" onkeypress="if(event.key==='Enter'){mostrarAba('historico')}">Histórico</div>
-    <div class="tab" role="tab" tabindex="0" aria-selected="false" aria-controls="somas" onclick="mostrarAba('somas')" onkeypress="if(event.key==='Enter'){mostrarAba('somas')}">Somas</div>
-  </div>
-
-  <section id="cadastro" class="content show" role="tabpanel" tabindex="0">
-    <input id="nome" aria-label="Nome do Cliente" placeholder="Nome do Cliente" autocomplete="off" />
-    <input id="telefone" aria-label="Telefone (opcional)" placeholder="Telefone (opcional)" autocomplete="off" />
-    <input id="valor" type="number" aria-label="Valor em reais" placeholder="Valor (R$)" min="0" step="0.01" />
-    <textarea id="obs" aria-label="Observações (opcional)" placeholder="Observações (opcional)" rows="3"></textarea>
-    <button onclick="salvar()" aria-label="Salvar cliente"><i class="fas fa-save"></i> Salvar</button>
-  </section>
-
-  <section id="historico" class="content" role="tabpanel" tabindex="0" aria-hidden="true">
-    <input id="buscaHistorico" placeholder="Buscar por nome" aria-label="Buscar por nome no histórico" oninput="carregarHistorico()" autocomplete="off" />
-    <div id="listaHistorico" aria-live="polite" aria-relevant="additions"></div>
-  </section>
-
-  <section id="somas" class="content" role="tabpanel" tabindex="0" aria-hidden="true">
-    <input id="buscaSoma" placeholder="Buscar por nome" aria-label="Buscar por nome nas somas" oninput="carregarSomas()" autocomplete="off" />
-    <div id="listaSomas" aria-live="polite" aria-relevant="additions"></div>
-  </section>
 
   <script>
-    function mostrarAba(id) {
-      document.querySelectorAll('.content').forEach(c => {
-        c.classList.remove('show');
-        c.setAttribute('aria-hidden', 'true');
-      });
-      document.querySelectorAll('.tab').forEach(t => {
-        t.classList.remove('active');
-        t.setAttribute('aria-selected', 'false');
-      });
-      document.getElementById(id).classList.add('show');
-      document.getElementById(id).removeAttribute('aria-hidden');
-      const tabBtn = [...document.querySelectorAll('.tab')].find(t => t.getAttribute('aria-controls') === id) || document.querySelector(`.tab[onclick*="${id}"]`);
-      if(tabBtn){
-        tabBtn.classList.add('active');
-        tabBtn.setAttribute('aria-selected', 'true');
-      }
-      if (id === "historico") carregarHistorico();
-      if (id === "somas") carregarSomas();
+    let clienteEditando = null;
+
+    function showTab(id) {
+      document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+      if (id === 'historico') renderHistorico();
+      if (id === 'somas') renderSomas();
     }
 
-    function salvar() {
-      const nome = document.getElementById("nome").value.trim();
-      const telefone = document.getElementById("telefone").value.trim();
-      const valorStr = document.getElementById("valor").value.trim();
-      const obs = document.getElementById("obs").value.trim();
-      if (!nome) return alert("Preencha o nome!");
-      if (!valorStr || isNaN(valorStr) || Number(valorStr) < 0) return alert("Informe um valor válido!");
-
-      const valor = parseFloat(valorStr);
-      const cliente = { nome, telefone, valor, obs, data: new Date().toLocaleString() };
-      const clientes = JSON.parse(localStorage.getItem("clientes")) || [];
-      clientes.push(cliente);
-      localStorage.setItem("clientes", JSON.stringify(clientes));
-      document.getElementById("nome").value = "";
-      document.getElementById("telefone").value = "";
-      document.getElementById("valor").value = "";
-      document.getElementById("obs").value = "";
-      alert("Salvo com sucesso!");
-      mostrarAba('historico');
-      carregarHistorico();
-      carregarSomas();
-    }
-
-    function carregarHistorico() {
-      const lista = document.getElementById("listaHistorico");
-      const busca = document.getElementById("buscaHistorico").value.toLowerCase();
-      const clientes = JSON.parse(localStorage.getItem("clientes")) || [];
-      lista.innerHTML = "";
-      clientes.forEach((c, i) => {
-        if (!c.nome.toLowerCase().includes(busca)) return;
-        const div = document.createElement("div");
-        div.className = "card";
-        div.innerHTML = `<b>${c.nome}</b> - R$ ${c.valor.toFixed(2)}<br>
-          <small>${c.data}</small><br>
-          ${c.obs ? `<i>${c.obs}</i><br>` : ""}
-          <div class="actions">
-            <button onclick="editar(${i})" aria-label="Editar ${c.nome}"><i class="fas fa-edit"></i> Editar</button>
-            <button onclick="excluir(${i})" aria-label="Excluir ${c.nome}"><i class="fas fa-trash"></i> Excluir</button>
-          </div>`;
-        lista.appendChild(div);
-      });
-    }
-
-    function editar(index) {
-      const clientes = JSON.parse(localStorage.getItem("clientes")) || [];
-      if (!clientes[index]) return;
-      const c = clientes[index];
-      document.getElementById("nome").value = c.nome;
-      document.getElementById("telefone").value = c.telefone;
-      document.getElementById("valor").value = c.valor;
-      document.getElementById("obs").value = c.obs;
-      clientes.splice(index, 1);
-      localStorage.setItem("clientes", JSON.stringify(clientes));
-      mostrarAba('cadastro');
-    }
-
-    function excluir(index) {
-      const clientes = JSON.parse(localStorage.getItem("clientes")) || [];
-      if (index < 0 || index >= clientes.length) return;
-      if (confirm("Tem certeza que deseja excluir este registro?")) {
-        clientes.splice(index, 1);
-        localStorage.setItem("clientes", JSON.stringify(clientes));
-        carregarHistorico();
-        carregarSomas();
-      }
-    }
-
-    function carregarSomas() {
-      const lista = document.getElementById("listaSomas");
-      const busca = document.getElementById("buscaSoma").value.toLowerCase();
-      const clientes = JSON.parse(localStorage.getItem("clientes")) || [];
-      const mapa = {};
-      const telefones = {};
-      clientes.forEach(c => {
-        if (!mapa[c.nome]) {
-          mapa[c.nome] = 0;
-          telefones[c.nome] = c.telefone || "";
-        }
-        mapa[c.nome] += c.valor;
-      });
-      lista.innerHTML = "";
-      Object.keys(mapa).forEach(nome => {
-        if (!nome.toLowerCase().includes(busca)) return;
-        const total = mapa[nome];
-        const tel = telefones[nome];
-        const telClean = tel.replace(/\D/g, '');
-        let link = "#";
-        if (telClean.length >= 10) {
-          const msg = `Olá ${nome}, você está devendo R$ ${total.toFixed(2)}. Por favor, pague via PIX: 054.167.380-73`;
-          link = `https://wa.me/${telClean}?text=${encodeURIComponent(msg)}`;
-        }
-        const div = document.createElement("div");
-        div.className = "card";
-        div.innerHTML = `<b>${nome}</b><br>Total: R$ ${total.toFixed(2)}<br>
-          ${telClean.length >= 10 ? `<a href="${link}" target="_blank" rel="noopener"><button aria-label="Enviar mensagem WhatsApp para ${nome}"><i class="fab fa-whatsapp"></i> WhatsApp</button></a>` : `<small>Telefone inválido para WhatsApp</small>`}`;
-        lista.appendChild(div);
-      });
-    }
-
-    function toggleDark() {
-      document.body.classList.toggle("dark-mode");
-      const btn = document.querySelector(".toggle-dark i");
-      if(document.body.classList.contains("dark-mode")){
-        btn.classList.remove("fa-moon");
-        btn.classList.add("fa-sun");
+    function salvarCliente() {
+      const nome = document.getElementById('nome').value.trim();
+      const telefone = document.getElementById('telefone').value;
+      const valor = document.getElementById('valor').value;
+      const obs = document.getElementById('obs').value;
+      if (!nome) return alert("Nome é obrigatório.");
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      if (clienteEditando !== null) {
+        dados[clienteEditando] = { nome, telefone, valor, obs, data: new Date().toLocaleString() };
+        clienteEditando = null;
       } else {
-        btn.classList.remove("fa-sun");
-        btn.classList.add("fa-moon");
+        dados.push({ nome, telefone, valor, obs, data: new Date().toLocaleString() });
+      }
+      localStorage.setItem("clientes", JSON.stringify(dados));
+      document.getElementById('nome').value = '';
+      document.getElementById('telefone').value = '';
+      document.getElementById('valor').value = '';
+      document.getElementById('obs').value = '';
+      renderHistorico();
+      renderSomas();
+      alert("Salvo com sucesso.");
+    }
+
+    function renderHistorico(filtro = "") {
+      const container = document.getElementById("listaHistorico");
+      container.innerHTML = "";
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      dados
+        .filter(c => c.nome.toLowerCase().includes(filtro.toLowerCase()))
+        .reverse()
+        .forEach((c, i) => {
+          const div = document.createElement("div");
+          div.className = "card";
+          div.innerHTML = `
+            <strong>${c.nome}</strong><br>
+            Valor: R$ ${c.valor || "0,00"}<br>
+            Telefone: ${c.telefone || "Não informado"}<br>
+            Obs: ${c.obs || "-"}<br>
+            Data: ${c.data}<br>
+            <div class="actions">
+              <button onclick="editarCliente(${i})">Editar</button>
+              <button onclick="excluirCliente(${i})">Excluir</button>
+              <button onclick="exportarPDF(${i})">PDF</button>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+    }
+
+    function renderSomas(filtro = "") {
+      const container = document.getElementById("listaSomas");
+      container.innerHTML = "";
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      const resumo = {};
+      const telefones = {};
+      dados.forEach(c => {
+        if (!resumo[c.nome]) {
+          resumo[c.nome] = 0;
+          telefones[c.nome] = c.telefone;
+        }
+        resumo[c.nome] += parseFloat(c.valor || 0);
+      });
+      Object.entries(resumo)
+        .filter(([nome]) => nome.toLowerCase().includes(filtro.toLowerCase()))
+        .forEach(([nome, total]) => {
+          const div = document.createElement("div");
+          div.className = "card";
+          const telefone = telefones[nome] || "";
+          div.innerHTML = `
+            <strong>${nome}</strong><br>Total: R$ ${total.toFixed(2)}
+            <div class="actions">
+              <a href="${gerarLinkWhatsApp(nome, telefone, total)}" target="_blank">
+                <button>WhatsApp</button>
+              </a>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+    }
+
+    function editarCliente(i) {
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      const c = dados[i];
+      document.getElementById('nome').value = c.nome;
+      document.getElementById('telefone').value = c.telefone;
+      document.getElementById('valor').value = c.valor;
+      document.getElementById('obs').value = c.obs;
+      clienteEditando = i;
+      showTab('cadastro');
+    }
+
+    function excluirCliente(i) {
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      if (confirm("Tem certeza que deseja excluir este registro?")) {
+        dados.splice(i, 1);
+        localStorage.setItem("clientes", JSON.stringify(dados));
+        renderHistorico();
+        renderSomas();
       }
     }
 
-    // Inicializa abas e conteúdo
-    document.addEventListener("DOMContentLoaded", () => {
-      mostrarAba("cadastro");
-      carregarHistorico();
-      carregarSomas();
-    });
+    function exportarPDF(i) {
+      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
+      const c = dados[i];
+      const conteudo = `Nome: ${c.nome}\nTelefone: ${c.telefone}\nValor: R$ ${c.valor}\nObs: ${c.obs}\nData: ${c.data}`;
+      const blob = new Blob([conteudo], { type: "application/pdf" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `cliente_${c.nome.replace(/\s+/g, "_")}.pdf`;
+      a.click();
+    }
+
+    function gerarLinkWhatsApp(nome, telefone, valor) {
+      const pix = "054.167.380-73";
+      const msg = `Olá ${nome}, você possui um valor pendente de R$ ${valor.toFixed(2)}.\nChave PIX para pagamento:\n${pix}`;
+      return "https://wa.me/" + telefone.replace(/\D/g, "") + "?text=" + encodeURIComponent(msg);
+    }
+
+    function filtrarHistorico() {
+      const termo = document.getElementById("buscaHistorico").value;
+      renderHistorico(termo);
+    }
+
+    function filtrarSomas() {
+      const termo = document.getElementById("buscaSomas").value;
+      renderSomas(termo);
+    }
   </script>
 </body>
 </html>
