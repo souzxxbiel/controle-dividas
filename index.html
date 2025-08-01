@@ -1,28 +1,346 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-br" >
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sistema de Gestão de Devedores</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+  <title>Gestão de Clientes - Mobile</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #3b5998, #8e44ad);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 1rem;
+      text-align: center;
+      background: rgba(0,0,0,0.2);
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-around;
+      background: rgba(0,0,0,0.15);
+    }
+
+    nav button {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.75rem 0;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    nav button.active, nav button:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    main {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 1rem;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    input, textarea {
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    input[type="text"], input[type="tel"], input[type="number"] {
+      -webkit-appearance: none;
+      -moz-appearance: textfield;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    button.submit {
+      background: #6c5ce7;
+      border: none;
+      padding: 0.75rem;
+      font-weight: 700;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button.submit:hover {
+      background: #4834d4;
+    }
+
+    label {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      display: block;
+    }
+
+    .list {
+      margin-top: 1rem;
+    }
+
+    .item {
+      background: rgba(255,255,255,0.1);
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+    }
+
+    .item h3 {
+      margin: 0 0 0.25rem 0;
+      font-weight: 700;
+    }
+
+    .item p {
+      margin: 0.2rem 0;
+      font-size: 0.9rem;
+      word-break: break-word;
+    }
+
+    input.search {
+      width: 100%;
+      padding: 0.5rem;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      color: #222;
+    }
+
+    /* Scrollbar mobile */
+    main::-webkit-scrollbar {
+      height: 6px;
+    }
+    main::-webkit-scrollbar-thumb {
+      background-color: rgba(255,255,255,0.3);
+      border-radius: 3px;
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Sistema de Gestão de Devedores</h1>
-  </header>
+  <header>Gestão de Clientes</header>
+  <nav>
+    <button id="btnCadastro" class="active" aria-label="Aba Cadastro">Cadastro</button>
+    <button id="btnHistorico" aria-label="Aba Histórico">Histórico</button>
+    <button id="btnSoma" aria-label="Aba Soma">Soma por Cliente</button>
+  </nav>
+
   <main>
-    <section class="cadastro">
-      <h2>Cadastro de Devedor</h2>
-      <form id="devedorForm">
-        <input type="text" name="nome" placeholder="Nome completo" required>
-        <input type="tel" name="telefone" placeholder="Telefone (+55 99 99999-9999)" required>
-        <input type="text" name="valor" placeholder="Valor devido (R$)" required>
-        <textarea name="observacoes" placeholder="Observações..."></textarea>
-        <button type="submit">Cadastrar</button>
+    <!-- Cadastro -->
+    <section id="cadastroSection">
+      <form id="cadastroForm" autocomplete="off">
+        <label for="nomeInput">Nome completo (obrigatório)</label>
+        <input list="nomesDatalist" type="text" id="nomeInput" name="nome" placeholder="Digite o nome" required />
+        <datalist id="nomesDatalist"></datalist>
+
+        <label for="telefoneInput">Telefone (opcional)</label>
+        <input type="tel" id="telefoneInput" name="telefone" placeholder="+55 99 99999-9999" pattern="\\+?\\d{0,15}" inputmode="tel" />
+
+        <label for="valorInput">Valor devido (R$) (opcional)</label>
+        <input type="number" step="0.01" min="0" id="valorInput" name="valor" placeholder="0,00" inputmode="decimal" />
+
+        <label for="obsInput">Observação (opcional)</label>
+        <textarea id="obsInput" name="observacao" placeholder="Anotações"></textarea>
+
+        <button type="submit" class="submit">Salvar</button>
       </form>
     </section>
+
+    <!-- Histórico -->
+    <section id="historicoSection" class="hidden">
+      <input type="text" id="searchHistorico" class="search" placeholder="Pesquisar histórico..." aria-label="Pesquisar histórico" />
+      <div id="listaHistorico" class="list"></div>
+    </section>
+
+    <!-- Soma -->
+    <section id="somaSection" class="hidden">
+      <input type="text" id="searchSoma" class="search" placeholder="Pesquisar cliente..." aria-label="Pesquisar cliente para soma" />
+      <div id="listaSoma" class="list"></div>
+    </section>
   </main>
-  <script src="script.js"></script>
+
+  <script>
+    const btnCadastro = document.getElementById('btnCadastro');
+    const btnHistorico = document.getElementById('btnHistorico');
+    const btnSoma = document.getElementById('btnSoma');
+
+    const cadastroSection = document.getElementById('cadastroSection');
+    const historicoSection = document.getElementById('historicoSection');
+    const somaSection = document.getElementById('somaSection');
+
+    const cadastroForm = document.getElementById('cadastroForm');
+    const nomesDatalist = document.getElementById('nomesDatalist');
+
+    const searchHistorico = document.getElementById('searchHistorico');
+    const listaHistorico = document.getElementById('listaHistorico');
+
+    const searchSoma = document.getElementById('searchSoma');
+    const listaSoma = document.getElementById('listaSoma');
+
+    let registros = JSON.parse(localStorage.getItem('registros')) || [];
+
+    function atualizaDatalist() {
+      const nomesUnicos = [...new Set(registros.map(r => r.nome))].sort();
+      nomesDatalist.innerHTML = '';
+      nomesUnicos.forEach(nome => {
+        const option = document.createElement('option');
+        option.value = nome;
+        nomesDatalist.appendChild(option);
+      });
+    }
+
+    function salvarRegistro(event) {
+      event.preventDefault();
+      const nome = cadastroForm.nome.value.trim();
+      if (!nome) {
+        alert('O nome é obrigatório.');
+        return;
+      }
+      const telefone = cadastroForm.telefone.value.trim();
+      const valor = cadastroForm.valor.value ? parseFloat(cadastroForm.valor.value) : 0;
+      const observacao = cadastroForm.observacao.value.trim();
+      const data = new Date().toISOString();
+
+      registros.push({ id: Date.now(), nome, telefone, valor, observacao, data });
+      localStorage.setItem('registros', JSON.stringify(registros));
+
+      cadastroForm.reset();
+      atualizaDatalist();
+      alert('Registro salvo com sucesso!');
+      mostrarHistorico();
+      mostrarSoma();
+    }
+
+    cadastroForm.addEventListener('submit', salvarRegistro);
+
+    function mostrarHistorico(filtro = '') {
+      listaHistorico.innerHTML = '';
+      const filtroLower = filtro.toLowerCase();
+      const filtrados = registros.filter(r => 
+        r.nome.toLowerCase().includes(filtroLower) || 
+        (r.telefone && r.telefone.includes(filtroLower)) ||
+        (r.observacao && r.observacao.toLowerCase().includes(filtroLower))
+      ).sort((a,b) => new Date(b.data) - new Date(a.data));
+
+      if (filtrados.length === 0) {
+        listaHistorico.innerHTML = '<p>Nenhum registro encontrado.</p>';
+        return;
+      }
+
+      filtrados.forEach(r => {
+        const item = document.createElement('div');
+        item.className = 'item';
+        item.innerHTML = `
+          <h3>${r.nome}</h3>
+          <p><strong>Telefone:</strong> ${r.telefone || '-'}</p>
+          <p><strong>Valor:</strong> R$ ${r.valor.toFixed(2)}</p>
+          <p><strong>Observação:</strong> ${r.observacao || '-'}</p>
+          <small>Data: ${new Date(r.data).toLocaleString()}</small>
+        `;
+        listaHistorico.appendChild(item);
+      });
+    }
+
+    function mostrarSoma(filtro = '') {
+      listaSoma.innerHTML = '';
+      const filtroLower = filtro.toLowerCase();
+
+      const somaPorCliente = registros.reduce((acc, cur) => {
+        const key = cur.nome.toLowerCase();
+        if (!acc[key]) {
+          acc[key] = { nome: cur.nome, total: 0 };
+        }
+        acc[key].total += cur.valor;
+        return acc;
+      }, {});
+
+      const listaFiltrada = Object.values(somaPorCliente)
+        .filter(cliente => cliente.nome.toLowerCase().includes(filtroLower))
+        .sort((a,b) => b.total - a.total);
+
+      if (listaFiltrada.length === 0) {
+        listaSoma.innerHTML = '<p>Nenhum cliente encontrado.</p>';
+        return;
+      }
+
+      listaFiltrada.forEach(cliente => {
+        const item = document.createElement('div');
+        item.className = 'item';
+        item.innerHTML = `
+          <h3>${cliente.nome}</h3>
+          <p><strong>Total devido:</strong> R$ ${cliente.total.toFixed(2)}</p>
+        `;
+        listaSoma.appendChild(item);
+      });
+    }
+
+    searchHistorico.addEventListener('input', () => mostrarHistorico(searchHistorico.value));
+    searchSoma.addEventListener('input', () => mostrarSoma(searchSoma.value));
+
+    // Botões de navegação
+    function mostrarAba(aba) {
+      btnCadastro.classList.remove('active');
+      btnHistorico.classList.remove('active');
+      btnSoma.classList.remove('active');
+      cadastroSection.classList.add('hidden');
+      historicoSection.classList.add('hidden');
+      somaSection.classList.add('hidden');
+
+      if (aba === 'cadastro') {
+        btnCadastro.classList.add('active');
+        cadastroSection.classList.remove('hidden');
+      } else if (aba === 'historico') {
+        btnHistorico.classList.add('active');
+        historicoSection.classList.remove('hidden');
+        mostrarHistorico();
+      } else if (aba === 'soma') {
+        btnSoma.classList.add('active');
+        somaSection.classList.remove('hidden');
+        mostrarSoma();
+      }
+    }
+
+    btnCadastro.addEventListener('click', () => mostrarAba('cadastro'));
+    btnHistorico.addEventListener('click', () => mostrarAba('historico'));
+    btnSoma.addEventListener('click', () => mostrarAba('soma'));
+
+    // Inicializa
+    atualizaDatalist();
+    mostrarAba('cadastro');
+  </script>
 </body>
 </html>
