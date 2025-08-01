@@ -52,6 +52,9 @@
       margin-top: 5px;
       flex-wrap: wrap;
     }
+    #restore-container {
+      margin-bottom: 15px;
+    }
     .notif {
       background: #0f0;
       color: #000;
@@ -83,10 +86,12 @@
     </div>
 
     <div id="historico" class="tab-content">
+      <div id="restore-container">
+        <button onclick="restaurarBackup()">Restaurar Backup</button>
+        <input type="file" id="backupFile" accept=".json" style="display:none" onchange="lerBackup(event)" />
+      </div>
       <input type="text" id="buscaHistorico" oninput="filtrarHistorico()" placeholder="Buscar por nome..." />
       <div id="listaHistorico"></div>
-      <button onclick="restaurarBackup()">Restaurar Backup</button>
-      <input type="file" id="backupFile" accept=".json" style="display:none" onchange="lerBackup(event)" />
     </div>
 
     <div id="somas" class="tab-content">
@@ -122,8 +127,7 @@
       document.getElementById('valor').value = '';
       document.getElementById('obs').value = '';
       notificar("Cliente salvo!");
-      salvarBackup();
-      baixarBackup();  // <-- chama o download automático do backup JSON
+      baixarBackup();
     }
 
     function baixarBackup() {
@@ -248,15 +252,6 @@
     function filtrarSomas() {
       const termo = document.getElementById("buscaSomas").value;
       renderSomas(termo);
-    }
-
-    function salvarBackup() {
-      // Abre link WhatsApp com backup (opcional, pode comentar se quiser)
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      const json = JSON.stringify(dados, null, 2);
-      const numero = "55996275431";
-      const url = `https://wa.me/${numero}?text=${encodeURIComponent("Backup de clientes:\n" + json)}`;
-      window.open(url, '_blank');
     }
 
     function notificar(msg) {
