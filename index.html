@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestor de Devedores</title>
   <style>
     body {
@@ -15,7 +15,7 @@
     .container {
       padding: 20px;
     }
-    input, textarea, select, button {
+    input, textarea, button {
       width: 100%;
       margin-bottom: 10px;
       padding: 10px;
@@ -30,7 +30,7 @@
     }
     .tabs button {
       flex: 1;
-      background: #007bff;
+      background: #0058a3;
       color: white;
       cursor: pointer;
     }
@@ -48,15 +48,21 @@
     }
     .actions {
       display: flex;
+      gap: 10px;
       flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 5px;
+      margin-top: 10px;
     }
-    .backup {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 20px;
+    .actions button, .actions input[type="file"] {
+      flex: 1;
+      background: #ffffff20;
+      color: white;
+      border: 1px solid #ffffff30;
+      border-radius: 8px;
+      padding: 8px;
+      cursor: pointer;
+    }
+    .actions button:hover {
+      background: #ffffff30;
     }
   </style>
 </head>
@@ -70,8 +76,8 @@
 
     <div id="cadastro" class="tab-content active">
       <input type="text" id="nome" placeholder="Nome completo" />
-      <input type="text" id="telefone" placeholder="Telefone (opcional)" />
-      <input type="number" id="valor" placeholder="Valor (R$)" />
+      <input type="text" id="telefone" placeholder="Telefone (opcional)" inputmode="numeric" />
+      <input type="number" id="valor" placeholder="Valor (R$)" inputmode="numeric" />
       <textarea id="obs" placeholder="Observações (opcional)"></textarea>
       <button onclick="salvarCliente()">Salvar</button>
     </div>
@@ -79,7 +85,6 @@
     <div id="historico" class="tab-content">
       <input type="text" id="buscaHistorico" oninput="filtrarHistorico()" placeholder="Buscar por nome..." />
       <div class="actions">
-        <button onclick="exportarHistoricoPDF()">📄 Exportar PDF</button>
         <button onclick="fazerBackup()">📁 Exportar Backup JSON</button>
         <input type="file" onchange="importarBackup(event)" accept=".json" />
       </div>
@@ -125,10 +130,9 @@
       const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
 
       dados
-        .map((c, i) => ({...c, id: i}))
+        .slice().reverse()
         .filter(c => c.nome.toLowerCase().includes(filtro.toLowerCase()))
-        .reverse()
-        .forEach(c => {
+        .forEach((c, i) => {
           const div = document.createElement("div");
           div.className = "card";
           div.innerHTML = `
@@ -137,33 +141,9 @@
             Telefone: ${c.telefone || "Não informado"}<br>
             Obs: ${c.obs || "-"}<br>
             Data: ${c.data}<br>
-            <div class="actions">
-              <button onclick="editarCliente(${c.id})">✏️ Editar</button>
-              <button onclick="excluirCliente(${c.id})">🗑️ Excluir</button>
-            </div>
           `;
           container.appendChild(div);
         });
-    }
-
-    function editarCliente(id) {
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      const c = dados[id];
-      document.getElementById('nome').value = c.nome;
-      document.getElementById('telefone').value = c.telefone;
-      document.getElementById('valor').value = c.valor;
-      document.getElementById('obs').value = c.obs;
-      dados.splice(id, 1);
-      localStorage.setItem("clientes", JSON.stringify(dados));
-      showTab('cadastro');
-    }
-
-    function excluirCliente(id) {
-      if (!confirm("Tem certeza que deseja excluir este cliente?")) return;
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      dados.splice(id, 1);
-      localStorage.setItem("clientes", JSON.stringify(dados));
-      renderHistorico();
     }
 
     function renderSomas(filtro = "") {
@@ -209,43 +189,28 @@
       renderSomas(termo);
     }
 
-    function exportarHistoricoPDF() {
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      let texto = "Histórico de Clientes\n\n";
-      dados.forEach(c => {
-        texto += `Nome: ${c.nome}\nTelefone: ${c.telefone}\nValor: R$ ${c.valor}\nObs: ${c.obs}\nData: ${c.data}\n\n`;
-      });
-
-      const blob = new Blob([texto], { type: "application/pdf" });
+    function fazerBackup() {
+      const dados = localStorage.getItem("clientes");
+      const blob = new Blob([dados], { type: "application/json" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = "historico.pdf";
-      a.click();
-    }
-
-    function fazerBackup() {
-      const dados = localStorage.getItem("clientes") || "[]";
-      const blob = new Blob([dados], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
       a.download = "backup_clientes.json";
       a.click();
-      URL.revokeObjectURL(url);
     }
 
     function importarBackup(event) {
       const file = event.target.files[0];
       if (!file) return;
-
       const reader = new FileReader();
       reader.onload = function(e) {
         try {
-          const json = JSON.parse(e.target.result);
-          localStorage.setItem("clientes", JSON.stringify(json));
-          alert("Backup importado com sucesso!");
-          location.reload();
-        } catch (err) {
+          const conteudo = JSON.parse(e.target.result);
+          if (!Array.isArray(conteudo)) return alert("Arquivo inválido.");
+          localStorage.setItem("clientes", JSON.stringify(conteudo));
+          alert("Backup importado com sucesso.");
+          renderHistorico();
+          renderSomas();
+        } catch {
           alert("Erro ao importar o backup.");
         }
       };
