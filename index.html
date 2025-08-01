@@ -1,196 +1,192 @@
+
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gestor de Devedores</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestor de Clientes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
       margin: 0;
-      padding: 0;
-      background: linear-gradient(to right, #002f6c, #6e00a3);
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #5f2c82, #49a09d);
       color: #fff;
     }
-    .container {
-      padding: 20px;
+    header {
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 600;
+      background: rgba(0, 0, 0, 0.2);
     }
-    input, textarea, select, button {
-      width: 100%;
-      margin-bottom: 10px;
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      font-size: 1em;
-    }
-    .tabs {
+    nav {
       display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
+      justify-content: space-around;
+      background-color: rgba(0, 0, 0, 0.2);
+      padding: 0.5rem;
     }
-    .tabs button {
-      flex: 1;
-      background: #007bff;
+    nav button {
+      background: transparent;
+      border: none;
       color: white;
+      font-weight: bold;
+      font-size: 1rem;
       cursor: pointer;
     }
-    .tab-content {
+    section {
       display: none;
+      padding: 1rem;
     }
-    .tab-content.active {
-      display: block;
+    section.active { display: block; }
+    input, textarea, button {
+      width: 100%;
+      padding: 0.75rem;
+      margin: 0.5rem 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
     }
-    .card {
-      background: #ffffff10;
-      padding: 10px;
-      border-radius: 10px;
-      margin-bottom: 10px;
+    input, textarea {
+      background-color: #ffffff20;
+      color: white;
     }
-    .actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 5px;
+    input::placeholder, textarea::placeholder {
+      color: #ffffffaa;
+    }
+    button {
+      background-color: #7a42f4;
+      color: white;
+      font-weight: bold;
+    }
+    .entry {
+      background: #ffffff20;
+      margin: 0.5rem 0;
+      padding: 0.5rem;
+      border-radius: 8px;
+    }
+    .search {
+      margin-bottom: 1rem;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="tabs">
-      <button onclick="showTab('cadastro')">Cadastro</button>
-      <button onclick="showTab('historico')">Histórico</button>
-      <button onclick="showTab('somas')">Somas</button>
-    </div>
 
-    <div id="cadastro" class="tab-content active">
-      <input type="text" id="nome" placeholder="Nome completo" />
-      <input type="text" id="telefone" placeholder="Telefone (opcional)" />
-      <input type="number" id="valor" placeholder="Valor (R$)" />
-      <textarea id="obs" placeholder="Observações (opcional)"></textarea>
-      <button onclick="salvarCliente()">Salvar</button>
-    </div>
+  <header>Gestor de Clientes</header>
+  <nav>
+    <button onclick="showTab('cadastro')">Cadastro</button>
+    <button onclick="showTab('historico')">Histórico</button>
+    <button onclick="showTab('totais')">Totais</button>
+  </nav>
 
-    <div id="historico" class="tab-content">
-      <input type="text" id="buscaHistorico" oninput="filtrarHistorico()" placeholder="Buscar por nome..." />
-      <div id="listaHistorico"></div>
-    </div>
+  <section id="cadastro" class="active">
+    <h2>Cadastro de Cliente</h2>
+    <input type="text" id="nome" placeholder="Nome do Cliente" required>
+    <input type="text" id="telefone" placeholder="Telefone (opcional)">
+    <input type="number" inputmode="numeric" id="valor" placeholder="Valor (R$)">
+    <textarea id="obs" placeholder="Observações (opcional)"></textarea>
+    <button onclick="salvarCadastro()">Salvar</button>
+  </section>
 
-    <div id="somas" class="tab-content">
-      <input type="text" id="buscaSomas" oninput="filtrarSomas()" placeholder="Buscar por nome..." />
-      <div id="listaSomas"></div>
-    </div>
-  </div>
+  <section id="historico">
+    <h2>Histórico</h2>
+    <input class="search" type="text" id="buscaHistorico" placeholder="Buscar por nome" oninput="listarHistorico()">
+    <div id="listaHistorico"></div>
+    <button onclick="exportarHistorico()">Exportar Histórico</button>
+  </section>
+
+  <section id="totais">
+    <h2>Totais por Cliente</h2>
+    <input class="search" type="text" id="buscaTotais" placeholder="Buscar por nome" oninput="listarTotais()">
+    <div id="listaTotais"></div>
+  </section>
 
   <script>
-    function showTab(id) {
-      document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
-      document.getElementById(id).classList.add("active");
-      if (id === 'historico') renderHistorico();
-      if (id === 'somas') renderSomas();
+    let cadastros = JSON.parse(localStorage.getItem("clientes")) || [];
+
+    function showTab(tabId) {
+      document.querySelectorAll("section").forEach(sec => sec.classList.remove("active"));
+      document.getElementById(tabId).classList.add("active");
+      if (tabId === "historico") listarHistorico();
+      if
+  
+      if (tabId === "totais") listarTotais();
     }
 
-    function salvarCliente() {
-      const nome = document.getElementById('nome').value.trim();
-      const telefone = document.getElementById('telefone').value;
-      const valor = document.getElementById('valor').value;
-      const obs = document.getElementById('obs').value;
+    function salvarCadastro() {
+      const nome = document.getElementById("nome").value.trim();
+      const telefone = document.getElementById("telefone").value.trim();
+      const valor = parseFloat(document.getElementById("valor").value.trim()) || 0;
+      const obs = document.getElementById("obs").value.trim();
+      const data = new Date().toLocaleString();
 
-      if (!nome) return alert("Nome é obrigatório.");
+      if (!nome) return alert("O nome é obrigatório.");
 
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      dados.push({ nome, telefone, valor, obs, data: new Date().toLocaleString() });
-      localStorage.setItem("clientes", JSON.stringify(dados));
+      cadastros.push({ nome, telefone, valor, obs, data });
+      localStorage.setItem("clientes", JSON.stringify(cadastros));
 
-      document.getElementById('nome').value = '';
-      document.getElementById('telefone').value = '';
-      document.getElementById('valor').value = '';
-      document.getElementById('obs').value = '';
-      alert("Salvo com sucesso.");
+      document.getElementById("nome").value = "";
+      document.getElementById("telefone").value = "";
+      document.getElementById("valor").value = "";
+      document.getElementById("obs").value = "";
+
+      alert("Cadastro salvo!");
     }
 
-    function renderHistorico(filtro = "") {
+    function listarHistorico() {
+      const termo = document.getElementById("buscaHistorico").value.toLowerCase();
       const container = document.getElementById("listaHistorico");
       container.innerHTML = "";
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
 
-      dados
-        .filter(c => c.nome.toLowerCase().includes(filtro.toLowerCase()))
+      cadastros
+        .filter(c => c.nome.toLowerCase().includes(termo))
         .reverse()
-        .forEach((c, i) => {
+        .forEach(c => {
           const div = document.createElement("div");
-          div.className = "card";
+          div.className = "entry";
+          const mensagemWhats = `Olá, ${c.nome}! Você deve R$ ${c.valor.toFixed(2)}. Aqui está o meu PIX: SEU_PIX_AQUI.`;
+          const whatsappLink = `https://wa.me/${c.telefone}?text=${encodeURIComponent(mensagemWhats)}`;
           div.innerHTML = `
             <strong>${c.nome}</strong><br>
-            Valor: R$ ${c.valor || "0,00"}<br>
-            Telefone: ${c.telefone || "Não informado"}<br>
-            Obs: ${c.obs || "-"}<br>
-            Data: ${c.data}<br>
-            <div class="actions">
-              <button onclick="exportarCliente(${i})">Exportar</button>
-            </div>
+            R$ ${c.valor.toFixed(2)}<br>
+            ${c.obs || ''}<br>
+            <small>${c.data}</small><br>
+            <a href="${whatsappLink}" target="_blank" style="color: #7a42f4;">Enviar Mensagem de Cobrança</a>
           `;
           container.appendChild(div);
         });
     }
 
-    function renderSomas(filtro = "") {
-      const container = document.getElementById("listaSomas");
-      container.innerHTML = "";
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      const resumo = {};
-      const telefones = {};
-
-      dados.forEach(c => {
-        if (!resumo[c.nome]) {
-          resumo[c.nome] = 0;
-          telefones[c.nome] = c.telefone;
-        }
-        resumo[c.nome] += parseFloat(c.valor || 0);
+    function listarTotais() {
+      const termo = document.getElementById("buscaTotais").value.toLowerCase();
+      const totais = {};
+      cadastros.forEach(c => {
+        if (!totais[c.nome]) totais[c.nome] = 0;
+        totais[c.nome] += c.valor;
       });
 
-      Object.entries(resumo)
-        .filter(([nome]) => nome.toLowerCase().includes(filtro.toLowerCase()))
-        .forEach(([nome, total]) => {
+      const container = document.getElementById("listaTotais");
+      container.innerHTML = "";
+
+      Object.keys(totais)
+        .filter(nome => nome.toLowerCase().includes(termo))
+        .forEach(nome => {
           const div = document.createElement("div");
-          div.className = "card";
-          const telefone = telefones[nome] || "";
-          div.innerHTML = `
-            <strong>${nome}</strong><br>Total: R$ ${total.toFixed(2)}
-            <div class="actions">
-              <a href="${gerarLinkWhatsApp(nome, telefone, total)}" target="_blank">
-                <button>WhatsApp</button>
-              </a>
-            </div>
-          `;
+          div.className = "entry";
+          div.innerHTML = `<strong>${nome}</strong><br>Total: R$ ${totais[nome].toFixed(2)}`;
           container.appendChild(div);
         });
     }
 
-    function filtrarHistorico() {
-      const termo = document.getElementById("buscaHistorico").value;
-      renderHistorico(termo);
-    }
-
-    function filtrarSomas() {
-      const termo = document.getElementById("buscaSomas").value;
-      renderSomas(termo);
-    }
-
-    function exportarCliente(i) {
-      const dados = JSON.parse(localStorage.getItem("clientes") || "[]");
-      const c = dados[i];
-      const blob = new Blob([`Nome: ${c.nome}\nTelefone: ${c.telefone}\nValor: R$ ${c.valor}\nObs: ${c.obs}\nData: ${c.data}`], { type: "text/plain" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `cliente_${c.nome.replace(/\s+/g, "_")}.txt`;
-      a.click();
-    }
-
-    function gerarLinkWhatsApp(nome, telefone, valor) {
-      const pix = "054.167.380-73";
-      const msg = `Olá ${nome}, você possui um valor pendente de R$ ${valor.toFixed(2)}.\nChave PIX para pagamento:\n${pix}`;
-      return "https://wa.me/" + telefone.replace(/\D/g, "") + "?text=" + encodeURIComponent(msg);
+    function exportarHistorico() {
+      const texto = cadastros.map(c => `${c.nome}, ${c.telefone}, R$ ${c.valor.toFixed(2)}, Observações: ${c.obs}, Data: ${c.data}`).join('\n');
+      const blob = new Blob([texto], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "historico_clientes.csv";
+      link.click();
     }
   </script>
 </body>
 </html>
-
+ 
