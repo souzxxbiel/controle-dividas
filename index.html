@@ -2,27 +2,34 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gestão de Devedores</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.2/css/all.min.css" rel="stylesheet" />
   <style>
     * {
       box-sizing: border-box;
     }
     body {
-      margin: 0;
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #002f6c, #7f00ff);
+      margin: 0;
+      background: linear-gradient(135deg, #000428, #004e92);
       color: white;
       padding: 10px;
+      transition: background 0.4s, color 0.4s;
+    }
+    .dark-mode {
+      background: linear-gradient(135deg, #1c1c1c, #383838);
+      color: #fff;
     }
     h2 {
       text-align: center;
+      margin-bottom: 10px;
     }
     .tabs {
       display: flex;
       justify-content: space-around;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
     .tab {
       flex: 1;
@@ -31,19 +38,27 @@
       background: rgba(255,255,255,0.1);
       cursor: pointer;
       border-radius: 8px;
-      margin: 2px;
+      margin: 0 2px;
+      transition: background 0.3s;
+      user-select: none;
     }
     .tab:hover {
       background: rgba(255,255,255,0.2);
     }
     .active {
       background: rgba(255,255,255,0.3);
+      font-weight: 700;
     }
     .content {
       display: none;
     }
     .show {
       display: block;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
     }
     input, textarea {
       width: 100%;
@@ -53,65 +68,121 @@
       border-radius: 8px;
       background: rgba(255,255,255,0.1);
       color: white;
+      font-size: 1em;
+      resize: vertical;
+    }
+    input:focus, textarea:focus {
+      outline: 2px solid #00ffff;
+      background: rgba(255,255,255,0.15);
     }
     button {
       padding: 10px 15px;
-      margin: 5px 0;
+      margin: 5px 3px 5px 0;
       border: none;
       border-radius: 8px;
-      background: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.15);
       color: white;
       cursor: pointer;
+      transition: background 0.3s;
+      font-size: 1em;
+      user-select: none;
     }
     button:hover {
       background: rgba(255,255,255,0.3);
     }
     .card {
-      background: rgba(0,0,0,0.2);
+      background: rgba(255,255,255,0.08);
       padding: 10px;
-      border-radius: 10px;
+      border-radius: 12px;
       margin-bottom: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      transition: transform 0.2s;
+      word-break: break-word;
+    }
+    .card:hover {
+      transform: scale(1.02);
     }
     .card small {
       color: #ccc;
     }
     .actions {
-      margin-top: 5px;
+      margin-top: 8px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .toggle-dark {
+      background: transparent;
+      font-size: 20px;
+      padding: 6px;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: color 0.3s;
+      user-select: none;
+    }
+    .toggle-dark:hover {
+      color: #00ffff;
+    }
+    a button {
+      margin: 0;
     }
   </style>
 </head>
 <body>
-  <h2>Gestão de Devedores</h2>
-  <div class="tabs">
-    <div class="tab active" onclick="mostrarAba('cadastro')">Cadastro</div>
-    <div class="tab" onclick="mostrarAba('historico')">Histórico</div>
-    <div class="tab" onclick="mostrarAba('somas')">Somas</div>
+  <div class="top-bar">
+    <h2>Gestão de Devedores</h2>
+    <button onclick="toggleDark()" class="toggle-dark" title="Modo Claro/Escuro">
+      <i class="fas fa-moon"></i>
+    </button>
   </div>
 
-  <div id="cadastro" class="content show">
-    <input id="nome" placeholder="Nome do Cliente" />
-    <input id="telefone" placeholder="Telefone (opcional)" />
-    <input id="valor" type="number" placeholder="Valor (R$)" />
-    <textarea id="obs" placeholder="Observações (opcional)"></textarea>
-    <button onclick="salvar()">Salvar</button>
+  <div class="tabs" role="tablist">
+    <div class="tab active" role="tab" tabindex="0" aria-selected="true" aria-controls="cadastro" onclick="mostrarAba('cadastro')" onkeypress="if(event.key==='Enter'){mostrarAba('cadastro')}">Cadastro</div>
+    <div class="tab" role="tab" tabindex="0" aria-selected="false" aria-controls="historico" onclick="mostrarAba('historico')" onkeypress="if(event.key==='Enter'){mostrarAba('historico')}">Histórico</div>
+    <div class="tab" role="tab" tabindex="0" aria-selected="false" aria-controls="somas" onclick="mostrarAba('somas')" onkeypress="if(event.key==='Enter'){mostrarAba('somas')}">Somas</div>
   </div>
 
-  <div id="historico" class="content">
-    <input id="buscaHistorico" placeholder="Buscar por nome" oninput="carregarHistorico()" />
-    <div id="listaHistorico"></div>
-  </div>
+  <section id="cadastro" class="content show" role="tabpanel" tabindex="0">
+    <input id="nome" aria-label="Nome do Cliente" placeholder="Nome do Cliente" autocomplete="off" />
+    <input id="telefone" aria-label="Telefone (opcional)" placeholder="Telefone (opcional)" autocomplete="off" />
+    <input id="valor" type="number" aria-label="Valor em reais" placeholder="Valor (R$)" min="0" step="0.01" />
+    <textarea id="obs" aria-label="Observações (opcional)" placeholder="Observações (opcional)" rows="3"></textarea>
+    <button onclick="salvar()" aria-label="Salvar cliente"><i class="fas fa-save"></i> Salvar</button>
+  </section>
 
-  <div id="somas" class="content">
-    <input id="buscaSoma" placeholder="Buscar por nome" oninput="carregarSomas()" />
-    <div id="listaSomas"></div>
-  </div>
+  <section id="historico" class="content" role="tabpanel" tabindex="0" aria-hidden="true">
+    <input id="buscaHistorico" placeholder="Buscar por nome" aria-label="Buscar por nome no histórico" oninput="carregarHistorico()" autocomplete="off" />
+    <div id="listaHistorico" aria-live="polite" aria-relevant="additions"></div>
+  </section>
+
+  <section id="somas" class="content" role="tabpanel" tabindex="0" aria-hidden="true">
+    <input id="buscaSoma" placeholder="Buscar por nome" aria-label="Buscar por nome nas somas" oninput="carregarSomas()" autocomplete="off" />
+    <div id="listaSomas" aria-live="polite" aria-relevant="additions"></div>
+  </section>
 
   <script>
     function mostrarAba(id) {
-      document.querySelectorAll('.content').forEach(c => c.classList.remove('show'));
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.content').forEach(c => {
+        c.classList.remove('show');
+        c.setAttribute('aria-hidden', 'true');
+      });
+      document.querySelectorAll('.tab').forEach(t => {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+      });
       document.getElementById(id).classList.add('show');
-      document.querySelector(`[onclick="mostrarAba('${id}')"]`).classList.add('active');
+      document.getElementById(id).removeAttribute('aria-hidden');
+      const tabBtn = [...document.querySelectorAll('.tab')].find(t => t.getAttribute('aria-controls') === id) || document.querySelector(`.tab[onclick*="${id}"]`);
+      if(tabBtn){
+        tabBtn.classList.add('active');
+        tabBtn.setAttribute('aria-selected', 'true');
+      }
       if (id === "historico") carregarHistorico();
       if (id === "somas") carregarSomas();
     }
@@ -119,11 +190,13 @@
     function salvar() {
       const nome = document.getElementById("nome").value.trim();
       const telefone = document.getElementById("telefone").value.trim();
-      const valor = document.getElementById("valor").value.trim();
+      const valorStr = document.getElementById("valor").value.trim();
       const obs = document.getElementById("obs").value.trim();
-      if (!nome || !valor) return alert("Preencha nome e valor!");
+      if (!nome) return alert("Preencha o nome!");
+      if (!valorStr || isNaN(valorStr) || Number(valorStr) < 0) return alert("Informe um valor válido!");
 
-      const cliente = { nome, telefone, valor: parseFloat(valor), obs, data: new Date().toLocaleString() };
+      const valor = parseFloat(valorStr);
+      const cliente = { nome, telefone, valor, obs, data: new Date().toLocaleString() };
       const clientes = JSON.parse(localStorage.getItem("clientes")) || [];
       clientes.push(cliente);
       localStorage.setItem("clientes", JSON.stringify(clientes));
@@ -132,6 +205,9 @@
       document.getElementById("valor").value = "";
       document.getElementById("obs").value = "";
       alert("Salvo com sucesso!");
+      mostrarAba('historico');
+      carregarHistorico();
+      carregarSomas();
     }
 
     function carregarHistorico() {
@@ -147,8 +223,8 @@
           <small>${c.data}</small><br>
           ${c.obs ? `<i>${c.obs}</i><br>` : ""}
           <div class="actions">
-            <button onclick="editar(${i})">Editar</button>
-            <button onclick="excluir(${i})">Excluir</button>
+            <button onclick="editar(${i})" aria-label="Editar ${c.nome}"><i class="fas fa-edit"></i> Editar</button>
+            <button onclick="excluir(${i})" aria-label="Excluir ${c.nome}"><i class="fas fa-trash"></i> Excluir</button>
           </div>`;
         lista.appendChild(div);
       });
@@ -156,6 +232,7 @@
 
     function editar(index) {
       const clientes = JSON.parse(localStorage.getItem("clientes")) || [];
+      if (!clientes[index]) return;
       const c = clientes[index];
       document.getElementById("nome").value = c.nome;
       document.getElementById("telefone").value = c.telefone;
@@ -168,10 +245,12 @@
 
     function excluir(index) {
       const clientes = JSON.parse(localStorage.getItem("clientes")) || [];
-      if (confirm("Tem certeza?")) {
+      if (index < 0 || index >= clientes.length) return;
+      if (confirm("Tem certeza que deseja excluir este registro?")) {
         clientes.splice(index, 1);
         localStorage.setItem("clientes", JSON.stringify(clientes));
         carregarHistorico();
+        carregarSomas();
       }
     }
 
@@ -180,23 +259,51 @@
       const busca = document.getElementById("buscaSoma").value.toLowerCase();
       const clientes = JSON.parse(localStorage.getItem("clientes")) || [];
       const mapa = {};
+      const telefones = {};
       clientes.forEach(c => {
-        if (!mapa[c.nome]) mapa[c.nome] = 0;
+        if (!mapa[c.nome]) {
+          mapa[c.nome] = 0;
+          telefones[c.nome] = c.telefone || "";
+        }
         mapa[c.nome] += c.valor;
       });
       lista.innerHTML = "";
       Object.keys(mapa).forEach(nome => {
         if (!nome.toLowerCase().includes(busca)) return;
         const total = mapa[nome];
-        const tel = clientes.find(c => c.nome === nome).telefone || "";
-        const link = `https://wa.me/${tel.replace(/\D/g, "")}?text=Olá ${nome}, você está devendo R$ ${total.toFixed(2)}. Por favor, pague via PIX: 054.167.380-73`;
+        const tel = telefones[nome];
+        const telClean = tel.replace(/\D/g, '');
+        let link = "#";
+        if (telClean.length >= 10) {
+          const msg = `Olá ${nome}, você está devendo R$ ${total.toFixed(2)}. Por favor, pague via PIX: 054.167.380-73`;
+          link = `https://wa.me/${telClean}?text=${encodeURIComponent(msg)}`;
+        }
         const div = document.createElement("div");
         div.className = "card";
         div.innerHTML = `<b>${nome}</b><br>Total: R$ ${total.toFixed(2)}<br>
-          <a href="${link}" target="_blank"><button>WhatsApp</button></a>`;
+          ${telClean.length >= 10 ? `<a href="${link}" target="_blank" rel="noopener"><button aria-label="Enviar mensagem WhatsApp para ${nome}"><i class="fab fa-whatsapp"></i> WhatsApp</button></a>` : `<small>Telefone inválido para WhatsApp</small>`}`;
         lista.appendChild(div);
       });
     }
+
+    function toggleDark() {
+      document.body.classList.toggle("dark-mode");
+      const btn = document.querySelector(".toggle-dark i");
+      if(document.body.classList.contains("dark-mode")){
+        btn.classList.remove("fa-moon");
+        btn.classList.add("fa-sun");
+      } else {
+        btn.classList.remove("fa-sun");
+        btn.classList.add("fa-moon");
+      }
+    }
+
+    // Inicializa abas e conteúdo
+    document.addEventListener("DOMContentLoaded", () => {
+      mostrarAba("cadastro");
+      carregarHistorico();
+      carregarSomas();
+    });
   </script>
 </body>
 </html>
